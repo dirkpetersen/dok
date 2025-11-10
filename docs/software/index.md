@@ -96,6 +96,7 @@ Alphabetical dictionary of all software, tools, and platforms mentioned in this 
 
 **MkDocs** - Python static site generator for documentation. Converts markdown files into fully-featured documentation websites.
 - [View in documentation](../code-pasting/markdown/index.md)
+- [Complete setup guide](mkdocs-material.md) - Create your own documentation site with MkDocs Material and Claude Code
 
 ## N
 
