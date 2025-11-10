@@ -58,7 +58,7 @@ nav:
   - Tutorials:
       - '': tutorials/index.md
       - Claude Code Tutorial: code-pasting/claude-code/tutorial.md
-      - MkDocs Material Setup: software/mkdocs-material.md
+      - MkDocs Material Setup: tutorials/mkdocs-material.md
   - Software: software/index.md
 
 markdown_extensions:
