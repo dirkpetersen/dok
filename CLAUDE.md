@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a MkDocs-based documentation site that provides comprehensive guides for development environment setup, cloud platforms, and AI-assisted development workflows. The site is built with mkdocs-material and automatically deployed to GitHub Pages at `https://dirkpetersen.github.io/dok`.
+This is a MkDocs-based documentation site that provides comprehensive guides for development environment setup, cloud platforms, and AI-assisted development workflows. The site is built with mkdocs-material (theme inspired by Oregon State University website) and automatically deployed to GitHub Pages at `https://dirkpetersen.github.io/dok`.
 
 ## Architecture
 
@@ -39,7 +39,12 @@ The scripts directory contains production-ready automation tools documented in t
 ### Local Development
 
 ```bash
-# Install dependencies (no virtual environment needed - uses system Python)
+# Option 1: Install dependencies using system Python (simpler)
+pip install mkdocs mkdocs-material
+
+# Option 2: Use virtual environment (isolated)
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install mkdocs mkdocs-material
 
 # Serve documentation locally with live reload at http://localhost:8000
@@ -48,6 +53,8 @@ mkdocs serve
 # Build static site to site/ directory
 mkdocs build
 ```
+
+Note: Either approach works. The `.venv` directory is gitignored if you choose to use a virtual environment.
 
 ### Testing Scripts
 
