@@ -1,0 +1,76 @@
+site_name: Dirk Petersen's Documentation
+site_url: https://dirkpetersen.github.io/docs/
+repo_url: https://github.com/dirkpetersen/docs
+repo_name: dirkpetersen/docs
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+
+plugins:
+  - search
+
+nav:
+  - Shell:
+      - '': index.md
+      - Overview: shell/index.md
+      - Basic: shell/basic/index.md
+      - SSH: shell/ssh/index.md
+      - Git: shell/git/index.md
+      - WSL: shell/wsl/index.md
+  - Code Pasting:
+      - '': code-pasting/index.md
+      - Markdown: code-pasting/markdown/index.md
+      - GitHub: code-pasting/github/index.md
+      - Claude Code: code-pasting/claude-code/index.md
+      - Python: code-pasting/python/index.md
+  - Nvidia: nvidia/index.md
+  - Clouds:
+      - '': clouds/index.md
+      - AWS: clouds/aws/index.md
+      - Azure: clouds/azure/index.md
+      - Google Cloud: clouds/gcp/index.md
+  - Tutorials:
+      - '': tutorials/index.md
+      - Claude Code Tutorial: code-pasting/claude-code/tutorial.md
+  - Software: software/index.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tasklist
+  - pymdownx.highlight:
+      linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path: ['.']
+      check_paths: true
+  - toc:
+      permalink: true
