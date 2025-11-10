@@ -1,0 +1,2114 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://dirkpetersen.github.io/docs/shell/basic/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../ssh/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
+    
+    
+      
+        <title>Basic - Dirk Petersen's Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.84d31ad4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#shell-basic-setup" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Dirk Petersen&#39;s Documentation" class="md-header__button md-logo" aria-label="Dirk Petersen's Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Dirk Petersen's Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Basic
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dirkpetersen/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dirkpetersen/docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../.." class="md-tabs__link">
+          
+  
+  
+  Shell
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../code-pasting/" class="md-tabs__link">
+          
+  
+  
+  Code Pasting
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../nvidia/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Nvidia
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../clouds/" class="md-tabs__link">
+          
+  
+  
+  Clouds
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tutorials/" class="md-tabs__link">
+          
+  
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../software/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Software
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Dirk Petersen&#39;s Documentation" class="md-nav__button md-logo" aria-label="Dirk Petersen's Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Dirk Petersen's Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dirkpetersen/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dirkpetersen/docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Shell
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Shell
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Basic
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Basic
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-setup-of-script-folders-in-correct-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick setup of script folders in correct path
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-creation-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Creation Permissions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Creation Permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set-umask" class="md-nav__link">
+    <span class="md-ellipsis">
+      Set umask
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      PATH Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PATH Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#organize-your-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Organize Your PATH
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#set-micromamba-as-default-conda" class="md-nav__link">
+    <span class="md-ellipsis">
+      Set Micromamba as Default Conda
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rootless-container-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rootless Container Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rootless Container Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#podmandocker-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Podman/Docker Support
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shell-profile-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shell Profile Setup
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shell Profile Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bash-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bash Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zsh-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Zsh Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#essential-environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Essential Environment Variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#color-schemes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Color Schemes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Color Schemes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#directory-colors-for-better-visibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Colors for Better Visibility
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vim-color-scheme" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vim Color Scheme
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command History
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ssh-keychain-auto-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSH Keychain Auto-Loading
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SSH Keychain Auto-Loading">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#smart-keychain-initialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Smart Keychain Initialization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-configuration-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Configuration Example
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Configuration Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#full-bashrc-interactive-shell-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      Full ~/.bashrc (Interactive Shell Config)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-profile-login-shell-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      Full ~/.profile (Login Shell Config)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#secure-development-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Secure Development Environment
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ssh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SSH
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Git
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wsl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    WSL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Code Pasting
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Code Pasting
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/markdown/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Markdown
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GitHub
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/claude-code/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Claude Code
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/python/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Python
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../nvidia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Nvidia
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Clouds
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Clouds
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clouds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clouds/aws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AWS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clouds/azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Azure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clouds/gcp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Google Cloud
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tutorials
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/claude-code/tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Claude Code Tutorial
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Software
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-setup-of-script-folders-in-correct-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick setup of script folders in correct path
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-creation-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Creation Permissions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Creation Permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set-umask" class="md-nav__link">
+    <span class="md-ellipsis">
+      Set umask
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      PATH Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PATH Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#organize-your-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Organize Your PATH
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#set-micromamba-as-default-conda" class="md-nav__link">
+    <span class="md-ellipsis">
+      Set Micromamba as Default Conda
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rootless-container-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rootless Container Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rootless Container Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#podmandocker-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Podman/Docker Support
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shell-profile-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shell Profile Setup
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shell Profile Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bash-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bash Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zsh-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Zsh Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#essential-environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Essential Environment Variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#color-schemes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Color Schemes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Color Schemes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#directory-colors-for-better-visibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Colors for Better Visibility
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vim-color-scheme" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vim Color Scheme
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command History
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ssh-keychain-auto-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSH Keychain Auto-Loading
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SSH Keychain Auto-Loading">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#smart-keychain-initialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Smart Keychain Initialization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-configuration-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Configuration Example
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Configuration Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#full-bashrc-interactive-shell-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      Full ~/.bashrc (Interactive Shell Config)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-profile-login-shell-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      Full ~/.profile (Login Shell Config)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#secure-development-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Secure Development Environment
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="shell-basic-setup">Shell - Basic Setup<a class="headerlink" href="#shell-basic-setup" title="Permanent link">&para;</a></h1>
+<p>Essential shell configuration for a productive Unix environment.</p>
+<h2 id="quick-setup-of-script-folders-in-correct-path">Quick setup of script folders in correct path<a class="headerlink" href="#quick-setup-of-script-folders-in-correct-path" title="Permanent link">&para;</a></h2>
+<p>Make sure you create these 2 folders, ~/.local/bin is where many installers but their scripts and ~/bin is the folder you should use for your scripts and wrappers. </p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>~/bin<span class="w"> </span>~/.local/bin
+</code></pre></div></td></tr></table></div>
+<p>then add this line at the end of your shell config file (<code>.bashrc</code> for Linux or <code>.zshrc</code> for Mac).</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="o">[</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin:&quot;</span><span class="nv">$HOME</span>/.local/bin:<span class="nv">$PATH</span><span class="s2">&quot;</span>
+</code></pre></div></td></tr></table></div>
+<p>everything below is optional </p>
+<h2 id="file-creation-permissions">File Creation Permissions<a class="headerlink" href="#file-creation-permissions" title="Permanent link">&para;</a></h2>
+<h3 id="set-umask">Set umask<a class="headerlink" href="#set-umask" title="Permanent link">&para;</a></h3>
+<p>Control file creation permissions to ensure security:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Set umask to 0007</span>
+<span class="c1"># This makes new files group-writable but not world-readable</span>
+<span class="nb">umask</span><span class="w"> </span><span class="m">0007</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>What this does:</strong>
+- <code>0007</code> sets permissions to <code>u=rwx, g=rwx, o=---</code>
+- Files created are <code>660</code> (rw-rw----)
+- Directories created are <code>770</code> (rwxrwx----)
+- Group members can read/write, others cannot access
+- Balances security with team collaboration</p>
+<p>Add this early in your shell profile (<code>.bashrc</code> for Linux or <code>.zshrc</code> for Mac).</p>
+<h2 id="path-configuration">PATH Configuration<a class="headerlink" href="#path-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="organize-your-path">Organize Your PATH<a class="headerlink" href="#organize-your-path" title="Permanent link">&para;</a></h3>
+<p>Properly structure your PATH for predictable binary resolution:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># User-local binaries (takes precedence)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+
+<span class="c1"># Traditional user bin directory</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
+
+<span class="c1"># Cargo binaries (Rust)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/.cargo/bin&quot;</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>Order matters:</strong>
+- <code>~/.local/bin</code> first - User-installed tools take precedence
+- System PATH in middle - Standard locations
+- <code>~/bin</code> last - Legacy user directory
+- <code>~/.cargo/bin</code> last - Rust binaries</p>
+<h3 id="set-micromamba-as-default-conda">Set Micromamba as Default Conda<a class="headerlink" href="#set-micromamba-as-default-conda" title="Permanent link">&para;</a></h3>
+<p>If using micromamba for environment management:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Set micromamba as default conda</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">CONDA_EXE</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>micromamba<span class="k">)</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">MAMBA_EXE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">CONDA_EXE</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="rootless-container-configuration">Rootless Container Configuration<a class="headerlink" href="#rootless-container-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="podmandocker-support">Podman/Docker Support<a class="headerlink" href="#podmandocker-support" title="Permanent link">&para;</a></h3>
+<p>For rootless Podman or Docker:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Set runtime directory for rootless containers</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">XDG_RUNTIME_DIR</span><span class="o">=</span><span class="s2">&quot;/run/user/</span><span class="k">$(</span>id<span class="w"> </span>-u<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Alias docker to podman if available</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>podman<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">alias</span><span class="w"> </span><span class="nv">docker</span><span class="o">=</span><span class="s1">&#39;podman&#39;</span>
+<span class="k">fi</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>Why this matters:</strong>
+- Allows running containers without root privileges
+- XDG_RUNTIME_DIR provides runtime file storage
+- <code>docker=podman</code> alias simplifies workflow if migrating from Docker</p>
+<h2 id="shell-profile-setup">Shell Profile Setup<a class="headerlink" href="#shell-profile-setup" title="Permanent link">&para;</a></h2>
+<h3 id="bash-configuration">Bash Configuration<a class="headerlink" href="#bash-configuration" title="Permanent link">&para;</a></h3>
+<p><strong>Interactive Shell Config</strong> - Edit <code>~/.bashrc</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># File creation permissions</span>
+<span class="nb">umask</span><span class="w"> </span><span class="m">0007</span>
+
+<span class="c1"># PATH Configuration</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/.cargo/bin&quot;</span>
+
+<span class="c1"># Set default editor</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">EDITOR</span><span class="o">=</span>vim
+<span class="nb">export</span><span class="w"> </span><span class="nv">GIT_EDITOR</span><span class="o">=</span>vim
+
+<span class="c1"># Language</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LANG</span><span class="o">=</span>en_US.UTF-8
+<span class="nb">export</span><span class="w"> </span><span class="nv">LC_ALL</span><span class="o">=</span>en_US.UTF-8
+
+<span class="c1"># Conda/Micromamba</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">CONDA_EXE</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>micromamba<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Rootless container support</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">XDG_RUNTIME_DIR</span><span class="o">=</span><span class="s2">&quot;/run/user/</span><span class="k">$(</span>id<span class="w"> </span>-u<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Container aliases</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>podman<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">alias</span><span class="w"> </span><span class="nv">docker</span><span class="o">=</span><span class="s1">&#39;podman&#39;</span>
+<span class="k">fi</span>
+
+<span class="c1"># Add useful aliases</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">ll</span><span class="o">=</span><span class="s1">&#39;ls -lah&#39;</span>
+<span class="nb">alias</span><span class="w"> </span>cd..<span class="o">=</span><span class="s1">&#39;cd ..&#39;</span>
+<span class="nb">alias</span><span class="w"> </span>clear-cache<span class="o">=</span><span class="s1">&#39;rm -rf ~/.cache&#39;</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>Login Shell Config</strong> - Edit <code>~/.profile</code> or <code>~/.bash_profile</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Source .bashrc for interactive login shells</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$BASH_VERSION</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bashrc&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span>.<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bashrc&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="k">fi</span>
+
+<span class="c1"># SSH Keychain - ONLY in login shell (skip in Slurm PTY)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$SLURM_PTY_PORT</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">eval</span><span class="w"> </span><span class="k">$(</span>~/.local/bin/keychain<span class="w"> </span>--quiet<span class="w"> </span>--eval<span class="w"> </span>id_ed25519<span class="k">)</span>
+<span class="k">fi</span>
+</code></pre></div></td></tr></table></div>
+<h3 id="zsh-configuration">Zsh Configuration<a class="headerlink" href="#zsh-configuration" title="Permanent link">&para;</a></h3>
+<p><strong>Interactive Shell Config</strong> - Edit <code>~/.zshrc</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># File creation permissions</span>
+<span class="nb">umask</span><span class="w"> </span><span class="m">0007</span>
+
+<span class="c1"># PATH Configuration</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/.cargo/bin&quot;</span>
+
+<span class="c1"># Set default editor</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">EDITOR</span><span class="o">=</span>vim
+<span class="nb">export</span><span class="w"> </span><span class="nv">GIT_EDITOR</span><span class="o">=</span>vim
+
+<span class="c1"># Language</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LANG</span><span class="o">=</span>en_US.UTF-8
+<span class="nb">export</span><span class="w"> </span><span class="nv">LC_ALL</span><span class="o">=</span>en_US.UTF-8
+
+<span class="c1"># Conda/Micromamba</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">CONDA_EXE</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>micromamba<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Rootless container support</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">XDG_RUNTIME_DIR</span><span class="o">=</span><span class="s2">&quot;/run/user/</span><span class="k">$(</span>id<span class="w"> </span>-u<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Container aliases</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>podman<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">alias</span><span class="w"> </span><span class="nv">docker</span><span class="o">=</span><span class="s1">&#39;podman&#39;</span>
+<span class="k">fi</span>
+
+<span class="c1"># Add useful aliases</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">ll</span><span class="o">=</span><span class="s1">&#39;ls -lah&#39;</span>
+<span class="nb">alias</span><span class="w"> </span>cd..<span class="o">=</span><span class="s1">&#39;cd ..&#39;</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>Login Shell Config</strong> - Edit <code>~/.zprofile</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># SSH Keychain - ONLY in login shell (skip in Slurm PTY)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$SLURM_PTY_PORT</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">eval</span><span class="w"> </span><span class="k">$(</span>~/.local/bin/keychain<span class="w"> </span>--quiet<span class="w"> </span>--eval<span class="w"> </span>id_ed25519<span class="k">)</span>
+<span class="k">fi</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="essential-environment-variables">Essential Environment Variables<a class="headerlink" href="#essential-environment-variables" title="Permanent link">&para;</a></h2>
+<p>Set these in your shell configuration:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Editor (for Git, system tools)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">EDITOR</span><span class="o">=</span>vim
+<span class="nb">export</span><span class="w"> </span><span class="nv">GIT_EDITOR</span><span class="o">=</span>vim
+
+<span class="c1"># Language and encoding</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LANG</span><span class="o">=</span>en_US.UTF-8
+<span class="nb">export</span><span class="w"> </span><span class="nv">LC_ALL</span><span class="o">=</span>en_US.UTF-8
+
+<span class="c1"># File creation permissions</span>
+<span class="nb">umask</span><span class="w"> </span><span class="m">0007</span>
+
+<span class="c1"># Container support</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">XDG_RUNTIME_DIR</span><span class="o">=</span><span class="s2">&quot;/run/user/</span><span class="k">$(</span>id<span class="w"> </span>-u<span class="k">)</span><span class="s2">&quot;</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="color-schemes">Color Schemes<a class="headerlink" href="#color-schemes" title="Permanent link">&para;</a></h2>
+<h3 id="directory-colors-for-better-visibility">Directory Colors for Better Visibility<a class="headerlink" href="#directory-colors-for-better-visibility" title="Permanent link">&para;</a></h3>
+<p>Add to your shell configuration for improved readability:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Export LS_COLORS with improved directory visibility</span>
+<span class="c1"># Change directory color from dark blue (01;34) to cyan (01;36)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LS_COLORS</span><span class="o">=</span><span class="s2">&quot;di=01;36:ln=01;36:so=01;31:pi=40;33:ex=01;32:bd=40;33;01:cd=40;33;01:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzop=01;31:*.xz=01;31:*.zst=01;31:*.zstd=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:&quot;</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>Key color changes:</strong>
+- <code>di=01;36</code> - Directories in cyan (easier to see than dark blue)
+- <code>ln=01;36</code> - Symlinks in cyan
+- <code>ex=01;32</code> - Executables in green</p>
+<h3 id="vim-color-scheme">Vim Color Scheme<a class="headerlink" href="#vim-color-scheme" title="Permanent link">&para;</a></h3>
+<p>Configure Vim for better visibility in <code>~/.vimrc</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c">&quot; Enable syntax highlighting</span>
+<span class="nb">syntax</span> <span class="k">on</span>
+
+<span class="c">&quot; Use desert color scheme</span>
+<span class="k">colorscheme</span> desert
+</code></pre></div></td></tr></table></div>
+<h2 id="command-history">Command History<a class="headerlink" href="#command-history" title="Permanent link">&para;</a></h2>
+<p>Keep your shell history clean and effective:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Increase history size</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">HISTSIZE</span><span class="o">=</span><span class="m">10000</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">HISTFILESIZE</span><span class="o">=</span><span class="m">10000</span>
+
+<span class="c1"># Ignore duplicate commands</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">HISTCONTROL</span><span class="o">=</span>ignoredups
+
+<span class="c1"># Ignore common commands from history</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">HISTIGNORE</span><span class="o">=</span><span class="s2">&quot;ls:cd:pwd:history&quot;</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="ssh-keychain-auto-loading">SSH Keychain Auto-Loading<a class="headerlink" href="#ssh-keychain-auto-loading" title="Permanent link">&para;</a></h2>
+<h3 id="smart-keychain-initialization">Smart Keychain Initialization<a class="headerlink" href="#smart-keychain-initialization" title="Permanent link">&para;</a></h3>
+<p><strong>IMPORTANT:</strong> Add SSH keychain to your <strong>login shell profile</strong> ONLY (<code>.profile</code>, <code>.bash_profile</code>, or <code>.zprofile</code>), NOT to <code>.bashrc</code> or <code>.zshrc</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># SSH Keychain - Skip in Slurm computing environment</span>
+<span class="c1"># This avoids conflicts with Slurm&#39;s PTY management</span>
+<span class="c1"># ONLY add this to login profiles: ~/.profile, ~/.bash_profile, or ~/.zprofile</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$SLURM_PTY_PORT</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">eval</span><span class="w"> </span><span class="k">$(</span>~/.local/bin/keychain<span class="w"> </span>--quiet<span class="w"> </span>--eval<span class="w"> </span>id_ed25519<span class="k">)</span>
+<span class="k">fi</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>Why login shell profile only?</strong>
+- Login shells (<code>.profile</code>, <code>.zprofile</code>) run once per login session
+- Interactive shells (<code>.bashrc</code>, <code>.zshrc</code>) run for every new shell
+- SSH agent should only be initialized once, not repeatedly
+- Prevents multiple keychain processes and agent conflicts</p>
+<p><strong>Why the Slurm check?</strong>
+- Slurm (job scheduler) has its own PTY management
+- Loading keychain in Slurm context can cause conflicts
+- Check <code>$SLURM_PTY_PORT</code> to detect Slurm environment
+- Skip keychain loading in compute jobs</p>
+<h2 id="complete-configuration-example">Complete Configuration Example<a class="headerlink" href="#complete-configuration-example" title="Permanent link">&para;</a></h2>
+<h3 id="full-bashrc-interactive-shell-config">Full ~/.bashrc (Interactive Shell Config)<a class="headerlink" href="#full-bashrc-interactive-shell-config" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># File creation permissions</span>
+<span class="nb">umask</span><span class="w"> </span><span class="m">0007</span>
+
+<span class="c1"># PATH Configuration</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/.cargo/bin&quot;</span>
+
+<span class="c1"># Editor</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">EDITOR</span><span class="o">=</span>vim
+<span class="nb">export</span><span class="w"> </span><span class="nv">GIT_EDITOR</span><span class="o">=</span>vim
+
+<span class="c1"># Language</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LANG</span><span class="o">=</span>en_US.UTF-8
+<span class="nb">export</span><span class="w"> </span><span class="nv">LC_ALL</span><span class="o">=</span>en_US.UTF-8
+
+<span class="c1"># Container support</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">XDG_RUNTIME_DIR</span><span class="o">=</span><span class="s2">&quot;/run/user/</span><span class="k">$(</span>id<span class="w"> </span>-u<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Conda/Micromamba</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">CONDA_EXE</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>micromamba<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Directory colors (cyan for better visibility)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LS_COLORS</span><span class="o">=</span><span class="s2">&quot;di=01;36:...&quot;</span>
+
+<span class="c1"># History</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">HISTSIZE</span><span class="o">=</span><span class="m">10000</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">HISTFILESIZE</span><span class="o">=</span><span class="m">10000</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">HISTCONTROL</span><span class="o">=</span>ignoredups
+<span class="nb">export</span><span class="w"> </span><span class="nv">HISTIGNORE</span><span class="o">=</span><span class="s2">&quot;ls:cd:pwd:history&quot;</span>
+
+<span class="c1"># Container aliases</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>podman<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">alias</span><span class="w"> </span><span class="nv">docker</span><span class="o">=</span><span class="s1">&#39;podman&#39;</span>
+<span class="k">fi</span>
+
+<span class="c1"># Useful aliases</span>
+<span class="nb">alias</span><span class="w"> </span>..<span class="o">=</span><span class="s1">&#39;cd ..&#39;</span>
+<span class="nb">alias</span><span class="w"> </span>...<span class="o">=</span><span class="s1">&#39;cd ../..&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">ll</span><span class="o">=</span><span class="s1">&#39;ls -lah&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">l</span><span class="o">=</span><span class="s1">&#39;ls -la&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">cls</span><span class="o">=</span><span class="s1">&#39;clear&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">py</span><span class="o">=</span><span class="s1">&#39;python&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">serve</span><span class="o">=</span><span class="s1">&#39;python -m http.server&#39;</span>
+<span class="nb">alias</span><span class="w"> </span>clear-cache<span class="o">=</span><span class="s1">&#39;rm -rf ~/.cache&#39;</span>
+</code></pre></div></td></tr></table></div>
+<h3 id="full-profile-login-shell-config">Full ~/.profile (Login Shell Config)<a class="headerlink" href="#full-profile-login-shell-config" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Source .bashrc if it exists</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$BASH_VERSION</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bashrc&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span>.<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bashrc&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="k">fi</span>
+
+<span class="c1"># SSH Keychain - ONLY in login shell (skip in Slurm)</span>
+<span class="c1"># DO NOT add this to .bashrc!</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$SLURM_PTY_PORT</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">eval</span><span class="w"> </span><span class="k">$(</span>~/.local/bin/keychain<span class="w"> </span>--quiet<span class="w"> </span>--eval<span class="w"> </span>id_ed25519<span class="k">)</span>
+<span class="k">fi</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="secure-development-environment">Secure Development Environment<a class="headerlink" href="#secure-development-environment" title="Permanent link">&para;</a></h2>
+<p>Your shell environment should be:</p>
+<ul>
+<li><strong>Secure</strong>: SSH keys with passphrases, keychain for convenience, restricted permissions (umask)</li>
+<li><strong>Clean</strong>: Well-organized PATH, proper binary resolution</li>
+<li><strong>Productive</strong>: Useful aliases, good history management, proper colors</li>
+<li><strong>Isolated</strong>: Virtual environments, container support, environment detection (Slurm)</li>
+<li><strong>Collaborative</strong>: Group-writable files (umask 0007) for team projects</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>

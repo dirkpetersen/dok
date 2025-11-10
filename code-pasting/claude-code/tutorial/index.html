@@ -1,0 +1,2526 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://dirkpetersen.github.io/docs/code-pasting/claude-code/tutorial/">
+      
+      
+        <link rel="prev" href="../../../tutorials/">
+      
+      
+        <link rel="next" href="../../../software/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
+    
+    
+      
+        <title>Claude Code Tutorial - Dirk Petersen's Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.84d31ad4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#claude-code-tutorial-project-development-workflow" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Dirk Petersen&#39;s Documentation" class="md-header__button md-logo" aria-label="Dirk Petersen's Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Dirk Petersen's Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Claude Code Tutorial
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dirkpetersen/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dirkpetersen/docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../.." class="md-tabs__link">
+          
+  
+  
+  Shell
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Code Pasting
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../nvidia/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Nvidia
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../clouds/" class="md-tabs__link">
+          
+  
+  
+  Clouds
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../tutorials/" class="md-tabs__link">
+          
+  
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../software/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Software
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Dirk Petersen&#39;s Documentation" class="md-nav__button md-logo" aria-label="Dirk Petersen's Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Dirk Petersen's Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dirkpetersen/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dirkpetersen/docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Shell
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Shell
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../shell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../shell/basic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Basic
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../shell/ssh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SSH
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../shell/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Git
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../shell/wsl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    WSL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Code Pasting
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Code Pasting
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../markdown/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Markdown
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GitHub
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Claude Code
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../python/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Python
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../nvidia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Nvidia
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Clouds
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Clouds
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../clouds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../clouds/aws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AWS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../clouds/azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Azure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../clouds/gcp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Google Cloud
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tutorials
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Claude Code Tutorial
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Claude Code Tutorial
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview-the-three-model-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview: The Three-Model Workflow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-initialize-your-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Initialize Your Project
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1: Initialize Your Project">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-empty-project-folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Empty Project Folder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#write-a-comprehensive-readme" class="md-nav__link">
+    <span class="md-ellipsis">
+      Write a Comprehensive README
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-planning-with-sonnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Planning with Sonnet
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2: Planning with Sonnet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#launch-claude-with-sonnet-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Launch Claude with Sonnet Model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-project-initialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run Project Initialization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#review-generated-claudemd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Review Generated CLAUDE.md
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-validate-with-sonnet-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Validate with Sonnet Questions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Validate with Sonnet Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ask-claude-for-clarification" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ask Claude for Clarification
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#continue-clarification-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      Continue Clarification Loop
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-deep-review-with-opus" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4: Deep Review with Opus
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 4: Deep Review with Opus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#switch-to-opus-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Switch to Opus Model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#answer-opus-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Answer Opus Questions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#continue-until-complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      Continue Until Complete
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-code-implementation-with-sonnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5: Code Implementation with Sonnet
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 5: Code Implementation with Sonnet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#switch-back-to-sonnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      Switch Back to Sonnet
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-coding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Start Coding
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-review-and-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 6: Review and Debug
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 6: Review and Debug">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monitor-the-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitor the Output
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#if-errors-occur" class="md-nav__link">
+    <span class="md-ellipsis">
+      If Errors Occur
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-complex-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      For Complex Errors
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example-walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Example Walkthrough
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Example Walkthrough">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starting-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Starting State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-claude-code-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      In Claude Code Session
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result" class="md-nav__link">
+    <span class="md-ellipsis">
+      Result
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips-for-success" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tips for Success
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tips for Success">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#planning-phase-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Planning Phase Tips
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-phase-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Question Phase Tips
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coding-phase-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Coding Phase Tips
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#escalation-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      Escalation Guide
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dont-start-coding-yet-instruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      "Don't start coding yet" Instruction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#handling-unexpected-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Handling Unexpected Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requesting-specific-technologies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Requesting Specific Technologies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow Checklist
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#claude-code-wont-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      Claude Code won't start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#init-command-doesnt-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      /init command doesn't work
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-switching-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model switching issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeouts-on-large-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Timeouts on large projects
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    <span class="md-ellipsis">
+      FAQ
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Software
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview-the-three-model-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview: The Three-Model Workflow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-initialize-your-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Initialize Your Project
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1: Initialize Your Project">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-empty-project-folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Empty Project Folder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#write-a-comprehensive-readme" class="md-nav__link">
+    <span class="md-ellipsis">
+      Write a Comprehensive README
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-planning-with-sonnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Planning with Sonnet
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2: Planning with Sonnet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#launch-claude-with-sonnet-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Launch Claude with Sonnet Model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-project-initialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run Project Initialization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#review-generated-claudemd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Review Generated CLAUDE.md
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-validate-with-sonnet-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Validate with Sonnet Questions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Validate with Sonnet Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ask-claude-for-clarification" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ask Claude for Clarification
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#continue-clarification-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      Continue Clarification Loop
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-deep-review-with-opus" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4: Deep Review with Opus
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 4: Deep Review with Opus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#switch-to-opus-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Switch to Opus Model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#answer-opus-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Answer Opus Questions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#continue-until-complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      Continue Until Complete
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-code-implementation-with-sonnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5: Code Implementation with Sonnet
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 5: Code Implementation with Sonnet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#switch-back-to-sonnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      Switch Back to Sonnet
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-coding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Start Coding
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-review-and-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 6: Review and Debug
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 6: Review and Debug">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monitor-the-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitor the Output
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#if-errors-occur" class="md-nav__link">
+    <span class="md-ellipsis">
+      If Errors Occur
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-complex-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      For Complex Errors
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example-walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Example Walkthrough
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Example Walkthrough">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starting-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Starting State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-claude-code-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      In Claude Code Session
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result" class="md-nav__link">
+    <span class="md-ellipsis">
+      Result
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips-for-success" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tips for Success
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tips for Success">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#planning-phase-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Planning Phase Tips
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#question-phase-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Question Phase Tips
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coding-phase-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Coding Phase Tips
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#escalation-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      Escalation Guide
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dont-start-coding-yet-instruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      "Don't start coding yet" Instruction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#handling-unexpected-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Handling Unexpected Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requesting-specific-technologies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Requesting Specific Technologies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow Checklist
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#claude-code-wont-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      Claude Code won't start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#init-command-doesnt-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      /init command doesn't work
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-switching-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model switching issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeouts-on-large-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Timeouts on large projects
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    <span class="md-ellipsis">
+      FAQ
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="claude-code-tutorial-project-development-workflow">Claude Code Tutorial: Project Development Workflow<a class="headerlink" href="#claude-code-tutorial-project-development-workflow" title="Permanent link">&para;</a></h1>
+<p>This tutorial walks you through the complete workflow for developing a project using Claude Code with the Haiku → Sonnet → Opus escalation strategy.</p>
+<h2 id="overview-the-three-model-workflow">Overview: The Three-Model Workflow<a class="headerlink" href="#overview-the-three-model-workflow" title="Permanent link">&para;</a></h2>
+<p>The recommended workflow uses three Claude models in sequence:</p>
+<ol>
+<li><strong>Sonnet</strong> - Planning phase: discovers tasks and requirements</li>
+<li><strong>Opus</strong> - Validation phase: validates plan and asks additional questions</li>
+<li><strong>Sonnet</strong> - Coding phase: implements the project based on final plan</li>
+</ol>
+<p>This approach ensures thorough planning before coding begins.</p>
+<h2 id="step-1-initialize-your-project">Step 1: Initialize Your Project<a class="headerlink" href="#step-1-initialize-your-project" title="Permanent link">&para;</a></h2>
+<h3 id="create-empty-project-folder">Create Empty Project Folder<a class="headerlink" href="#create-empty-project-folder" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>mkdir<span class="w"> </span>my-awesome-project
+<span class="nb">cd</span><span class="w"> </span>my-awesome-project
+git<span class="w"> </span>init
+</code></pre></div></td></tr></table></div>
+<h3 id="write-a-comprehensive-readme">Write a Comprehensive README<a class="headerlink" href="#write-a-comprehensive-readme" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>nano<span class="w"> </span>README.md
+</code></pre></div></td></tr></table></div>
+<p>In the README file, describe your project in detail:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="gh"># Project Title</span>
+
+<span class="gu">## What You Want to Accomplish</span>
+
+[Describe the overall goal and vision]
+
+<span class="gu">## Goals</span>
+
+<span class="k">-</span><span class="w"> </span>[Goal 1: specific, measurable outcome]
+<span class="k">-</span><span class="w"> </span>[Goal 2: specific, measurable outcome]
+<span class="k">-</span><span class="w"> </span>[Goal 3: specific, measurable outcome]
+
+<span class="gu">## Technology Preferences</span>
+
+<span class="k">-</span><span class="w"> </span>Language: Python
+<span class="k">-</span><span class="w"> </span>Framework: [if applicable]
+<span class="k">-</span><span class="w"> </span>Key libraries: [list any preferences]
+
+<span class="gu">## Input Data/Source</span>
+
+<span class="k">-</span><span class="w"> </span>Data source: [API, file, website, etc.]
+<span class="k">-</span><span class="w"> </span>Format: [JSON, CSV, etc.]
+<span class="k">-</span><span class="w"> </span>Location: [URL or path]
+
+<span class="gu">## Expected Output</span>
+
+<span class="k">-</span><span class="w"> </span>Format: [What should the output look like?]
+<span class="k">-</span><span class="w"> </span>Destination: [File, database, API, etc.]
+<span class="k">-</span><span class="w"> </span>Processing steps: [High-level description of processing]
+
+<span class="gu">## Additional Details</span>
+
+[Any other important details about the project]
+</code></pre></div></td></tr></table></div>
+<p><strong>Example: Weather Data Analyzer</strong></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="gh"># Weather Data Analyzer</span>
+
+<span class="gu">## What You Want to Accomplish</span>
+
+Create a tool that fetches weather data from OpenWeatherMap API, analyzes temperature trends, and generates a weekly report with predictions.
+
+<span class="gu">## Goals</span>
+
+<span class="k">-</span><span class="w"> </span>Fetch hourly weather data for the past 7 days
+<span class="k">-</span><span class="w"> </span>Identify temperature trends and patterns
+<span class="k">-</span><span class="w"> </span>Generate a visual chart of temperature progression
+<span class="k">-</span><span class="w"> </span>Output a markdown report with predictions
+
+<span class="gu">## Technology Preferences</span>
+
+<span class="k">-</span><span class="w"> </span>Language: Python 3.12
+<span class="k">-</span><span class="w"> </span>Data analysis: Pandas, NumPy
+<span class="k">-</span><span class="w"> </span>Visualization: Matplotlib
+<span class="k">-</span><span class="w"> </span>HTTP requests: Requests library
+
+<span class="gu">## Input Data/Source</span>
+
+<span class="k">-</span><span class="w"> </span>OpenWeatherMap API (free tier)
+<span class="k">-</span><span class="w"> </span>Coordinates: San Francisco (37.7749, -122.4194)
+<span class="k">-</span><span class="w"> </span>Data format: JSON API responses
+
+<span class="gu">## Expected Output</span>
+
+<span class="k">-</span><span class="w"> </span>A markdown report (weather_report.md) with:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>7-day temperature summary
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Line chart showing temperature trend (embedded as image)
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Temperature prediction for next 3 days
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Severe weather alerts if any
+
+<span class="gu">## Additional Details</span>
+
+<span class="k">-</span><span class="w"> </span>Use UTC timezone for all timestamps
+<span class="k">-</span><span class="w"> </span>Handle API rate limiting gracefully
+<span class="k">-</span><span class="w"> </span>Cache responses locally to minimize API calls
+<span class="k">-</span><span class="w"> </span>Should run as a standalone script with no arguments
+</code></pre></div></td></tr></table></div>
+<p>Save the file: <code>Ctrl+X</code>, then <code>Y</code>, then <code>Enter</code>.</p>
+<h2 id="step-2-planning-with-sonnet">Step 2: Planning with Sonnet<a class="headerlink" href="#step-2-planning-with-sonnet" title="Permanent link">&para;</a></h2>
+<h3 id="launch-claude-with-sonnet-model">Launch Claude with Sonnet Model<a class="headerlink" href="#launch-claude-with-sonnet-model" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>claude<span class="w"> </span>sonnet
+</code></pre></div></td></tr></table></div>
+<h3 id="run-project-initialization">Run Project Initialization<a class="headerlink" href="#run-project-initialization" title="Permanent link">&para;</a></h3>
+<p>Once Claude Code is running:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>/model sonnet
+/init
+</code></pre></div></td></tr></table></div>
+<p>Claude will:
+- Read the README.md file
+- Analyze your requirements
+- Create a project inventory
+- Generate a CLAUDE.md file with implementation tasks</p>
+<p>Wait for Claude to complete the analysis. You should see:
+- List of identified tasks
+- File structure recommendations
+- Implementation strategy</p>
+<h3 id="review-generated-claudemd">Review Generated CLAUDE.md<a class="headerlink" href="#review-generated-claudemd" title="Permanent link">&para;</a></h3>
+<p>Open the generated CLAUDE.md file in another terminal:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>cat<span class="w"> </span>CLAUDE.md
+<span class="c1"># or edit if needed</span>
+nano<span class="w"> </span>CLAUDE.md
+</code></pre></div></td></tr></table></div>
+<p>This file contains:
+- Task breakdown
+- Implementation steps
+- Configuration notes
+- Testing strategy</p>
+<h2 id="step-3-validate-with-sonnet-questions">Step 3: Validate with Sonnet Questions<a class="headerlink" href="#step-3-validate-with-sonnet-questions" title="Permanent link">&para;</a></h2>
+<h3 id="ask-claude-for-clarification">Ask Claude for Clarification<a class="headerlink" href="#ask-claude-for-clarification" title="Permanent link">&para;</a></h3>
+<p>In the Claude Code session, ask:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>Do you have any questions about this project before we proceed?
+</code></pre></div></td></tr></table></div>
+<p>Claude will ask 5-10 clarifying questions. <strong>Answer all questions in a single line format:</strong></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>1. [Answer to question 1] 2. [Answer to question 2] 3. [Answer to question 3] 4. [Answer to question 4] 5. [Answer to question 5]
+</code></pre></div></td></tr></table></div>
+<p><strong>Example response:</strong>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>1. Use Python 3.12 2. Store in SQLite database 3. Run daily via cron 4. Include error logging 5. Keep dependencies minimal
+</code></pre></div></td></tr></table></div></p>
+<h3 id="continue-clarification-loop">Continue Clarification Loop<a class="headerlink" href="#continue-clarification-loop" title="Permanent link">&para;</a></h3>
+<p>After you answer, ask again:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>Do you have more questions?
+</code></pre></div></td></tr></table></div>
+<p>Keep answering until Claude says it has no more questions. This ensures complete understanding before coding.</p>
+<h2 id="step-4-deep-review-with-opus">Step 4: Deep Review with Opus<a class="headerlink" href="#step-4-deep-review-with-opus" title="Permanent link">&para;</a></h2>
+<h3 id="switch-to-opus-model">Switch to Opus Model<a class="headerlink" href="#switch-to-opus-model" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>/model opus
+/init
+</code></pre></div></td></tr></table></div>
+<p>Opus will:
+- Review Sonnet's plan
+- Identify edge cases
+- Ask additional architectural questions
+- Suggest optimizations</p>
+<h3 id="answer-opus-questions">Answer Opus Questions<a class="headerlink" href="#answer-opus-questions" title="Permanent link">&para;</a></h3>
+<p>Same process as Step 3 - answer all questions in one line:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>1. [Answer] 2. [Answer] 3. [Answer] ...
+</code></pre></div></td></tr></table></div>
+<h3 id="continue-until-complete">Continue Until Complete<a class="headerlink" href="#continue-until-complete" title="Permanent link">&para;</a></h3>
+<p>Keep asking "Do you have more questions?" until Opus is satisfied. This final validation ensures the plan is bulletproof.</p>
+<h2 id="step-5-code-implementation-with-sonnet">Step 5: Code Implementation with Sonnet<a class="headerlink" href="#step-5-code-implementation-with-sonnet" title="Permanent link">&para;</a></h2>
+<h3 id="switch-back-to-sonnet">Switch Back to Sonnet<a class="headerlink" href="#switch-back-to-sonnet" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>/model sonnet
+</code></pre></div></td></tr></table></div>
+<h3 id="start-coding">Start Coding<a class="headerlink" href="#start-coding" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>Please start coding this project now. After you&#39;re done, execute it and debug any issues.
+</code></pre></div></td></tr></table></div>
+<p>Sonnet will:
+1. Create all necessary files
+2. Write complete, production-ready code
+3. Execute the code to test it
+4. Fix any runtime errors
+5. Provide a summary of what was created</p>
+<p>Wait patiently. Complex projects may take 10-20+ minutes.</p>
+<h2 id="step-6-review-and-debug">Step 6: Review and Debug<a class="headerlink" href="#step-6-review-and-debug" title="Permanent link">&para;</a></h2>
+<h3 id="monitor-the-output">Monitor the Output<a class="headerlink" href="#monitor-the-output" title="Permanent link">&para;</a></h3>
+<p>Watch for:
+- File creation messages
+- Execution output
+- Error messages (if any)
+- Success confirmations</p>
+<h3 id="if-errors-occur">If Errors Occur<a class="headerlink" href="#if-errors-occur" title="Permanent link">&para;</a></h3>
+<p>If Sonnet encounters errors:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>I see there&#39;s an error. Can you please fix this and try again?
+</code></pre></div></td></tr></table></div>
+<p>Sonnet will:
+- Analyze the error
+- Fix the code
+- Re-execute
+- Confirm success</p>
+<h3 id="for-complex-errors">For Complex Errors<a class="headerlink" href="#for-complex-errors" title="Permanent link">&para;</a></h3>
+<p>If Sonnet can't fix an error, escalate to Opus:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>/model opus
+
+This error is complex. Can you review and suggest a fix?
+</code></pre></div></td></tr></table></div>
+<p>Opus will provide deeper analysis and solutions.</p>
+<h2 id="complete-example-walkthrough">Complete Example Walkthrough<a class="headerlink" href="#complete-example-walkthrough" title="Permanent link">&para;</a></h2>
+<h3 id="starting-state">Starting State<a class="headerlink" href="#starting-state" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code>$<span class="w"> </span>mkdir<span class="w"> </span>weather-analyzer
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>weather-analyzer
+$<span class="w"> </span>git<span class="w"> </span>init
+$<span class="w"> </span>nano<span class="w"> </span>README.md
+<span class="c1"># [write your README as shown above]</span>
+<span class="c1"># [save and exit]</span>
+$<span class="w"> </span>claude<span class="w"> </span>sonnet
+</code></pre></div></td></tr></table></div>
+<h3 id="in-claude-code-session">In Claude Code Session<a class="headerlink" href="#in-claude-code-session" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>/model sonnet
+/init
+</code></pre></div></td></tr></table></div>
+<p><em>[Wait for analysis to complete]</em></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>Do you have any questions about this project?
+</code></pre></div></td></tr></table></div>
+<p>Claude asks: "Should the report include severity levels for weather alerts? Should predictions use machine learning or simple linear extrapolation? Should the script support multiple cities?"</p>
+<p>Your response:
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>1. Include severity levels (Critical/Warning/Info) 2. Use simple linear extrapolation 3. Single city only for MVP
+</code></pre></div></td></tr></table></div></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>Do you have more questions?
+</code></pre></div></td></tr></table></div>
+<p>Claude: "Just one more - how should we handle missing data points?"</p>
+<p>Your response:
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>1. Use forward fill method for missing data
+</code></pre></div></td></tr></table></div></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>Do you have more questions?
+</code></pre></div></td></tr></table></div>
+<p>Claude: "I believe I have all the information needed to create a solid plan."</p>
+<p>Now switch models:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>/model opus
+/init
+</code></pre></div></td></tr></table></div>
+<p><em>[Opus reviews and asks additional questions]</em></p>
+<p>After Opus is satisfied:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>/model sonnet
+
+Please start coding this project now. After you&#39;re done, execute it and debug any issues.
+</code></pre></div></td></tr></table></div>
+<p><em>[Wait 10-20 minutes for implementation]</em></p>
+<h3 id="result">Result<a class="headerlink" href="#result" title="Permanent link">&para;</a></h3>
+<p>You now have:
+- ✅ Complete weather analyzer script
+- ✅ Fully tested and working code
+- ✅ Error handling and logging
+- ✅ Documented functions
+- ✅ Ready for production or further enhancement</p>
+<h2 id="tips-for-success">Tips for Success<a class="headerlink" href="#tips-for-success" title="Permanent link">&para;</a></h2>
+<h3 id="planning-phase-tips">Planning Phase Tips<a class="headerlink" href="#planning-phase-tips" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Be specific</strong> - Vague requirements lead to confused AI models</li>
+<li><strong>Include examples</strong> - Show what input/output should look like</li>
+<li><strong>Mention constraints</strong> - Budget, time, performance requirements</li>
+<li><strong>List edge cases</strong> - What shouldn't break the system?</li>
+<li><strong>Define success</strong> - How do you know it works?</li>
+</ol>
+<h3 id="question-phase-tips">Question Phase Tips<a class="headerlink" href="#question-phase-tips" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Answer quickly</strong> - Don't overthink responses</li>
+<li><strong>Be concise</strong> - Use one-liners, not paragraphs</li>
+<li><strong>Clarify assumptions</strong> - If Claude assumes wrong, correct it</li>
+<li><strong>Ask for confirmation</strong> - "Does that match your expectation?"</li>
+</ol>
+<h3 id="coding-phase-tips">Coding Phase Tips<a class="headerlink" href="#coding-phase-tips" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Stay patient</strong> - Complex projects take time</li>
+<li><strong>Don't interrupt</strong> - Let Claude complete the implementation</li>
+<li><strong>Review output</strong> - Check the generated code makes sense</li>
+<li><strong>Test thoroughly</strong> - Claude tests but you should too</li>
+<li><strong>Iterate if needed</strong> - Ask for improvements after first run</li>
+</ol>
+<h3 id="escalation-guide">Escalation Guide<a class="headerlink" href="#escalation-guide" title="Permanent link">&para;</a></h3>
+<p><strong>Use Haiku for:</strong>
+- Simple bug fixes
+- Small code additions
+- Quick questions</p>
+<p><strong>Use Sonnet for:</strong>
+- New feature development
+- Planning and architecture
+- Most general coding tasks</p>
+<p><strong>Use Opus for:</strong>
+- Complex problem-solving
+- Architectural review
+- Difficult debugging
+- When Sonnet gets stuck</p>
+<h2 id="common-patterns">Common Patterns<a class="headerlink" href="#common-patterns" title="Permanent link">&para;</a></h2>
+<h3 id="dont-start-coding-yet-instruction">"Don't start coding yet" Instruction<a class="headerlink" href="#dont-start-coding-yet-instruction" title="Permanent link">&para;</a></h3>
+<p>After the planning phase is complete but before implementation, you can say:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>Don&#39;t start coding yet. I want to make sure we have the right approach.
+Do you have any final questions about the plan?
+</code></pre></div></td></tr></table></div>
+<p>This ensures perfect clarity before coding begins.</p>
+<h3 id="handling-unexpected-issues">Handling Unexpected Issues<a class="headerlink" href="#handling-unexpected-issues" title="Permanent link">&para;</a></h3>
+<p>If Claude makes incorrect assumptions:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>I notice you&#39;re assuming [wrong assumption]. Actually, [correct information].
+Can you adjust the plan accordingly?
+</code></pre></div></td></tr></table></div>
+<h3 id="requesting-specific-technologies">Requesting Specific Technologies<a class="headerlink" href="#requesting-specific-technologies" title="Permanent link">&para;</a></h3>
+<p>During planning questions, you can be very specific:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>1. Must use FastAPI 2. Must use PostgreSQL 3. Must include Docker 4. Must have comprehensive logging 5. Must pass type checking with MyPy
+</code></pre></div></td></tr></table></div>
+<h2 id="workflow-checklist">Workflow Checklist<a class="headerlink" href="#workflow-checklist" title="Permanent link">&para;</a></h2>
+<ul class="task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Created project directory and git initialized</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Wrote comprehensive README.md with all project details</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Ran Sonnet with <code>/init</code> to generate plan</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Reviewed generated CLAUDE.md file</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Answered all Sonnet clarification questions</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Ran Opus with <code>/init</code> for additional validation</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Answered all Opus clarification questions</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Switched back to Sonnet for implementation</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Ran and debugged the code</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Tested the output thoroughly</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Project complete and committed to git</li>
+</ul>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<p>After implementing your project:</p>
+<ol>
+<li><strong>Test thoroughly</strong> - Try edge cases and error conditions</li>
+<li><strong>Commit to git</strong> - Save your work with descriptive commit messages</li>
+<li><strong>Iterate</strong> - Ask Claude for improvements or new features</li>
+<li><strong>Deploy</strong> - Put your project to work in the real world</li>
+<li><strong>Maintain</strong> - Use Claude Code for ongoing improvements</li>
+</ol>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="claude-code-wont-start">Claude Code won't start<a class="headerlink" href="#claude-code-wont-start" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Ensure AWS credentials are set</span>
+<span class="nb">echo</span><span class="w"> </span><span class="nv">$AWS_PROFILE</span><span class="w">  </span><span class="c1"># Should be &quot;bedrock&quot;</span>
+
+<span class="c1"># Test Bedrock access</span>
+aws<span class="w"> </span>bedrock<span class="w"> </span>list-foundation-models<span class="w"> </span>--region<span class="w"> </span>us-west-2<span class="w"> </span>--profile<span class="w"> </span>bedrock
+</code></pre></div></td></tr></table></div>
+<h3 id="init-command-doesnt-work">/init command doesn't work<a class="headerlink" href="#init-command-doesnt-work" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Make sure you&#39;re in a git repository</span>
+git<span class="w"> </span>status<span class="w">  </span><span class="c1"># Should show git repository info</span>
+
+<span class="c1"># Make sure README.md exists</span>
+ls<span class="w"> </span>-la<span class="w"> </span>README.md
+</code></pre></div></td></tr></table></div>
+<h3 id="model-switching-issues">Model switching issues<a class="headerlink" href="#model-switching-issues" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Always ensure you&#39;re in a Claude Code session first</span>
+claude<span class="w"> </span>sonnet
+
+<span class="c1"># Then switch models</span>
+/model<span class="w"> </span>opus
+/init
+</code></pre></div></td></tr></table></div>
+<h3 id="timeouts-on-large-projects">Timeouts on large projects<a class="headerlink" href="#timeouts-on-large-projects" title="Permanent link">&para;</a></h3>
+<p>Large projects may take 20-30 minutes. This is normal. Don't interrupt the process.</p>
+<h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h2>
+<p><strong>Q: Do I need to write the README perfectly?</strong>
+A: No! The more detail the better, but Claude will ask clarifying questions if needed.</p>
+<p><strong>Q: Can I skip the Opus review?</strong>
+A: You can, but we recommend it for important projects. Opus often catches issues Sonnet misses.</p>
+<p><strong>Q: What if I don't like the generated code?</strong>
+A: Ask Claude to rewrite specific sections or adjust the approach.</p>
+<p><strong>Q: Can I use this for really large projects?</strong>
+A: Yes! Complex projects may take longer (20-40 minutes), but Claude can handle them.</p>
+<p><strong>Q: What if Claude gets stuck?</strong>
+A: Try escalating to a more capable model (Opus) or simplify the task scope.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>

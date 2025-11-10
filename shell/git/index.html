@@ -1,0 +1,2169 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://dirkpetersen.github.io/docs/shell/git/">
+      
+      
+        <link rel="prev" href="../ssh/">
+      
+      
+        <link rel="next" href="../wsl/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
+    
+    
+      
+        <title>Git - Dirk Petersen's Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.84d31ad4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#shell-git-configuration" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Dirk Petersen&#39;s Documentation" class="md-header__button md-logo" aria-label="Dirk Petersen's Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Dirk Petersen's Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Git
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dirkpetersen/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dirkpetersen/docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../.." class="md-tabs__link">
+          
+  
+  
+  Shell
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../code-pasting/" class="md-tabs__link">
+          
+  
+  
+  Code Pasting
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../nvidia/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Nvidia
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../clouds/" class="md-tabs__link">
+          
+  
+  
+  Clouds
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tutorials/" class="md-tabs__link">
+          
+  
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../software/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Software
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Dirk Petersen&#39;s Documentation" class="md-nav__button md-logo" aria-label="Dirk Petersen's Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Dirk Petersen's Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dirkpetersen/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    dirkpetersen/docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Shell
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Shell
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Basic
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ssh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SSH
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Git
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Git
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#git-essentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Essentials
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-aliases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Aliases
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-git-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Global Git Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-global-git-configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Global Git Configuration File
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2025-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      2025 Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2025 Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#default-branch-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      Default Branch Name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#safer-pushing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Safer Pushing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clean-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clean History
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#merge-conflict-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Merge Conflict Resolution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commit-signing-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      Commit Signing (Optional)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#line-ending-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Line Ending Management
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-git-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Git Workflows
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Git Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#initialize-a-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initialize a Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clone-a-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clone a Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-and-switch-branches" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create and Switch Branches
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-and-commit-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Stage and Commit Changes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#push-to-remote" class="md-nav__link">
+    <span class="md-ellipsis">
+      Push to Remote
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pull-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pull Changes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#view-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      View History
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Git Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commit-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Commit Messages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#branch-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      Branch Naming
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keeping-history-clean" class="md-nav__link">
+    <span class="md-ellipsis">
+      Keeping History Clean
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Environment Variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#helpful-git-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Helpful Git Commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ssh-integration-with-git" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSH Integration with Git
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wsl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    WSL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Code Pasting
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Code Pasting
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/markdown/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Markdown
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GitHub
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/claude-code/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Claude Code
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/python/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Python
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../nvidia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Nvidia
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Clouds
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Clouds
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clouds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clouds/aws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AWS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clouds/azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Azure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../clouds/gcp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Google Cloud
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tutorials
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code-pasting/claude-code/tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Claude Code Tutorial
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Software
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#git-essentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Essentials
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-aliases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Aliases
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-git-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Global Git Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-global-git-configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Global Git Configuration File
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2025-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      2025 Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2025 Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#default-branch-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      Default Branch Name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#safer-pushing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Safer Pushing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clean-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clean History
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#merge-conflict-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Merge Conflict Resolution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commit-signing-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      Commit Signing (Optional)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#line-ending-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Line Ending Management
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-git-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Git Workflows
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Git Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#initialize-a-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initialize a Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clone-a-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clone a Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-and-switch-branches" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create and Switch Branches
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-and-commit-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Stage and Commit Changes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#push-to-remote" class="md-nav__link">
+    <span class="md-ellipsis">
+      Push to Remote
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pull-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pull Changes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#view-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      View History
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Git Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commit-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Commit Messages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#branch-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      Branch Naming
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keeping-history-clean" class="md-nav__link">
+    <span class="md-ellipsis">
+      Keeping History Clean
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Environment Variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#helpful-git-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Helpful Git Commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ssh-integration-with-git" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSH Integration with Git
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="shell-git-configuration">Shell - Git Configuration<a class="headerlink" href="#shell-git-configuration" title="Permanent link">&para;</a></h1>
+<p>Git setup, configuration, and shell aliases for efficient version control workflows.</p>
+<h2 id="git-essentials">Git Essentials<a class="headerlink" href="#git-essentials" title="Permanent link">&para;</a></h2>
+<p>at the very least execute these commands initially  </p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="s2">&quot;Your Name&quot;</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">&quot;your.email@example.com&quot;</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>init.defaultBranch<span class="w"> </span>main
+</code></pre></div></td></tr></table></div>
+<p>everything below is optional </p>
+<h2 id="git-aliases">Git Aliases<a class="headerlink" href="#git-aliases" title="Permanent link">&para;</a></h2>
+<p>Add these convenient aliases to your shell configuration:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Git</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">g</span><span class="o">=</span><span class="s1">&#39;git&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">gs</span><span class="o">=</span><span class="s1">&#39;git status&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">ga</span><span class="o">=</span><span class="s1">&#39;git add&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">gc</span><span class="o">=</span><span class="s1">&#39;git commit&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">gp</span><span class="o">=</span><span class="s1">&#39;git push&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">gl</span><span class="o">=</span><span class="s1">&#39;git log&#39;</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="global-git-configuration">Global Git Configuration<a class="headerlink" href="#global-git-configuration" title="Permanent link">&para;</a></h2>
+<p>Set up your global Git configuration with modern 2025 best practices:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># User identity (required)</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="s2">&quot;Your Name&quot;</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">&quot;your.email@example.com&quot;</span>
+
+<span class="c1"># Editor and diff</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>core.editor<span class="w"> </span>vim
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>diff.tool<span class="w"> </span>vimdiff
+
+<span class="c1"># Default branch name (modern standard)</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>init.defaultBranch<span class="w"> </span>main
+
+<span class="c1"># Line endings (prevents git conflicts across OS)</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>core.autocrlf<span class="w"> </span>input<span class="w">  </span><span class="c1"># On macOS/Linux</span>
+<span class="c1"># git config --global core.autocrlf true  # On Windows/WSL</span>
+
+<span class="c1"># Rebase by default for cleaner history</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>pull.rebase<span class="w"> </span><span class="nb">true</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>rebase.autoStash<span class="w"> </span><span class="nb">true</span>
+
+<span class="c1"># Safe pushing - only push current branch</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>push.default<span class="w"> </span>current
+
+<span class="c1"># Fast-forward only on pull</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>merge.ff<span class="w"> </span>only
+
+<span class="c1"># Sign commits with GPG (security best practice)</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>commit.gpgsign<span class="w"> </span><span class="nb">false</span><span class="w">  </span><span class="c1"># Set to true if using GPG keys</span>
+
+<span class="c1"># Better merge conflict handling</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>merge.conflictStyle<span class="w"> </span>zdiff3
+
+<span class="c1"># Show helpful status output</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>status.showStash<span class="w"> </span><span class="nb">true</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>status.showUntrackedFiles<span class="w"> </span>all
+</code></pre></div></td></tr></table></div>
+<h2 id="complete-global-git-configuration-file">Complete Global Git Configuration File<a class="headerlink" href="#complete-global-git-configuration-file" title="Permanent link">&para;</a></h2>
+<p>View your complete Git configuration at <code>~/.gitconfig</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">[user]</span>
+<span class="w">    </span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Your Name</span>
+<span class="w">    </span><span class="na">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">your.email@example.com</span>
+
+<span class="k">[core]</span>
+<span class="w">    </span><span class="na">editor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">vim</span>
+<span class="w">    </span><span class="na">autocrlf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">input</span>
+<span class="w">    </span><span class="na">pager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">less -x2</span>
+
+<span class="k">[init]</span>
+<span class="w">    </span><span class="na">defaultBranch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">main</span>
+
+<span class="k">[pull]</span>
+<span class="w">    </span><span class="na">rebase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span>
+
+<span class="k">[rebase]</span>
+<span class="w">    </span><span class="na">autoStash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span>
+
+<span class="k">[push]</span>
+<span class="w">    </span><span class="na">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">current</span>
+
+<span class="k">[merge]</span>
+<span class="w">    </span><span class="na">ff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">only</span>
+<span class="w">    </span><span class="na">conflictStyle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">zdiff3</span>
+
+<span class="k">[commit]</span>
+<span class="w">    </span><span class="na">gpgsign</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">false</span>
+<span class="w">    </span><span class="c1"># Set to true if using GPG:</span>
+<span class="w">    </span><span class="c1"># gpgsign = true</span>
+
+<span class="k">[status]</span>
+<span class="w">    </span><span class="na">showStash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span>
+<span class="w">    </span><span class="na">showUntrackedFiles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">all</span>
+
+<span class="k">[diff]</span>
+<span class="w">    </span><span class="na">tool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">vimdiff</span>
+
+<span class="k">[difftool]</span>
+<span class="w">    </span><span class="na">prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">false</span>
+
+<span class="k">[alias]</span>
+<span class="w">    </span><span class="c1"># Status commands</span>
+<span class="w">    </span><span class="na">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">status</span>
+<span class="w">    </span><span class="na">ss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">status --short</span>
+<span class="w">    </span><span class="na">unstage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">restore --staged</span>
+<span class="w">    </span><span class="na">discard</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">restore</span>
+
+<span class="w">    </span><span class="c1"># Branch commands</span>
+<span class="w">    </span><span class="na">br</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">branch</span>
+<span class="w">    </span><span class="na">bra</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">branch -a</span>
+<span class="w">    </span><span class="na">brv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">branch -vv</span>
+
+<span class="w">    </span><span class="c1"># Checkout/switch</span>
+<span class="w">    </span><span class="na">co</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">checkout</span>
+<span class="w">    </span><span class="na">sw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">switch</span>
+
+<span class="w">    </span><span class="c1"># Commit commands</span>
+<span class="w">    </span><span class="na">ci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">commit</span>
+<span class="w">    </span><span class="na">amend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">commit --amend --no-edit</span>
+
+<span class="w">    </span><span class="c1"># Log commands</span>
+<span class="w">    </span><span class="na">lg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">log --oneline --graph --decorate --all</span>
+<span class="w">    </span><span class="na">last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">log -1 HEAD</span>
+<span class="w">    </span><span class="na">recent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">log --oneline -10</span>
+
+<span class="w">    </span><span class="c1"># Stash commands</span>
+<span class="w">    </span><span class="na">stash-all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">stash save -u</span>
+
+<span class="w">    </span><span class="c1"># Useful utilities</span>
+<span class="w">    </span><span class="na">aliases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">config --get-regexp alias</span>
+<span class="w">    </span><span class="na">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">rev-list --count HEAD</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="2025-best-practices">2025 Best Practices<a class="headerlink" href="#2025-best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="default-branch-name">Default Branch Name<a class="headerlink" href="#default-branch-name" title="Permanent link">&para;</a></h3>
+<p>Modern projects use <code>main</code> instead of <code>master</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>init.defaultBranch<span class="w"> </span>main
+</code></pre></div></td></tr></table></div>
+<h3 id="safer-pushing">Safer Pushing<a class="headerlink" href="#safer-pushing" title="Permanent link">&para;</a></h3>
+<p>Prevent accidental pushes to wrong branches:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>push.default<span class="w"> </span>current
+</code></pre></div></td></tr></table></div>
+<h3 id="clean-history">Clean History<a class="headerlink" href="#clean-history" title="Permanent link">&para;</a></h3>
+<p>Enable rebase on pull for linear, clean commit history:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>pull.rebase<span class="w"> </span><span class="nb">true</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>rebase.autoStash<span class="w"> </span><span class="nb">true</span>
+</code></pre></div></td></tr></table></div>
+<h3 id="merge-conflict-resolution">Merge Conflict Resolution<a class="headerlink" href="#merge-conflict-resolution" title="Permanent link">&para;</a></h3>
+<p>Use modern conflict resolution strategy:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>merge.conflictStyle<span class="w"> </span>zdiff3
+</code></pre></div></td></tr></table></div>
+<p>This shows three-way diffs for better conflict understanding.</p>
+<h3 id="commit-signing-optional">Commit Signing (Optional)<a class="headerlink" href="#commit-signing-optional" title="Permanent link">&para;</a></h3>
+<p>For security, sign commits with GPG (requires setup):</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># After GPG key setup</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>commit.gpgsign<span class="w"> </span><span class="nb">true</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.signingkey<span class="w"> </span>YOUR_KEY_ID
+</code></pre></div></td></tr></table></div>
+<h3 id="line-ending-management">Line Ending Management<a class="headerlink" href="#line-ending-management" title="Permanent link">&para;</a></h3>
+<p>Prevent line ending issues across platforms:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>core.autocrlf<span class="w"> </span>input<span class="w">     </span><span class="c1"># macOS/Linux</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>core.safecrlf<span class="w"> </span><span class="nb">true</span><span class="w">      </span><span class="c1"># Warn on mixed line endings</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="common-git-workflows">Common Git Workflows<a class="headerlink" href="#common-git-workflows" title="Permanent link">&para;</a></h2>
+<h3 id="initialize-a-repository">Initialize a Repository<a class="headerlink" href="#initialize-a-repository" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>mkdir<span class="w"> </span>my-project
+<span class="nb">cd</span><span class="w"> </span>my-project
+git<span class="w"> </span>init
+</code></pre></div></td></tr></table></div>
+<h3 id="clone-a-repository">Clone a Repository<a class="headerlink" href="#clone-a-repository" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:USERNAME/repository.git
+<span class="nb">cd</span><span class="w"> </span>repository
+</code></pre></div></td></tr></table></div>
+<h3 id="create-and-switch-branches">Create and Switch Branches<a class="headerlink" href="#create-and-switch-branches" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feature/my-feature
+</code></pre></div></td></tr></table></div>
+<h3 id="stage-and-commit-changes">Stage and Commit Changes<a class="headerlink" href="#stage-and-commit-changes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Stage specific files</span>
+git<span class="w"> </span>add<span class="w"> </span>path/to/file
+
+<span class="c1"># Stage all changes</span>
+git<span class="w"> </span>add<span class="w"> </span>.
+
+<span class="c1"># Commit with message</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Describe your changes&quot;</span>
+</code></pre></div></td></tr></table></div>
+<h3 id="push-to-remote">Push to Remote<a class="headerlink" href="#push-to-remote" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Push current branch</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>feature/my-feature
+
+<span class="c1"># Push all branches</span>
+git<span class="w"> </span>push<span class="w"> </span>--all
+
+<span class="c1"># Force push (use with caution!)</span>
+git<span class="w"> </span>push<span class="w"> </span>--force-with-lease
+</code></pre></div></td></tr></table></div>
+<h3 id="pull-changes">Pull Changes<a class="headerlink" href="#pull-changes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Pull with rebase (recommended)</span>
+git<span class="w"> </span>pull<span class="w"> </span>--rebase
+
+<span class="c1"># Pull normally</span>
+git<span class="w"> </span>pull
+</code></pre></div></td></tr></table></div>
+<h3 id="view-history">View History<a class="headerlink" href="#view-history" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># View commit log</span>
+git<span class="w"> </span>log
+
+<span class="c1"># View log with graph</span>
+git<span class="w"> </span>log<span class="w"> </span>--oneline<span class="w"> </span>--graph<span class="w"> </span>--all
+
+<span class="c1"># View commits by author</span>
+git<span class="w"> </span>log<span class="w"> </span>--author<span class="o">=</span><span class="s2">&quot;Name&quot;</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="git-best-practices">Git Best Practices<a class="headerlink" href="#git-best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="commit-messages">Commit Messages<a class="headerlink" href="#commit-messages" title="Permanent link">&para;</a></h3>
+<p>Write clear, descriptive commit messages:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Good</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Fix authentication bug in login flow&quot;</span>
+
+<span class="c1"># Bad</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Fix bug&quot;</span>
+</code></pre></div></td></tr></table></div>
+<p>Follow the format:
+- <strong>First line</strong>: Short summary (50 chars max)
+- <strong>Blank line</strong>
+- <strong>Body</strong>: Explain what and why (wrap at 72 chars)</p>
+<h3 id="branch-naming">Branch Naming<a class="headerlink" href="#branch-naming" title="Permanent link">&para;</a></h3>
+<p>Use descriptive branch names:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Features</span>
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feature/user-authentication
+
+<span class="c1"># Bug fixes</span>
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>bugfix/login-redirect
+
+<span class="c1"># Improvements</span>
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>improvement/performance-optimization
+
+<span class="c1"># Release</span>
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>release/v1.2.0
+</code></pre></div></td></tr></table></div>
+<h3 id="keeping-history-clean">Keeping History Clean<a class="headerlink" href="#keeping-history-clean" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Rebase before pushing to clean up commits</span>
+git<span class="w"> </span>rebase<span class="w"> </span>-i<span class="w"> </span>origin/main
+
+<span class="c1"># Squash commits</span>
+git<span class="w"> </span>rebase<span class="w"> </span>-i<span class="w"> </span>HEAD~3<span class="w">  </span><span class="c1"># Interactive rebase last 3 commits</span>
+
+<span class="c1"># Amend last commit</span>
+git<span class="w"> </span>commit<span class="w"> </span>--amend<span class="w"> </span>--no-edit
+</code></pre></div></td></tr></table></div>
+<h2 id="git-environment-variables">Git Environment Variables<a class="headerlink" href="#git-environment-variables" title="Permanent link">&para;</a></h2>
+<p>Set these in your shell configuration:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Git editor</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GIT_EDITOR</span><span class="o">=</span>vim
+
+<span class="c1"># Avoid being asked for credentials repeatedly</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GIT_ASKPASS</span><span class="o">=</span>/usr/bin/git-credential-osxkeychain<span class="w">  </span><span class="c1"># macOS</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="helpful-git-commands">Helpful Git Commands<a class="headerlink" href="#helpful-git-commands" title="Permanent link">&para;</a></h2>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Check status</span>
+git<span class="w"> </span>status
+
+<span class="c1"># Show unstaged changes</span>
+git<span class="w"> </span>diff
+
+<span class="c1"># Show staged changes</span>
+git<span class="w"> </span>diff<span class="w"> </span>--cached
+
+<span class="c1"># Show changes in specific file</span>
+git<span class="w"> </span>diff<span class="w"> </span>path/to/file
+
+<span class="c1"># Stash changes temporarily</span>
+git<span class="w"> </span>stash
+
+<span class="c1"># Apply stashed changes</span>
+git<span class="w"> </span>stash<span class="w"> </span>pop
+
+<span class="c1"># Undo last commit (keep changes)</span>
+git<span class="w"> </span>reset<span class="w"> </span>--soft<span class="w"> </span>HEAD~1
+
+<span class="c1"># Discard last commit completely</span>
+git<span class="w"> </span>reset<span class="w"> </span>--hard<span class="w"> </span>HEAD~1
+
+<span class="c1"># View who changed each line</span>
+git<span class="w"> </span>blame<span class="w"> </span>path/to/file
+
+<span class="c1"># Search commit history</span>
+git<span class="w"> </span>log<span class="w"> </span>-S<span class="w"> </span><span class="s2">&quot;search term&quot;</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="ssh-integration-with-git">SSH Integration with Git<a class="headerlink" href="#ssh-integration-with-git" title="Permanent link">&para;</a></h2>
+<p>Ensure your SSH key is configured for Git authentication:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Test SSH connection to GitHub</span>
+ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
+
+<span class="c1"># Should output: Hi USERNAME! You&#39;ve successfully authenticated...</span>
+</code></pre></div></td></tr></table></div>
+<p>Your SSH configuration from the <a href="../ssh/">SSH section</a> enables secure Git operations without storing credentials.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
