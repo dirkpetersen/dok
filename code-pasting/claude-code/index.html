@@ -2460,9 +2460,9 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">=== Installation Complete! ===</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Usage:&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude .              # Launch with Haiku (fast/default)&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude sonnet .       # Launch with Sonnet (balanced)&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude opus .         # Launch with Opus (most capable)&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude                # Launch with Haiku (fast/default)&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude sonnet         # Launch with Sonnet (balanced)&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude opus           # Launch with Opus (most capable)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;The wrapper is now installed at: </span><span class="nv">$SYMLINK_PATH</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Real Claude Code binary: </span><span class="nv">$real_claude</span><span class="s2">&quot;</span>
@@ -2557,7 +2557,7 @@ mkdir<span class="w"> </span>-p<span class="w"> </span>~/test-project
 git<span class="w"> </span>init
 
 <span class="c1"># Launch Claude Code with default Haiku model</span>
-claude<span class="w"> </span>.
+claude
 </code></pre></div></td></tr></table></div>
 <div class="admonition note">
 <p class="admonition-title">First Time Setup: Reload Shell if Needed</p>
@@ -2584,7 +2584,7 @@ claude<span class="w"> </span>.
 git<span class="w"> </span>init
 </code></pre></div></td></tr></table></div>
 <p>Then run Claude Code inside this directory:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>claude<span class="w"> </span>.
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>claude
 </code></pre></div></td></tr></table></div>
 <h4 id="option-2-create-a-repository-on-github">Option 2: Create a Repository on GitHub<a class="headerlink" href="#option-2-create-a-repository-on-github" title="Permanent link">&para;</a></h4>
 <ol>
@@ -2602,7 +2602,7 @@ git<span class="w"> </span>init
 <ol>
 <li>Run Claude Code:</li>
 </ol>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>claude<span class="w"> </span>.
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>claude
 </code></pre></div></td></tr></table></div>
 <h2 id="model-comparison">Model Comparison<a class="headerlink" href="#model-comparison" title="Permanent link">&para;</a></h2>
 <p>Understanding the differences between the three available models helps you choose the right tool for each task:</p>
