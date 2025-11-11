@@ -35,7 +35,7 @@ Before installing Claude Code, verify that npm is available and properly configu
 **Copy and paste this command into your terminal:**
 
 ```bash
-curl -o- https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/nodejs-install-check.sh | bash
+curl -o- "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/nodejs-install-check.sh?t=$(date +%s)" | bash
 ```
 
 ??? info "View script contents"
@@ -64,7 +64,7 @@ npm i -g @anthropic-ai/claude-code
 Install the wrapper script that provides easy model switching and proper permission handling:
 
 ```bash
-curl -o- https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh | bash
+curl -o- "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?t=$(date +%s)" | bash
 ```
 
 This wrapper script will:
