@@ -3,8 +3,6 @@
 # Wrapper script for Claude Code with AWS Bedrock integration
 # Provides easy model switching and proper permission handling
 
-set -e
-
 SCRIPT_NAME="claude-wrapper.sh"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
@@ -63,11 +61,22 @@ install_wrapper() {
   # Download wrapper script from GitHub (handles piped execution)
   if [[ "$(readlink -f "$0")" != "$(readlink -f "$WRAPPER_PATH")" ]]; then
     # If $0 is not the script path (e.g., when piped), download from GitHub
-    if [[ ! -f "$0" ]] || [[ "$0" == "bash" ]]; then
-      echo -e "${YELLOW}Downloading wrapper script...${NC}"
-      curl -s -o "$WRAPPER_PATH" https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh
+    if [[ ! -f "$0" ]] || [[ "$0" == "bash" ]] || [[ ! -r "$0" ]]; then
+      echo -e "${YELLOW}Downloading wrapper script from GitHub...${NC}"
+      if curl -f -s -o "$WRAPPER_PATH" https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh; then
+        echo -e "${GREEN}✓${NC} Downloaded wrapper script"
+      else
+        echo -e "${RED}✗ Failed to download wrapper script${NC}" >&2
+        exit 1
+      fi
     else
-      cp "$0" "$WRAPPER_PATH"
+      echo -e "${YELLOW}Copying wrapper script...${NC}"
+      if cp "$0" "$WRAPPER_PATH"; then
+        echo -e "${GREEN}✓${NC} Copied wrapper script"
+      else
+        echo -e "${RED}✗ Failed to copy wrapper script${NC}" >&2
+        exit 1
+      fi
     fi
     chmod +x "$WRAPPER_PATH"
     echo -e "${GREEN}✓${NC} Installed wrapper to $WRAPPER_PATH"
