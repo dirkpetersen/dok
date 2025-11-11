@@ -106,16 +106,25 @@ if [[ "$1" == "--install" ]]; then
   install_wrapper
 fi
 
-# If script is not in ~/bin yet, prompt for installation
+# If script is not in ~/bin yet, auto-install or prompt
 if [[ "$(readlink -f "$0")" != "$(readlink -f "$WRAPPER_PATH")" ]]; then
   echo -e "${YELLOW}Claude Code wrapper is not installed yet.${NC}"
-  read -p "Install to $INSTALL_DIR/claude? (y/n): " install_confirm
 
-  if [[ "$install_confirm" == "y" || "$install_confirm" == "Y" ]]; then
-    install_wrapper
+  # Check if stdin is a terminal (interactive) or pipe (non-interactive)
+  if [[ -t 0 ]]; then
+    # Interactive mode - prompt user
+    read -p "Install to $INSTALL_DIR/claude? (y/n): " install_confirm
+
+    if [[ "$install_confirm" == "y" || "$install_confirm" == "Y" ]]; then
+      install_wrapper
+    else
+      echo "Installation cancelled. Run with --install to install later."
+      exit 1
+    fi
   else
-    echo "Installation cancelled. Run with --install to install later."
-    exit 1
+    # Non-interactive mode (piped) - auto-install
+    echo -e "${YELLOW}Running in non-interactive mode. Auto-installing...${NC}"
+    install_wrapper
   fi
 fi
 
