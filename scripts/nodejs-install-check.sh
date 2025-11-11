@@ -35,10 +35,22 @@ add_nvm_to_shell() {
       ;;
   esac
 
-  # Check if NVM initialization already exists
-  if grep -q 'NVM_DIR.*nvm.sh' "$shell_rc" 2>/dev/null; then
+  # Create shell rc file if it doesn't exist
+  if [[ ! -f "$shell_rc" ]]; then
+    touch "$shell_rc"
+    echo -e "${YELLOW}Created new $shell_name configuration file: $shell_rc${NC}"
+  fi
+
+  # Check if NVM initialization already exists (uncommented)
+  if grep -q '^[^#]*NVM_DIR.*nvm.sh' "$shell_rc" 2>/dev/null; then
     echo -e "${GREEN}✓${NC} NVM already configured in $shell_name configuration"
     return 0
+  fi
+
+  # Remove commented-out NVM lines if they exist
+  if grep -q '#.*NVM_DIR.*nvm.sh' "$shell_rc" 2>/dev/null; then
+    echo -e "${YELLOW}Removing commented NVM configuration...${NC}"
+    sed -i.bak '/^#.*NVM_DIR/d; /^#.*nvm.sh/d; /^#.*bash_completion/d' "$shell_rc"
   fi
 
   # Add NVM initialization to shell RC file
@@ -88,6 +100,10 @@ fi
 
 echo -e "${GREEN}✓${NC} NVM installed successfully"
 
+# Add NVM initialization to shell configuration FIRST (before using nvm)
+echo -e "${YELLOW}Configuring shell...${NC}"
+add_nvm_to_shell
+
 # Load nvm in current shell
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -111,10 +127,6 @@ if [[ "$npm_prefix" != "$HOME/.nvm"* ]]; then
   echo -e "${YELLOW}Setting npm prefix to NVM directory...${NC}"
   npm config set prefix "$HOME/.nvm/versions/node/$(node --version | cut -d'v' -f2)"
 fi
-
-# Add NVM initialization to shell configuration
-echo -e "${YELLOW}Configuring shell...${NC}"
-add_nvm_to_shell
 
 # Final instructions
 echo ""
