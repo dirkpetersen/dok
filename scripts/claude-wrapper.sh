@@ -184,15 +184,7 @@ if [[ $? -ne 0 ]]; then
   exit 1
 fi
 
-# Build permission flags:
-# - Read and execute: everywhere (system-wide access)
-# - Write: only in current directory tree (following symlinks)
-CURRENT_DIR=$(pwd -P)  # Resolve symlinks to get real path
-PERMISSION_FLAGS=(
-  "--permissions" "read:**"
-  "--permissions" "exec:**"
-  "--permissions" "write:$CURRENT_DIR/**"
-)
-
-# Execute the real Claude Code with model and permissions
-exec "$REAL_CLAUDE" --model "$mymodel" "${PERMISSION_FLAGS[@]}" "$@"
+# Execute the real Claude Code with model selection
+# Note: Using --dangerously-skip-permissions for unrestricted access
+# Remove this flag if you want to use permission restrictions
+exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
