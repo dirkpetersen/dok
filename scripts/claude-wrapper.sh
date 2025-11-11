@@ -58,10 +58,11 @@ install_wrapper() {
   # Create ~/bin if it doesn't exist
   mkdir -p "$INSTALL_DIR"
 
-  # Download wrapper script from GitHub (handles piped execution)
-  if [[ "$(readlink -f "$0")" != "$(readlink -f "$WRAPPER_PATH")" ]]; then
-    # If $0 is not the script path (e.g., when piped), download from GitHub
-    if [[ ! -f "$0" ]] || [[ "$0" == "bash" ]] || [[ ! -r "$0" ]]; then
+  # Copy or download wrapper script to ~/bin
+  if [[ ! -f "$WRAPPER_PATH" ]] || [[ "$(readlink -f "$0" 2>/dev/null || echo "")" != "$(readlink -f "$WRAPPER_PATH" 2>/dev/null)" ]]; then
+    # When script is piped (curl | bash), $0 will be "bash"
+    # Always download from GitHub in this case for reliability
+    if [[ "$0" == "bash" ]] || [[ ! -f "$0" ]]; then
       echo -e "${YELLOW}Downloading wrapper script from GitHub...${NC}"
       if curl -f -s -o "$WRAPPER_PATH" https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh; then
         echo -e "${GREEN}✓${NC} Downloaded wrapper script"
@@ -70,6 +71,7 @@ install_wrapper() {
         exit 1
       fi
     else
+      # Script is being run from a file, copy it
       echo -e "${YELLOW}Copying wrapper script...${NC}"
       if cp "$0" "$WRAPPER_PATH"; then
         echo -e "${GREEN}✓${NC} Copied wrapper script"
