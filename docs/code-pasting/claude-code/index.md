@@ -91,7 +91,7 @@ cd ~/test-project
 git init
 
 # Launch Claude Code with default Haiku model
-claude .
+claude
 ```
 
 !!! note "First Time Setup: Reload Shell if Needed"
@@ -128,7 +128,7 @@ git init
 Then run Claude Code inside this directory:
 
 ```bash
-claude .
+claude
 ```
 
 #### Option 2: Create a Repository on GitHub
@@ -147,7 +147,7 @@ cd my-project
 3. Run Claude Code:
 
 ```bash
-claude .
+claude
 ```
 
 ## Model Comparison

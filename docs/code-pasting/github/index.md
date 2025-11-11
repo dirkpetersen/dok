@@ -131,5 +131,5 @@ cd your-repo
 Then you can run Claude Code inside:
 
 ```bash
-claude .
+claude
 ```

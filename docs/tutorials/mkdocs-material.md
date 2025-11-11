@@ -131,7 +131,7 @@ Now start Claude Code to initialize your documentation project:
 
 ```bash
 # Launch Claude Code in the repository directory
-claude .
+claude
 ```
 
 ## Step 5: Run /init Command
@@ -607,7 +607,7 @@ Creating a personal documentation site with Claude Code:
 1. **Create repo**: `gh repo create dok --public`
 2. **Clone**: `git clone git@github.com:USERNAME/dok.git`
 3. **Write README.md**: Describe documentation intent and topics
-4. **Launch Claude Code**: `claude .`
+4. **Launch Claude Code**: `claude`
 5. **Initialize**: Run `/init` command
 6. **Develop**: Ask Claude Code to add content, make changes
 7. **Automatic deployment**: Push triggers GitHub Actions
