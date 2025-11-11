@@ -2351,15 +2351,7 @@ npm<span class="w"> </span>--version
 <span class="normal">187</span>
 <span class="normal">188</span>
 <span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">190</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
@@ -2545,18 +2537,10 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="k">fi</span>
 
-<span class="c1"># Build permission flags:</span>
-<span class="c1"># - Read and execute: everywhere (system-wide access)</span>
-<span class="c1"># - Write: only in current directory tree (following symlinks)</span>
-<span class="nv">CURRENT_DIR</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="w"> </span>-P<span class="k">)</span><span class="w">  </span><span class="c1"># Resolve symlinks to get real path</span>
-<span class="nv">PERMISSION_FLAGS</span><span class="o">=(</span>
-<span class="w">  </span><span class="s2">&quot;--permissions&quot;</span><span class="w"> </span><span class="s2">&quot;read:**&quot;</span>
-<span class="w">  </span><span class="s2">&quot;--permissions&quot;</span><span class="w"> </span><span class="s2">&quot;exec:**&quot;</span>
-<span class="w">  </span><span class="s2">&quot;--permissions&quot;</span><span class="w"> </span><span class="s2">&quot;write:</span><span class="nv">$CURRENT_DIR</span><span class="s2">/**&quot;</span>
-<span class="o">)</span>
-
-<span class="c1"># Execute the real Claude Code with model and permissions</span>
-<span class="nb">exec</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REAL_CLAUDE</span><span class="s2">&quot;</span><span class="w"> </span>--model<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$mymodel</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">PERMISSION_FLAGS</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span>
+<span class="c1"># Execute the real Claude Code with model selection</span>
+<span class="c1"># Note: Using --dangerously-skip-permissions for unrestricted access</span>
+<span class="c1"># Remove this flag if you want to use permission restrictions</span>
+<span class="nb">exec</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REAL_CLAUDE</span><span class="s2">&quot;</span><span class="w"> </span>--model<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$mymodel</span><span class="s2">&quot;</span><span class="w"> </span>--dangerously-skip-permissions<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span>
 </code></pre></div></td></tr></table></div>
 </details>
 <h3 id="5-test-claude-code">5. Test Claude Code<a class="headerlink" href="#5-test-claude-code" title="Permanent link">&para;</a></h3>
