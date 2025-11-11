@@ -3,7 +3,7 @@
 # Script to check and install Node.js/npm with proper configuration
 # Works on both standard Linux/macOS and HPC systems with Lmod
 
-set -e
+# Note: NOT using set -e because we want to handle errors gracefully
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -11,7 +11,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-# Function to detect user's login shell and add nvm initialization to PATH
+# Function to detect user's login shell and add nvm initialization to shell rc
 add_nvm_to_shell() {
   local shell_rc=""
   local shell_name=""
@@ -30,7 +30,7 @@ add_nvm_to_shell() {
       shell_name="Bash"
       ;;
     *)
-      echo -e "${YELLOW}Warning: Detected shell '$login_shell'. Please manually add NVM initialization to your shell RC file.${NC}"
+      echo -e "${YELLOW}Warning: Detected shell '$login_shell'. Please manually add NVM initialization.${NC}"
       return 1
       ;;
   esac
@@ -51,20 +51,23 @@ add_nvm_to_shell() {
   if grep -q '#.*NVM_DIR.*nvm.sh' "$shell_rc" 2>/dev/null; then
     echo -e "${YELLOW}Removing commented NVM configuration...${NC}"
     sed -i.bak '/^#.*NVM_DIR/d; /^#.*nvm.sh/d; /^#.*bash_completion/d' "$shell_rc"
+    rm -f "${shell_rc}.bak"
   fi
 
   # Add NVM initialization to shell RC file
+  # Use a separator comment to mark our additions
   echo "" >> "$shell_rc"
-  echo "# NVM (Node Version Manager) initialization" >> "$shell_rc"
+  echo "# ========== NVM (Node Version Manager) initialization ==========" >> "$shell_rc"
   echo "export NVM_DIR=\"\$HOME/.nvm\"" >> "$shell_rc"
-  echo "[ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\"  # This loads nvm" >> "$shell_rc"
-  echo "[ -s \"\$NVM_DIR/bash_completion\" ] && \\. \"\$NVM_DIR/bash_completion\"  # This loads nvm bash_completion" >> "$shell_rc"
+  echo "[ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\"" >> "$shell_rc"
+  echo "[ -s \"\$NVM_DIR/bash_completion\" ] && \\. \"\$NVM_DIR/bash_completion\"" >> "$shell_rc"
+  echo "# ================================================================" >> "$shell_rc"
 
-  echo -e "${GREEN}✓${NC} Added NVM initialization to $shell_name configuration ($shell_rc)"
+  echo -e "${GREEN}✓${NC} Added NVM initialization to $shell_name configuration"
   return 0
 }
 
-# Check if npm is installed
+# Check if npm is already installed
 if command -v npm &> /dev/null; then
   echo -e "${GREEN}✓${NC} npm is already installed"
   npm --version
@@ -91,22 +94,46 @@ fi
 
 # Install NVM (Node Version Manager)
 echo -e "${YELLOW}Installing NVM (Node Version Manager)...${NC}"
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 
-if [[ ! -f "$HOME/.nvm/nvm.sh" ]]; then
-  echo -e "${RED}✗ Failed to install NVM${NC}"
+# Check if NVM already installed
+if [[ ! -d "$HOME/.nvm" ]]; then
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+  if [[ ! -f "$HOME/.nvm/nvm.sh" ]]; then
+    echo -e "${RED}✗ Failed to install NVM${NC}"
+    exit 1
+  fi
+  echo -e "${GREEN}✓${NC} NVM installed successfully"
+else
+  echo -e "${GREEN}✓${NC} NVM already exists at $HOME/.nvm"
+fi
+
+# Add NVM initialization to shell configuration
+echo -e "${YELLOW}Configuring shell...${NC}"
+add_nvm_to_shell
+if [[ $? -ne 0 ]]; then
+  echo -e "${RED}✗ Failed to configure shell${NC}"
   exit 1
 fi
 
-echo -e "${GREEN}✓${NC} NVM installed successfully"
-
-# Add NVM initialization to shell configuration FIRST (before using nvm)
-echo -e "${YELLOW}Configuring shell...${NC}"
-add_nvm_to_shell
-
-# Load nvm in current shell
+# Load nvm in current shell session
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+if [[ ! -s "$NVM_DIR/nvm.sh" ]]; then
+  echo -e "${RED}✗ NVM script not found at $NVM_DIR/nvm.sh${NC}"
+  exit 1
+fi
+
+# Source NVM in current shell
+. "$NVM_DIR/nvm.sh" 2>/dev/null || true
+
+# Verify NVM is loaded
+if ! command -v nvm &> /dev/null; then
+  echo -e "${RED}✗ Failed to load NVM in current shell${NC}"
+  echo -e "${YELLOW}Try reloading your shell: source ~/.bashrc${NC}"
+  exit 1
+fi
+
+echo -e "${GREEN}✓${NC} NVM loaded in current shell"
 
 # Install Node.js (version 24, latest LTS)
 echo -e "${YELLOW}Installing Node.js v24...${NC}"
@@ -119,14 +146,11 @@ fi
 
 echo -e "${GREEN}✓${NC} Node.js installed successfully"
 
-# Configure npm to install global packages in home directory
-echo -e "${YELLOW}Configuring npm...${NC}"
-npm_prefix=$(npm config get prefix 2>/dev/null || echo "")
-
-if [[ "$npm_prefix" != "$HOME/.nvm"* ]]; then
-  echo -e "${YELLOW}Setting npm prefix to NVM directory...${NC}"
-  npm config set prefix "$HOME/.nvm/versions/node/$(node --version | cut -d'v' -f2)"
-fi
+# Verify versions
+echo ""
+echo -e "${GREEN}Installation Summary:${NC}"
+node --version
+npm --version
 
 # Final instructions
 echo ""
@@ -134,7 +158,7 @@ echo "========================================"
 echo "Node.js/npm installation complete!"
 echo "========================================"
 echo ""
-echo "To apply the PATH changes, reload your shell configuration:"
+echo "To apply the NVM configuration in new shell sessions:"
 echo ""
 if [[ -n "$ZSH_VERSION" ]]; then
   echo "  source ~/.zshrc"
@@ -151,6 +175,6 @@ else
   esac
 fi
 echo ""
-echo "Then verify the installation:"
-echo "  npm --version"
+echo "Then install Claude Code:"
+echo "  npm install -g @anthropic-ai/claude-code"
 echo ""
