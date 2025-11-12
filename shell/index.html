@@ -2823,14 +2823,7 @@
 <span class="normal">1195</span>
 <span class="normal">1196</span>
 <span class="normal">1197</span>
-<span class="normal">1198</span>
-<span class="normal">1199</span>
-<span class="normal">1200</span>
-<span class="normal">1201</span>
-<span class="normal">1202</span>
-<span class="normal">1203</span>
-<span class="normal">1204</span>
-<span class="normal">1205</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1198</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3986,16 +3979,9 @@ setup_git_config<span class="w"> </span><span class="s2">&quot;</span><span clas
 
 <span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Next steps:</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">\n&quot;</span>
 
-<span class="c1"># Detect current shell for appropriate reload command</span>
-<span class="nv">CURRENT_SHELL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="p">##*/</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CURRENT_SHELL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;zsh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">  </span><span class="nv">RELOAD_CMD</span><span class="o">=</span><span class="s2">&quot;. ~/.zshrc&quot;</span>
-<span class="k">else</span>
-<span class="w">  </span><span class="nv">RELOAD_CMD</span><span class="o">=</span><span class="s2">&quot;. ~/.bashrc&quot;</span>
-<span class="k">fi</span>
-
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;1. Reload your shell configuration:&quot;</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   </span><span class="nv">$RELOAD_CMD</span><span class="s2">&quot;</span>
+<span class="nv">RELOAD_FILE</span><span class="o">=</span><span class="k">$(</span>get_login_profile<span class="k">)</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   . </span><span class="nv">$RELOAD_FILE</span><span class="s2">&quot;</span>
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;2. Add your SSH public key to GitHub:&quot;</span>
