@@ -1156,7 +1156,8 @@ echo -e "${YELLOW}Next steps:${NC}\n"
 
 echo "1. Reload your shell configuration:"
 RELOAD_FILE=$(get_login_profile)
-echo "   . $RELOAD_FILE"
+RELOAD_FILE_DISPLAY="${RELOAD_FILE/#$HOME/~}"
+echo "   . $RELOAD_FILE_DISPLAY"
 echo ""
 
 echo "2. Add your SSH public key to GitHub:"
