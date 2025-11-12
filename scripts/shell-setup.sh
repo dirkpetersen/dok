@@ -1154,16 +1154,9 @@ echo -e "${GREEN}=== Setup Complete! ===${NC}\n"
 
 echo -e "${YELLOW}Next steps:${NC}\n"
 
-# Detect current shell for appropriate reload command
-CURRENT_SHELL="${SHELL##*/}"
-if [[ "$CURRENT_SHELL" == "zsh" ]]; then
-  RELOAD_CMD=". ~/.zshrc"
-else
-  RELOAD_CMD=". ~/.bashrc"
-fi
-
 echo "1. Reload your shell configuration:"
-echo "   $RELOAD_CMD"
+RELOAD_FILE=$(get_login_profile)
+echo "   . $RELOAD_FILE"
 echo ""
 
 echo "2. Add your SSH public key to GitHub:"
