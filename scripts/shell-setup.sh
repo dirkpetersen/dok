@@ -1155,9 +1155,16 @@ echo -e "${GREEN}=== Setup Complete! ===${NC}\n"
 echo -e "${YELLOW}Next steps:${NC}\n"
 
 echo "1. Reload your shell configuration:"
-RELOAD_FILE=$(get_login_profile)
-RELOAD_FILE_DISPLAY="${RELOAD_FILE/#$HOME/~}"
-echo "   . $RELOAD_FILE_DISPLAY"
+CURRENT_SHELL="${SHELL##*/}"
+if [[ "$CURRENT_SHELL" == "zsh" ]]; then
+  echo "   . ~/.zprofile"
+else
+  if [[ -f "$HOME/.bash_profile" ]]; then
+    echo "   . ~/.bash_profile"
+  else
+    echo "   . ~/.profile"
+  fi
+fi
 echo ""
 
 echo "2. Add your SSH public key to GitHub:"
