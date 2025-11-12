@@ -776,13 +776,13 @@ EOF
 setup_keychain_profile() {
   local profile=$(get_login_profile)
 
-  # Build keychain command for SSH only (GPG keys have no passphrase)
+  # Build keychain command for SSH key management
   # Use --nogui to avoid pinentry requirement (uses console prompts instead)
-  local keychain_line='[ -z $SLURM_PTY_PORT ] && eval $(keychain --nogui --quiet --eval --agents ssh ~/.ssh/id_ed25519)'
+  local keychain_line='[ -z $SLURM_PTY_PORT ] && eval $(keychain --nogui --quiet --eval ~/.ssh/id_ed25519)'
 
   if grep -q "keychain" "$profile" 2>/dev/null; then
     # Check if the desired SSH configuration already exists
-    if grep -q "keychain.*--nogui.*--quiet.*--eval.*--agents ssh.*id_ed25519" "$profile" 2>/dev/null; then
+    if grep -q "keychain.*--nogui.*--quiet.*--eval.*id_ed25519" "$profile" 2>/dev/null; then
       echo -e "${GREEN}✓${NC} Keychain already configured in $profile"
       return 0
     fi
@@ -1154,8 +1154,16 @@ echo -e "${GREEN}=== Setup Complete! ===${NC}\n"
 
 echo -e "${YELLOW}Next steps:${NC}\n"
 
+# Detect current shell for appropriate reload command
+CURRENT_SHELL="${SHELL##*/}"
+if [[ "$CURRENT_SHELL" == "zsh" ]]; then
+  RELOAD_CMD=". ~/.zshrc"
+else
+  RELOAD_CMD=". ~/.bashrc"
+fi
+
 echo "1. Reload your shell configuration:"
-echo "   . ~/.profile"
+echo "   $RELOAD_CMD"
 echo ""
 
 echo "2. Add your SSH public key to GitHub:"
