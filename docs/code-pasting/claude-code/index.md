@@ -36,14 +36,8 @@ Install Claude Code using the official binary installer:
 curl -fsSL https://claude.ai/install.sh | bash -s latest
 ```
 
-!!! note "Binary Installation (Recommended)"
-    The official binary installer (`claude.ai/install.sh`) has replaced the npm package method. This approach:
-    - Installs pre-compiled binaries directly (no Node.js dependency)
-    - Provides faster installation and startup
-    - Simplifies updates and version management
-    - Works consistently across all platforms
-
-    **Note:** The older `npm i -g @anthropic-ai/claude-code` method is no longer recommended and may not receive updates.
+!!! note "Having issues?"
+    If this installation doesn't work for some reason, see the [legacy npm-based installation](#alternative-npm-based-installation) at the end of this guide.
 
 ### 3. Install Claude Code Wrapper
 
@@ -207,9 +201,9 @@ claude opus /path/to/project
 - Ensure AWS credentials are properly configured before use
 - The wrapper script automatically handles model selection and AWS environment setup
 
-## Alternative: npm-based Installation
+## Alternative: npm-based Installation (Legacy)
 
-If you prefer to use npm instead of the binary installer, follow these steps:
+If the binary installer doesn't work or you prefer npm, follow these steps:
 
 ### Check and Install npm
 
@@ -242,14 +236,8 @@ Once npm is set up, install Claude Code globally:
 npm i -g @anthropic-ai/claude-code
 ```
 
-!!! warning "npm Installation Not Recommended"
-    The npm package method (`npm i -g @anthropic-ai/claude-code`) is no longer the primary installation method. The binary installer is preferred because it:
-    - Does not require Node.js to be installed
-    - Provides faster installation and startup
-    - Simplifies updates and version management
-    - Works more consistently across platforms
-
-    Use this method only if you specifically need npm-based installation or already have Node.js installed.
+!!! note "Legacy Method"
+    This is a fallback if the primary binary installation doesn't work for you.
 
 ## Next: Complete Project Development Workflow
 
