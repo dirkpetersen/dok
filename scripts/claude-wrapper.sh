@@ -82,10 +82,24 @@ find_claude_binary() {
   local claude_paths=$(which -a claude 2>/dev/null || true)
 
   if [[ -z "$claude_paths" ]]; then
-    echo -e "${RED}✗ Claude Code not found in PATH${NC}" >&2
-    echo "Please install Claude Code first:" >&2
-    echo "  npm i -g @anthropic-ai/claude-code" >&2
-    return 1
+    echo -e "${YELLOW}Claude Code not found in PATH${NC}" >&2
+    echo "" >&2
+    echo "Installing Claude Code..." >&2
+    if curl -fsSL https://claude.ai/install.sh | bash -s latest; then
+      echo -e "${GREEN}✓${NC} Claude Code installed successfully${NC}" >&2
+      # Re-check PATH after installation
+      claude_paths=$(which -a claude 2>/dev/null || true)
+      if [[ -z "$claude_paths" ]]; then
+        echo -e "${RED}✗ Claude Code still not found in PATH after installation${NC}" >&2
+        echo "Please reload your shell and try again:" >&2
+        echo "  . ~/.bashrc  # For Bash" >&2
+        echo "  . ~/.zshrc   # For Zsh" >&2
+        return 1
+      fi
+    else
+      echo -e "${RED}✗ Failed to install Claude Code${NC}" >&2
+      return 1
+    fi
   fi
 
   # Find first claude that is NOT in ~/bin
