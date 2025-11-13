@@ -169,8 +169,6 @@ install_wrapper() {
     exit 1
   fi
 
-  echo -e "${GREEN}✓${NC} Found Claude Code at: $real_claude"
-
   # Create ~/bin if it doesn't exist
   mkdir -p "$INSTALL_DIR"
 
@@ -197,7 +195,7 @@ install_wrapper() {
       fi
     fi
     chmod +x "$WRAPPER_PATH"
-    echo -e "${GREEN}✓${NC} Installed wrapper to $WRAPPER_PATH"
+    echo -e "${GREEN}✓${NC} Installed wrapper to ~/bin/$SCRIPT_NAME"
   fi
 
   # Create symlink if it doesn't exist or points elsewhere
@@ -206,29 +204,27 @@ install_wrapper() {
     if [[ "$current_target" != "$SCRIPT_NAME" ]]; then
       rm "$SYMLINK_PATH"
       ln -s "$SCRIPT_NAME" "$SYMLINK_PATH"
-      echo -e "${GREEN}✓${NC} Updated symlink $SYMLINK_PATH -> $SCRIPT_NAME"
+      echo -e "${GREEN}✓${NC} Updated symlink ~/bin/claude"
     else
-      echo -e "${GREEN}✓${NC} Symlink already correctly configured"
+      echo -e "${GREEN}✓${NC} Wrapper already correctly configured"
     fi
   elif [[ -e "$SYMLINK_PATH" ]]; then
-    echo -e "${RED}✗ $SYMLINK_PATH exists but is not a symlink${NC}"
+    echo -e "${RED}✗ ~/bin/claude exists but is not a symlink${NC}"
     echo "Please remove it manually and run this script again"
     exit 1
   else
     ln -s "$SCRIPT_NAME" "$SYMLINK_PATH"
-    echo -e "${GREEN}✓${NC} Created symlink $SYMLINK_PATH -> $SCRIPT_NAME"
+    echo -e "${GREEN}✓${NC} Created symlink ~/bin/claude"
   fi
 
   echo ""
   echo -e "${GREEN}=== Installation Complete! ===${NC}"
   echo ""
-  echo "Usage:"
+  echo "You can now run the claude wrapper from anywhere:"
+  echo ""
   echo "  claude                # Launch with Haiku (fast/default)"
   echo "  claude sonnet         # Launch with Sonnet (balanced)"
   echo "  claude opus           # Launch with Opus (most capable)"
-  echo ""
-  echo "The wrapper is now installed at: $SYMLINK_PATH"
-  echo "Real Claude Code binary: $real_claude"
   echo ""
 
   exit 0
@@ -252,7 +248,7 @@ if [[ "$(readlink -f "$0")" != "$(readlink -f "$WRAPPER_PATH")" ]]; then
   # Check if stdin is a terminal (interactive) or pipe (non-interactive)
   if [[ -t 0 ]]; then
     # Interactive mode - prompt user
-    read -p "Install to $INSTALL_DIR/claude? (y/n): " install_confirm
+    read -p "Install to ~/bin/claude? (y/n): " install_confirm
 
     if [[ "$install_confirm" == "y" || "$install_confirm" == "Y" ]]; then
       install_wrapper
