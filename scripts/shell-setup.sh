@@ -911,6 +911,8 @@ EOF
 # Function to setup Vim configuration
 setup_vim_config() {
   local vimrc="$HOME/.vimrc"
+  local vim_wrapper="$HOME/bin/vim-wrapper"
+  local edr_symlink="$HOME/bin/edr"
 
   # Check if vim is installed
   if ! command -v vim &> /dev/null; then
@@ -929,7 +931,6 @@ setup_vim_config() {
     if [[ "$has_syntax" == true && "$has_colorscheme" == true ]]; then
       if [[ "$FORCE_MODE" != true ]]; then
         echo -e "${GREEN}✓${NC} Vim already configured with desert color scheme"
-        return 0
       else
         echo -e "${YELLOW}Force mode: Reconfiguring Vim${NC}"
         # Backup existing .vimrc
@@ -940,7 +941,7 @@ setup_vim_config() {
     fi
   fi
 
-  # Create or append to .vimrc
+  # Create or append to .vimrc if needed
   if [[ ! -f "$vimrc" ]]; then
     # Create new .vimrc
     cat > "$vimrc" << 'EOF'
@@ -952,7 +953,7 @@ colorscheme desert
 EOF
     log_change "CREATED_FILE" "$vimrc"
     echo -e "${GREEN}✓${NC} Created ~/.vimrc with desert color scheme"
-  else
+  elif [[ "$has_syntax" != true ]] || [[ "$has_colorscheme" != true ]]; then
     # Append to existing .vimrc
     echo "" >> "$vimrc"
     echo "\" Enable syntax highlighting" >> "$vimrc"
@@ -965,6 +966,69 @@ EOF
     log_change "ADDED_TO_FILE" "$vimrc|\" Use desert color scheme"
     log_change "ADDED_TO_FILE" "$vimrc|colorscheme desert"
     echo -e "${GREEN}✓${NC} Added desert color scheme to ~/.vimrc"
+  fi
+
+  # Install vim wrapper script
+  if [[ ! -f "$vim_wrapper" ]] || [[ "$FORCE_MODE" == true ]]; then
+    mkdir -p "$HOME/bin"
+
+    # Download or copy vim-wrapper.sh
+    if curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/vim-wrapper.sh" -o "$vim_wrapper" 2>/dev/null; then
+      chmod +x "$vim_wrapper"
+      log_change "CREATED_FILE" "$vim_wrapper"
+      echo -e "${GREEN}✓${NC} Installed vim wrapper to ~/bin/vim-wrapper"
+    else
+      echo -e "${YELLOW}Could not download vim-wrapper.sh from GitHub${NC}"
+      echo -e "${YELLOW}Creating vim wrapper locally...${NC}"
+      cat > "$vim_wrapper" << 'EOF'
+#!/bin/bash
+# vim-wrapper.sh - Simple vim wrapper for easy editing
+# Starts in insert mode and uses double-escape to save/quit
+
+vim -c "startinsert" \
+    -c "let g:esc_pressed = 0" \
+    -c "function! SaveAndQuit()
+        if &modified
+            let choice = confirm('Save changes?', \"&Yes\n&No\n&Cancel\", 1)
+            if choice == 1
+                wq
+            elseif choice == 2
+                q!
+            endif
+        else
+            q
+        endif
+    endfunction" \
+    -c "function! HandleEscape()
+        if g:esc_pressed
+            let g:esc_pressed = 0
+            call SaveAndQuit()
+        else
+            let g:esc_pressed = 1
+            call timer_start(500, {-> execute('let g:esc_pressed = 0')})
+            return \"\\<Esc>\"
+        endif
+        return ''
+    endfunction" \
+    -c "inoremap <expr> <Esc> HandleEscape()" \
+    -c "nnoremap <Esc><Esc> :call SaveAndQuit()<CR>" \
+    "$@"
+EOF
+      chmod +x "$vim_wrapper"
+      log_change "CREATED_FILE" "$vim_wrapper"
+      echo -e "${GREEN}✓${NC} Created vim wrapper at ~/bin/vim-wrapper"
+    fi
+  else
+    echo -e "${GREEN}✓${NC} Vim wrapper already installed"
+  fi
+
+  # Create edr symlink
+  if [[ ! -L "$edr_symlink" ]] || [[ "$FORCE_MODE" == true ]]; then
+    ln -sf "vim-wrapper" "$edr_symlink"
+    log_change "CREATED_FILE" "$edr_symlink"
+    echo -e "${GREEN}✓${NC} Created symlink ~/bin/edr -> vim-wrapper"
+  else
+    echo -e "${GREEN}✓${NC} Symlink ~/bin/edr already exists"
   fi
 }
 
