@@ -134,7 +134,10 @@ install_wrapper() {
 
   # Find the real claude binary
   local real_claude=$(find_claude_binary)
-  if [[ $? -ne 0 ]]; then
+  local find_result=$?
+
+  if [[ $find_result -ne 0 ]] || [[ -z "$real_claude" ]]; then
+    echo -e "${RED}✗ Cannot install wrapper without Claude Code binary${NC}" >&2
     exit 1
   fi
 
@@ -203,12 +206,6 @@ install_wrapper() {
   exit 0
 }
 
-# Check PATH configuration early, before any installation attempts
-verify_path_configuration
-if [[ $? -ne 0 ]]; then
-  exit 1
-fi
-
 # Check if this is an installation run
 if [[ "$1" == "--install" ]]; then
   install_wrapper
@@ -239,6 +236,12 @@ fi
 # ============================================================================
 # WRAPPER FUNCTIONALITY
 # ============================================================================
+
+# Verify PATH configuration before running the wrapper
+verify_path_configuration
+if [[ $? -ne 0 ]]; then
+  exit 1
+fi
 
 # AWS Bedrock Configuration
 export CLAUDE_CODE_USE_BEDROCK=1
