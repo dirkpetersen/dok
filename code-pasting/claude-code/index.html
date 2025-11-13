@@ -2146,9 +2146,18 @@ npm<span class="w"> </span>--version
 <li>Set up the correct PATH configuration</li>
 </ul>
 <h3 id="3-install-claude-code">3. Install Claude Code<a class="headerlink" href="#3-install-claude-code" title="Permanent link">&para;</a></h3>
-<p>Install Claude Code globally via npm:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>npm<span class="w"> </span>i<span class="w"> </span>-g<span class="w"> </span>@anthropic-ai/claude-code
+<p>Install Claude Code using the official binary installer:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://claude.ai/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash<span class="w"> </span>-s<span class="w"> </span>latest
 </code></pre></div></td></tr></table></div>
+<div class="admonition note">
+<p class="admonition-title">Binary Installation (Recommended)</p>
+<p>The official binary installer (<code>claude.ai/install.sh</code>) has replaced the npm package method. This approach:
+- Installs pre-compiled binaries directly (no Node.js dependency)
+- Provides faster installation and startup
+- Simplifies updates and version management
+- Works consistently across all platforms</p>
+<p><strong>Note:</strong> The older <code>npm i -g @anthropic-ai/claude-code</code> method is no longer recommended and may not receive updates.</p>
+</div>
 <h3 id="4-install-claude-code-wrapper">4. Install Claude Code Wrapper<a class="headerlink" href="#4-install-claude-code-wrapper" title="Permanent link">&para;</a></h3>
 <p>Install the wrapper script that provides easy model switching and proper permission handling:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-o-<span class="w"> </span><span class="s2">&quot;https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?t=</span><span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
