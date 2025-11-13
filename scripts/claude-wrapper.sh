@@ -132,12 +132,18 @@ find_claude_binary() {
 install_wrapper() {
   echo -e "${YELLOW}Installing Claude Code wrapper...${NC}"
 
-  # Find the real claude binary
+  # Find the real claude binary (this will auto-install if not found)
   local real_claude=$(find_claude_binary)
   local find_result=$?
 
   if [[ $find_result -ne 0 ]] || [[ -z "$real_claude" ]]; then
+    # Claude Code installation failed or not found
     echo -e "${RED}✗ Cannot install wrapper without Claude Code binary${NC}" >&2
+    echo "" >&2
+    echo "Please ensure Claude Code is installed and in your PATH." >&2
+    echo "You may need to reload your shell:" >&2
+    echo "  . ~/.bashrc  # For Bash" >&2
+    echo "  . ~/.zshrc   # For Zsh" >&2
     exit 1
   fi
 
