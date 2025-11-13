@@ -1831,7 +1831,7 @@
 </code></pre></div></td></tr></table></div>
 <div class="admonition note">
 <p class="admonition-title">Having issues?</p>
-<p>If this installation doesn't work for some reason, see the <a href="#alternative-npm-based-installation">legacy npm-based installation</a> at the end of this guide.</p>
+<p>If this installation doesn't work for some reason, see the <a href="#alternative-npm-based-installation-legacy">legacy npm-based installation</a> at the end of this guide.</p>
 </div>
 <h3 id="3-install-claude-code-wrapper">3. Install Claude Code Wrapper<a class="headerlink" href="#3-install-claude-code-wrapper" title="Permanent link">&para;</a></h3>
 <p>Install the wrapper script that provides easy model switching and proper permission handling:</p>
@@ -2035,7 +2035,75 @@
 <span class="normal">187</span>
 <span class="normal">188</span>
 <span class="normal">189</span>
-<span class="normal">190</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
@@ -2050,6 +2118,68 @@
 <span class="nv">YELLOW</span><span class="o">=</span><span class="s1">&#39;\033[1;33m&#39;</span>
 <span class="nv">RED</span><span class="o">=</span><span class="s1">&#39;\033[0;31m&#39;</span>
 <span class="nv">NC</span><span class="o">=</span><span class="s1">&#39;\033[0m&#39;</span><span class="w"> </span><span class="c1"># No Color</span>
+
+<span class="c1"># Function to verify PATH configuration</span>
+verify_path_configuration<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">home_bin</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">home_local_bin</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin&quot;</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">current_shell</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="p">##*/</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">rc_file</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+
+<span class="w">  </span><span class="c1"># Determine which rc file to use</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$current_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;zsh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">rc_file</span><span class="o">=</span><span class="s2">&quot;~/.zshrc&quot;</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="nv">rc_file</span><span class="o">=</span><span class="s2">&quot;~/.bashrc&quot;</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Check if ~/bin is in PATH</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;:</span><span class="nv">$PATH</span><span class="s2">:&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span>*<span class="s2">&quot;:</span><span class="nv">$home_bin</span><span class="s2">:&quot;</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: </span><span class="nv">$home_bin</span><span class="s2"> is not in PATH</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;To fix this, add the following to </span><span class="nv">$rc_file</span><span class="s2">:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Then reload your shell:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  . </span><span class="nv">$rc_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Check if ~/.local/bin is in PATH</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;:</span><span class="nv">$PATH</span><span class="s2">:&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span>*<span class="s2">&quot;:</span><span class="nv">$home_local_bin</span><span class="s2">:&quot;</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: </span><span class="nv">$home_local_bin</span><span class="s2"> is not in PATH</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;To fix this, add the following to </span><span class="nv">$rc_file</span><span class="s2">:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Then reload your shell:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  . </span><span class="nv">$rc_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Check if ~/bin comes before ~/.local/bin</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_index</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-o<span class="w"> </span>-b<span class="w"> </span><span class="s2">&quot;^.*</span><span class="nv">$home_bin</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-c<span class="k">)</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">local_bin_index</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-o<span class="w"> </span>-b<span class="w"> </span><span class="s2">&quot;^.*</span><span class="nv">$home_local_bin</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-c<span class="k">)</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$bin_index</span><span class="w"> </span>-gt<span class="w"> </span><span class="nv">$local_bin_index</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$local_bin_index</span><span class="w"> </span>-gt<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: </span><span class="nv">$home_bin</span><span class="s2"> must come before </span><span class="nv">$home_local_bin</span><span class="s2"> in PATH</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;To fix this, ensure </span><span class="nv">$rc_file</span><span class="s2"> has:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Then reload your shell:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  . </span><span class="nv">$rc_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="o">}</span>
 
 <span class="c1"># Function to find the real claude binary (not in ~/bin)</span>
 find_claude_binary<span class="o">()</span><span class="w"> </span><span class="o">{</span>
@@ -2185,6 +2315,12 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="c1"># ============================================================================</span>
 <span class="c1"># WRAPPER FUNCTIONALITY</span>
 <span class="c1"># ============================================================================</span>
+
+<span class="c1"># Verify PATH configuration before running</span>
+verify_path_configuration
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="k">fi</span>
 
 <span class="c1"># AWS Bedrock Configuration</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">1</span>
