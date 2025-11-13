@@ -101,8 +101,12 @@ find_claude_binary() {
       if [[ -z "$claude_paths" ]]; then
         echo -e "${RED}✗ Claude Code still not found in PATH after installation${NC}" >&2
         echo "Please reload your shell and try again:" >&2
-        echo "  . ~/.bashrc  # For Bash" >&2
-        echo "  . ~/.zshrc   # For Zsh" >&2
+        local current_shell="${SHELL##*/}"
+        if [[ "$current_shell" == "zsh" ]]; then
+          echo "  . ~/.zshrc" >&2
+        else
+          echo "  . ~/.bashrc" >&2
+        fi
         return 1
       fi
     else
@@ -142,8 +146,12 @@ install_wrapper() {
     echo "" >&2
     echo "Please ensure Claude Code is installed and in your PATH." >&2
     echo "You may need to reload your shell:" >&2
-    echo "  . ~/.bashrc  # For Bash" >&2
-    echo "  . ~/.zshrc   # For Zsh" >&2
+    local current_shell="${SHELL##*/}"
+    if [[ "$current_shell" == "zsh" ]]; then
+      echo "  . ~/.zshrc" >&2
+    else
+      echo "  . ~/.bashrc" >&2
+    fi
     exit 1
   fi
 
