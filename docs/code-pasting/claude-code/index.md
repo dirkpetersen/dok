@@ -28,30 +28,7 @@ region = us-west-2
 !!! tip "Use AWS CLI to configure credentials"
     You can use the AWS CLI to set up your credentials conveniently. See the [AWS documentation](../../clouds/aws/index.md) for detailed instructions on configuring AWS CLI.
 
-### 2. Check and Install npm
-
-Before installing Claude Code, verify that npm is available and properly configured.
-
-**Copy and paste this command into your terminal:**
-
-```bash
-curl -o- "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/nodejs-install-check.sh?$(date +%s)" | bash
-```
-
-??? info "View script contents"
-    ```bash linenums="1"
-    --8<-- "scripts/nodejs-install-check.sh"
-    ```
-
-This script will:
-
-- Check if npm is installed
-- Attempt to load nodejs module (for HPC systems)
-- Install nvm and Node.js 24 if needed
-- Configure npm to install global packages in your home directory
-- Set up the correct PATH configuration
-
-### 3. Install Claude Code
+### 2. Install Claude Code
 
 Install Claude Code using the official binary installer:
 
@@ -68,7 +45,7 @@ curl -fsSL https://claude.ai/install.sh | bash -s latest
 
     **Note:** The older `npm i -g @anthropic-ai/claude-code` method is no longer recommended and may not receive updates.
 
-### 4. Install Claude Code Wrapper
+### 3. Install Claude Code Wrapper
 
 Install the wrapper script that provides easy model switching and proper permission handling:
 
@@ -89,7 +66,7 @@ This wrapper script will:
     --8<-- "scripts/claude-wrapper.sh"
     ```
 
-### 5. Test Claude Code
+### 4. Test Claude Code
 
 Create a test project and launch Claude Code:
 
@@ -229,6 +206,50 @@ claude opus /path/to/project
 - Use **Opus** for challenging problems requiring maximum capability
 - Ensure AWS credentials are properly configured before use
 - The wrapper script automatically handles model selection and AWS environment setup
+
+## Alternative: npm-based Installation
+
+If you prefer to use npm instead of the binary installer, follow these steps:
+
+### Check and Install npm
+
+Before installing Claude Code via npm, verify that npm is available and properly configured.
+
+**Copy and paste this command into your terminal:**
+
+```bash
+curl -o- "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/nodejs-install-check.sh?$(date +%s)" | bash
+```
+
+??? info "View script contents"
+    ```bash linenums="1"
+    --8<-- "scripts/nodejs-install-check.sh"
+    ```
+
+This script will:
+
+- Check if npm is installed
+- Attempt to load nodejs module (for HPC systems)
+- Install nvm and Node.js 24 if needed
+- Configure npm to install global packages in your home directory
+- Set up the correct PATH configuration
+
+### Install Claude Code via npm
+
+Once npm is set up, install Claude Code globally:
+
+```bash
+npm i -g @anthropic-ai/claude-code
+```
+
+!!! warning "npm Installation Not Recommended"
+    The npm package method (`npm i -g @anthropic-ai/claude-code`) is no longer the primary installation method. The binary installer is preferred because it:
+    - Does not require Node.js to be installed
+    - Provides faster installation and startup
+    - Simplifies updates and version management
+    - Works more consistently across platforms
+
+    Use this method only if you specifically need npm-based installation or already have Node.js installed.
 
 ## Next: Complete Project Development Workflow
 
