@@ -17,7 +17,7 @@ The Shell section is organized into three key areas:
 Run the comprehensive shell setup script to automatically configure everything:
 
 ```bash
-mkdir -p ~/temp && curl -o ~/temp/shell-setup.sh "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/shell-setup.sh?t=$(date +%s)" && bash ~/temp/shell-setup.sh
+mkdir -p ~/temp && curl -o ~/temp/shell-setup.sh "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/shell-setup.sh?$(date +%s)" && bash ~/temp/shell-setup.sh
 ```
 
 This script will:
