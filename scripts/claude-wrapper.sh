@@ -90,46 +90,60 @@ find_claude_binary() {
   # Get all claude executables in PATH
   local claude_paths=$(which -a claude 2>/dev/null || true)
 
-  if [[ -z "$claude_paths" ]]; then
-    echo -e "${YELLOW}Claude Code not found in PATH${NC}" >&2
-    echo "" >&2
-    echo "Installing Claude Code..." >&2
-    if curl -fsSL https://claude.ai/install.sh | bash -s latest; then
-      echo -e "${GREEN}✓${NC} Claude Code installed successfully${NC}" >&2
-      # Re-check PATH after installation
-      claude_paths=$(which -a claude 2>/dev/null || true)
-      if [[ -z "$claude_paths" ]]; then
-        echo -e "${RED}✗ Claude Code still not found in PATH after installation${NC}" >&2
-        echo "Please reload your shell and try again:" >&2
-        local current_shell="${SHELL##*/}"
-        if [[ "$current_shell" == "zsh" ]]; then
-          echo "  . ~/.zshrc" >&2
-        else
-          echo "  . ~/.bashrc" >&2
-        fi
-        return 1
-      fi
-    else
-      echo -e "${RED}✗ Failed to install Claude Code${NC}" >&2
-      return 1
-    fi
-  fi
-
   # Find first claude that is NOT in ~/bin
   local home_bin_expanded="$HOME/bin"
+  local real_claude=""
+
   while IFS= read -r claude_path; do
     # Expand ~ in path for comparison
     local expanded_path="${claude_path/#\~/$HOME}"
 
     # Skip if it's in ~/bin (could be our symlink)
     if [[ "$expanded_path" != "$home_bin_expanded"* ]]; then
-      echo "$expanded_path"
-      return 0
+      real_claude="$expanded_path"
+      break
     fi
   done <<< "$claude_paths"
 
-  echo -e "${RED}✗ Could not find Claude Code binary outside of ~/bin${NC}" >&2
-  return 1
+  # If we found a real claude binary, return it
+  if [[ -n "$real_claude" ]]; then
+    echo "$real_claude"
+    return 0
+  fi
+
+  # No Claude Code found outside ~/bin, try to install it
+  echo -e "${YELLOW}Claude Code not found in PATH${NC}" >&2
+  echo "" >&2
+  echo "Installing Claude Code..." >&2
+  if curl -fsSL https://claude.ai/install.sh | bash -s latest; then
+    echo -e "${GREEN}✓${NC} Claude Code installed successfully" >&2
+    echo "" >&2
+    # Re-check PATH after installation
+    claude_paths=$(which -a claude 2>/dev/null || true)
+
+    # Try to find it again
+    while IFS= read -r claude_path; do
+      local expanded_path="${claude_path/#\~/$HOME}"
+      if [[ "$expanded_path" != "$home_bin_expanded"* ]]; then
+        echo "$expanded_path"
+        return 0
+      fi
+    done <<< "$claude_paths"
+
+    # Still not found after install
+    echo -e "${RED}✗ Claude Code still not found in PATH after installation${NC}" >&2
+    echo "Please reload your shell and try again:" >&2
+    local current_shell="${SHELL##*/}"
+    if [[ "$current_shell" == "zsh" ]]; then
+      echo "  . ~/.zshrc" >&2
+    else
+      echo "  . ~/.bashrc" >&2
+    fi
+    return 1
+  else
+    echo -e "${RED}✗ Failed to install Claude Code${NC}" >&2
+    return 1
+  fi
 }
 
 # Function to install the wrapper
