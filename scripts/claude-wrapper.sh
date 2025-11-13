@@ -57,11 +57,17 @@ verify_path_configuration() {
   fi
 
   # Check if ~/bin comes before ~/.local/bin
-  local bin_index=$(echo "$PATH" | grep -o -b "^.*$home_bin" | wc -c)
-  local local_bin_index=$(echo "$PATH" | grep -o -b "^.*$home_local_bin" | wc -c)
+  # Find position of first occurrence of each directory in PATH
+  local path_before_bin="${PATH%%:$home_bin:*}"
+  local path_before_local_bin="${PATH%%:$home_local_bin:*}"
 
-  if [[ $bin_index -gt $local_bin_index ]] && [[ $local_bin_index -gt 0 ]]; then
+  # If path_before_bin is longer, it means ~/.local/bin appears first
+  if [[ ${#path_before_local_bin} -lt ${#path_before_bin} ]]; then
     echo -e "${RED}✗ Error: $home_bin must come before $home_local_bin in PATH${NC}" >&2
+    echo "" >&2
+    echo "Current PATH order:" >&2
+    echo "  $home_local_bin comes first" >&2
+    echo "  $home_bin comes second" >&2
     echo "" >&2
     echo "To fix this, ensure $rc_file has:" >&2
     echo "" >&2
