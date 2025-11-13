@@ -53,11 +53,20 @@ This script will:
 
 ### 3. Install Claude Code
 
-Install Claude Code globally via npm:
+Install Claude Code using the official binary installer:
 
 ```bash
-npm i -g @anthropic-ai/claude-code
+curl -fsSL https://claude.ai/install.sh | bash -s latest
 ```
+
+!!! note "Binary Installation (Recommended)"
+    The official binary installer (`claude.ai/install.sh`) has replaced the npm package method. This approach:
+    - Installs pre-compiled binaries directly (no Node.js dependency)
+    - Provides faster installation and startup
+    - Simplifies updates and version management
+    - Works consistently across all platforms
+
+    **Note:** The older `npm i -g @anthropic-ai/claude-code` method is no longer recommended and may not receive updates.
 
 ### 4. Install Claude Code Wrapper
 
