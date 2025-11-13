@@ -2325,6 +2325,12 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
 <span class="o">}</span>
 
+<span class="c1"># Check PATH configuration early, before any installation attempts</span>
+verify_path_configuration
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="k">fi</span>
+
 <span class="c1"># Check if this is an installation run</span>
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;--install&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span>install_wrapper
@@ -2355,12 +2361,6 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="c1"># ============================================================================</span>
 <span class="c1"># WRAPPER FUNCTIONALITY</span>
 <span class="c1"># ============================================================================</span>
-
-<span class="c1"># Verify PATH configuration before running</span>
-verify_path_configuration
-<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
-<span class="k">fi</span>
 
 <span class="c1"># AWS Bedrock Configuration</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">1</span>
