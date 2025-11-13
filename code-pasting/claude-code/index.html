@@ -1035,15 +1035,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#alternative-npm-based-installation" class="md-nav__link">
+  <a href="#alternative-npm-based-installation-legacy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Alternative: npm-based Installation
+        Alternative: npm-based Installation (Legacy)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Alternative: npm-based Installation">
+    <nav class="md-nav" aria-label="Alternative: npm-based Installation (Legacy)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1734,15 +1734,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#alternative-npm-based-installation" class="md-nav__link">
+  <a href="#alternative-npm-based-installation-legacy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Alternative: npm-based Installation
+        Alternative: npm-based Installation (Legacy)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Alternative: npm-based Installation">
+    <nav class="md-nav" aria-label="Alternative: npm-based Installation (Legacy)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1830,13 +1830,8 @@
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://claude.ai/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash<span class="w"> </span>-s<span class="w"> </span>latest
 </code></pre></div></td></tr></table></div>
 <div class="admonition note">
-<p class="admonition-title">Binary Installation (Recommended)</p>
-<p>The official binary installer (<code>claude.ai/install.sh</code>) has replaced the npm package method. This approach:
-- Installs pre-compiled binaries directly (no Node.js dependency)
-- Provides faster installation and startup
-- Simplifies updates and version management
-- Works consistently across all platforms</p>
-<p><strong>Note:</strong> The older <code>npm i -g @anthropic-ai/claude-code</code> method is no longer recommended and may not receive updates.</p>
+<p class="admonition-title">Having issues?</p>
+<p>If this installation doesn't work for some reason, see the <a href="#alternative-npm-based-installation">legacy npm-based installation</a> at the end of this guide.</p>
 </div>
 <h3 id="3-install-claude-code-wrapper">3. Install Claude Code Wrapper<a class="headerlink" href="#3-install-claude-code-wrapper" title="Permanent link">&para;</a></h3>
 <p>Install the wrapper script that provides easy model switching and proper permission handling:</p>
@@ -2380,8 +2375,8 @@ git<span class="w"> </span>init
 <li>Ensure AWS credentials are properly configured before use</li>
 <li>The wrapper script automatically handles model selection and AWS environment setup</li>
 </ul>
-<h2 id="alternative-npm-based-installation">Alternative: npm-based Installation<a class="headerlink" href="#alternative-npm-based-installation" title="Permanent link">&para;</a></h2>
-<p>If you prefer to use npm instead of the binary installer, follow these steps:</p>
+<h2 id="alternative-npm-based-installation-legacy">Alternative: npm-based Installation (Legacy)<a class="headerlink" href="#alternative-npm-based-installation-legacy" title="Permanent link">&para;</a></h2>
+<p>If the binary installer doesn't work or you prefer npm, follow these steps:</p>
 <h3 id="check-and-install-npm">Check and Install npm<a class="headerlink" href="#check-and-install-npm" title="Permanent link">&para;</a></h3>
 <p>Before installing Claude Code via npm, verify that npm is available and properly configured.</p>
 <p><strong>Copy and paste this command into your terminal:</strong></p>
@@ -2762,14 +2757,9 @@ npm<span class="w"> </span>--version
 <p>Once npm is set up, install Claude Code globally:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>npm<span class="w"> </span>i<span class="w"> </span>-g<span class="w"> </span>@anthropic-ai/claude-code
 </code></pre></div></td></tr></table></div>
-<div class="admonition warning">
-<p class="admonition-title">npm Installation Not Recommended</p>
-<p>The npm package method (<code>npm i -g @anthropic-ai/claude-code</code>) is no longer the primary installation method. The binary installer is preferred because it:
-- Does not require Node.js to be installed
-- Provides faster installation and startup
-- Simplifies updates and version management
-- Works more consistently across platforms</p>
-<p>Use this method only if you specifically need npm-based installation or already have Node.js installed.</p>
+<div class="admonition note">
+<p class="admonition-title">Legacy Method</p>
+<p>This is a fallback if the primary binary installation doesn't work for you.</p>
 </div>
 <h2 id="next-complete-project-development-workflow">Next: Complete Project Development Workflow<a class="headerlink" href="#next-complete-project-development-workflow" title="Permanent link">&para;</a></h2>
 <p>Ready to develop a full project with Claude Code? Follow the <strong><a href="tutorial/">Claude Code Tutorial</a></strong> for the complete step-by-step workflow using the recommended Haiku → Sonnet → Opus escalation strategy.</p>
