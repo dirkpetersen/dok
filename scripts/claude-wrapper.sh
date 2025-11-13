@@ -200,6 +200,12 @@ install_wrapper() {
   exit 0
 }
 
+# Check PATH configuration early, before any installation attempts
+verify_path_configuration
+if [[ $? -ne 0 ]]; then
+  exit 1
+fi
+
 # Check if this is an installation run
 if [[ "$1" == "--install" ]]; then
   install_wrapper
@@ -230,12 +236,6 @@ fi
 # ============================================================================
 # WRAPPER FUNCTIONALITY
 # ============================================================================
-
-# Verify PATH configuration before running
-verify_path_configuration
-if [[ $? -ne 0 ]]; then
-  exit 1
-fi
 
 # AWS Bedrock Configuration
 export CLAUDE_CODE_USE_BEDROCK=1
