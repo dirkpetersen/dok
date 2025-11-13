@@ -2123,7 +2123,10 @@
 <span class="normal">275</span>
 <span class="normal">276</span>
 <span class="normal">277</span>
-<span class="normal">278</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
@@ -2182,12 +2185,15 @@ verify_path_configuration<span class="o">()</span><span class="w"> </span><span 
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="c1"># Check if ~/bin comes before ~/.local/bin</span>
-<span class="w">  </span><span class="c1"># Find position of first occurrence of each directory in PATH</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">path_before_bin</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">PATH</span><span class="p">%%:</span><span class="nv">$home_bin</span><span class="p">:*</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">path_before_local_bin</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">PATH</span><span class="p">%%:</span><span class="nv">$home_local_bin</span><span class="p">:*</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="c1"># Add colons to beginning and end for easier matching</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">normalized_path</span><span class="o">=</span><span class="s2">&quot;:</span><span class="nv">$PATH</span><span class="s2">:&quot;</span>
 
-<span class="w">  </span><span class="c1"># If path_before_bin is longer, it means ~/.local/bin appears first</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="si">${#</span><span class="nv">path_before_local_bin</span><span class="si">}</span><span class="w"> </span>-lt<span class="w"> </span><span class="si">${#</span><span class="nv">path_before_bin</span><span class="si">}</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="c1"># Find the position of first occurrence of each directory</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_pos</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">normalized_path</span><span class="p">%%:</span><span class="nv">$home_bin</span><span class="p">:*</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">local_bin_pos</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">normalized_path</span><span class="p">%%:</span><span class="nv">$home_local_bin</span><span class="p">:*</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="w">  </span><span class="c1"># If local_bin appears before bin, the prefix will be shorter</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="si">${#</span><span class="nv">local_bin_pos</span><span class="si">}</span><span class="w"> </span>-lt<span class="w"> </span><span class="si">${#</span><span class="nv">bin_pos</span><span class="si">}</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: </span><span class="nv">$home_bin</span><span class="s2"> must come before </span><span class="nv">$home_local_bin</span><span class="s2"> in PATH</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Current PATH order:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
