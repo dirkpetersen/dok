@@ -14,6 +14,68 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Function to verify PATH configuration
+verify_path_configuration() {
+  local home_bin="$HOME/bin"
+  local home_local_bin="$HOME/.local/bin"
+  local current_shell="${SHELL##*/}"
+  local rc_file=""
+
+  # Determine which rc file to use
+  if [[ "$current_shell" == "zsh" ]]; then
+    rc_file="~/.zshrc"
+  else
+    rc_file="~/.bashrc"
+  fi
+
+  # Check if ~/bin is in PATH
+  if [[ ":$PATH:" != *":$home_bin:"* ]]; then
+    echo -e "${RED}✗ Error: $home_bin is not in PATH${NC}" >&2
+    echo "" >&2
+    echo "To fix this, add the following to $rc_file:" >&2
+    echo "" >&2
+    echo "  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH" >&2
+    echo "" >&2
+    echo "Then reload your shell:" >&2
+    echo "  . $rc_file" >&2
+    echo "" >&2
+    return 1
+  fi
+
+  # Check if ~/.local/bin is in PATH
+  if [[ ":$PATH:" != *":$home_local_bin:"* ]]; then
+    echo -e "${RED}✗ Error: $home_local_bin is not in PATH${NC}" >&2
+    echo "" >&2
+    echo "To fix this, add the following to $rc_file:" >&2
+    echo "" >&2
+    echo "  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH" >&2
+    echo "" >&2
+    echo "Then reload your shell:" >&2
+    echo "  . $rc_file" >&2
+    echo "" >&2
+    return 1
+  fi
+
+  # Check if ~/bin comes before ~/.local/bin
+  local bin_index=$(echo "$PATH" | grep -o -b "^.*$home_bin" | wc -c)
+  local local_bin_index=$(echo "$PATH" | grep -o -b "^.*$home_local_bin" | wc -c)
+
+  if [[ $bin_index -gt $local_bin_index ]] && [[ $local_bin_index -gt 0 ]]; then
+    echo -e "${RED}✗ Error: $home_bin must come before $home_local_bin in PATH${NC}" >&2
+    echo "" >&2
+    echo "To fix this, ensure $rc_file has:" >&2
+    echo "" >&2
+    echo "  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH" >&2
+    echo "" >&2
+    echo "Then reload your shell:" >&2
+    echo "  . $rc_file" >&2
+    echo "" >&2
+    return 1
+  fi
+
+  return 0
+}
+
 # Function to find the real claude binary (not in ~/bin)
 find_claude_binary() {
   # Get all claude executables in PATH
@@ -148,6 +210,12 @@ fi
 # ============================================================================
 # WRAPPER FUNCTIONALITY
 # ============================================================================
+
+# Verify PATH configuration before running
+verify_path_configuration
+if [[ $? -ne 0 ]]; then
+  exit 1
+fi
 
 # AWS Bedrock Configuration
 export CLAUDE_CODE_USE_BEDROCK=1

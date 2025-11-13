@@ -37,7 +37,7 @@ curl -fsSL https://claude.ai/install.sh | bash -s latest
 ```
 
 !!! note "Having issues?"
-    If this installation doesn't work for some reason, see the [legacy npm-based installation](#alternative-npm-based-installation) at the end of this guide.
+    If this installation doesn't work for some reason, see the [legacy npm-based installation](#alternative-npm-based-installation-legacy) at the end of this guide.
 
 ### 3. Install Claude Code Wrapper
 
