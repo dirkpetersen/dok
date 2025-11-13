@@ -57,12 +57,15 @@ verify_path_configuration() {
   fi
 
   # Check if ~/bin comes before ~/.local/bin
-  # Find position of first occurrence of each directory in PATH
-  local path_before_bin="${PATH%%:$home_bin:*}"
-  local path_before_local_bin="${PATH%%:$home_local_bin:*}"
+  # Add colons to beginning and end for easier matching
+  local normalized_path=":$PATH:"
 
-  # If path_before_bin is longer, it means ~/.local/bin appears first
-  if [[ ${#path_before_local_bin} -lt ${#path_before_bin} ]]; then
+  # Find the position of first occurrence of each directory
+  local bin_pos="${normalized_path%%:$home_bin:*}"
+  local local_bin_pos="${normalized_path%%:$home_local_bin:*}"
+
+  # If local_bin appears before bin, the prefix will be shorter
+  if [[ ${#local_bin_pos} -lt ${#bin_pos} ]]; then
     echo -e "${RED}✗ Error: $home_bin must come before $home_local_bin in PATH${NC}" >&2
     echo "" >&2
     echo "Current PATH order:" >&2
