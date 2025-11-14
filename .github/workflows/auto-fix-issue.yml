@@ -3,12 +3,43 @@ name: Auto-Fix Issue with Claude Code
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to process manually'
+        required: true
+        type: number
 
 jobs:
   auto-fix:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Determine issue number
+        id: issue_num
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ github.event.inputs.issue_number }}" >> $GITHUB_OUTPUT
+          else
+            echo "value=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fetch issue data
+        id: issue_data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUM=${{ steps.issue_num.outputs.value }}
+          ISSUE_JSON=$(gh api repos/dirkpetersen/dok/issues/$ISSUE_NUM)
+          ISSUE_TITLE=$(echo "$ISSUE_JSON" | jq -r '.title')
+          ISSUE_BODY=$(echo "$ISSUE_JSON" | jq -r '.body')
+
+          echo "number=$ISSUE_NUM" >> $GITHUB_OUTPUT
+          echo "title=$ISSUE_TITLE" >> $GITHUB_OUTPUT
+
+          # Save body to file since it can be multiline
+          echo "$ISSUE_BODY" > /tmp/issue-body.txt
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -29,18 +60,18 @@ jobs:
 
       - name: Create feature branch
         run: |
-          BRANCH_NAME="fix/issue-${{ github.event.issue.number }}"
+          BRANCH_NAME="fix/issue-${{ steps.issue_data.outputs.number }}"
           git checkout -b "$BRANCH_NAME"
           git push origin "$BRANCH_NAME"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create issue context file
-        env:
-          ISSUE_NUM: ${{ github.event.issue.number }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
+          ISSUE_NUM=${{ steps.issue_data.outputs.number }}
+          ISSUE_TITLE="${{ steps.issue_data.outputs.title }}"
+          ISSUE_BODY=$(cat /tmp/issue-body.txt)
+
           mkdir -p /tmp
           cat > /tmp/issue-context.txt <<EOF
           Issue #$ISSUE_NUM: $ISSUE_TITLE
@@ -90,8 +121,8 @@ jobs:
         if: steps.changes.outputs.HAS_CHANGES == 'true'
         run: |
           git add -A
-          git commit -m "fix: Resolve issue #${{ github.event.issue.number }}"
-          git push origin "fix/issue-${{ github.event.issue.number }}"
+          git commit -m "fix: Resolve issue #${{ steps.issue_data.outputs.number }}"
+          git push origin "fix/issue-${{ steps.issue_data.outputs.number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -100,8 +131,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ISSUE_NUM=${{ github.event.issue.number }}
-          ISSUE_TITLE="${{ github.event.issue.title }}"
+          ISSUE_NUM=${{ steps.issue_data.outputs.number }}
+          ISSUE_TITLE="${{ steps.issue_data.outputs.title }}"
           BRANCH="fix/issue-$ISSUE_NUM"
 
           # Create PR using gh CLI
