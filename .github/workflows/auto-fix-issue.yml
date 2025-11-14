@@ -54,7 +54,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.BEDROCK_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.BEDROCK_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-west-2
-          AWS_PROFILE: bedrock
           CLAUDE_CODE_USE_BEDROCK: 1
         run: |
           ISSUE_NUM=${{ github.event.issue.number }}
