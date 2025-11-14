@@ -97,30 +97,35 @@ jobs:
 
       - name: Create Pull Request
         if: steps.changes.outputs.HAS_CHANGES == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const issueNumber = context.payload.issue.number;
-            const issueTitle = context.payload.issue.title;
-            const branch = "fix/issue-" + issueNumber;
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUM=${{ github.event.issue.number }}
+          ISSUE_TITLE="${{ github.event.issue.title }}"
+          BRANCH="fix/issue-$ISSUE_NUM"
 
-            const pr = await github.rest.pulls.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: "Fix: Resolve issue #" + issueNumber,
-              head: branch,
-              base: "main",
-              body: "## Automated Fix\n\nThis PR automatically addresses issue #" + issueNumber + ".\n\n**Issue**: " + issueTitle + "\n\nPlease review and merge if the fix looks good.\n\nFixes #" + issueNumber
-            });
+          # Create PR using gh CLI
+          PR_URL=$(gh pr create \
+            --repo dirkpetersen/dok \
+            --head "$BRANCH" \
+            --base main \
+            --title "Fix: Resolve issue #$ISSUE_NUM" \
+            --body "## Automated Fix
 
-            console.log("Created PR #" + pr.data.number);
+This PR automatically addresses issue #$ISSUE_NUM.
 
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              body: "🤖 PR #" + pr.data.number + " created with automated fix. Please review!"
-            });
+**Issue**: $ISSUE_TITLE
+
+Please review and merge if the fix looks good.
+
+Fixes #$ISSUE_NUM")
+
+          echo "Created PR: $PR_URL"
+
+          # Comment on the issue
+          gh issue comment $ISSUE_NUM \
+            --repo dirkpetersen/dok \
+            --body "🤖 PR created with automated fix: $PR_URL - Please review!"
 
       - name: Comment if no changes
         if: steps.changes.outputs.HAS_CHANGES == 'false'
