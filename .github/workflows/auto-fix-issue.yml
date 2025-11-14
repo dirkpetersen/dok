@@ -127,6 +127,11 @@ Fixes #$ISSUE_NUM")
             --repo dirkpetersen/dok \
             --body "🤖 PR created with automated fix: $PR_URL - Please review!"
 
+          # Close the issue since a PR was created
+          gh issue close $ISSUE_NUM \
+            --repo dirkpetersen/dok \
+            --comment "✅ Automated fix completed. Closing this issue as PR $PR_URL has been created with the solution."
+
       - name: Comment if no changes
         if: steps.changes.outputs.HAS_CHANGES == 'false'
         uses: actions/github-script@v7
