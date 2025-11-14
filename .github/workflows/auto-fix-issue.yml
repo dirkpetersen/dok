@@ -22,63 +22,73 @@ jobs:
       - name: Install Claude Code
         run: npm i -g @anthropic-ai/claude-code
 
+      - name: Configure Git
+        run: |
+          git config user.email "dirkpetersen@users.noreply.github.com"
+          git config user.name "Automated Claude Code"
+
       - name: Create feature branch
         run: |
-          git config user.email "${{ secrets.GIT_EMAIL }}"
-          git config user.name "${{ secrets.GIT_NAME }}"
           BRANCH_NAME="fix/issue-${{ github.event.issue.number }}"
           git checkout -b "$BRANCH_NAME"
           git push origin "$BRANCH_NAME"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare Claude Code prompt
-        id: prompt
+      - name: Create prompt file with issue context
         run: |
-          ISSUE_TITLE="${{ github.event.issue.title }}"
-          ISSUE_BODY="${{ github.event.issue.body }}"
-          ISSUE_NUMBER="${{ github.event.issue.number }}"
-
-          cat > /tmp/claude-prompt.txt << 'EOF'
-You are an automated assistant tasked with fixing a GitHub issue in this repository.
-
-## Issue Details
-Title: ${{ github.event.issue.title }}
-Issue #${{ github.event.issue.number }}
+          cat > /tmp/issue-context.txt << 'ISSUE_EOF'
+Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
 
 Description:
 ${{ github.event.issue.body }}
+ISSUE_EOF
 
-## Your Task
-1. Analyze the issue and understand what needs to be fixed
-2. Make necessary changes to the codebase or documentation
-3. Commit your changes with a clear message referencing the issue
-4. Create a pull request that addresses this issue
-
-## Important
-- Reference the issue number in your commit message and PR description
-- Use conventional commit format: "fix: description (fixes #issue_number)"
-- Make sure all changes are tested and working
-- Keep changes focused and minimal for this issue
-
-Please proceed with fixing this issue.
-EOF
-          echo "PROMPT_FILE=/tmp/claude-prompt.txt" >> $GITHUB_OUTPUT
-
-      - name: Run Claude Code to fix issue
+      - name: Run Claude Code to analyze and fix issue
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.BEDROCK_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.BEDROCK_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-west-2
           AWS_PROFILE: bedrock
           CLAUDE_CODE_USE_BEDROCK: 1
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          # Read the prompt
-          PROMPT=$(cat /tmp/claude-prompt.txt)
+          # Create a simple wrapper to run Claude Code
+          cat > /tmp/fix-issue.sh << 'EOF'
+          #!/bin/bash
+          set -e
 
-          # Run Claude Code in batch mode
-          echo "$PROMPT" | claude sonnet --no-verify
+          ISSUE_NUM=$1
+          REPO_DIR="."
+
+          # Read issue context
+          CONTEXT=$(cat /tmp/issue-context.txt)
+
+          cat > /tmp/claude-prompt.md << PROMPT_EOF
+          # Automated Issue Fix
+
+          You are an AI assistant helping to fix GitHub issues in a documentation and tooling repository.
+
+          $CONTEXT
+
+          ## Your Task:
+          1. Analyze the issue and understand what needs to be fixed
+          2. Make necessary changes to resolve it (docs, code, scripts, configs)
+          3. Keep changes minimal and focused on this issue
+
+          ## After completing:
+          - Commit your changes with message: "fix: Resolve issue #$ISSUE_NUM"
+          - You will not create a PR; that will be done automatically
+
+          Proceed with fixing this issue now.
+          PROMPT_EOF
+
+          # Execute claude code with the prompt
+          cd "$REPO_DIR"
+          claude /tmp/claude-prompt.md
+          EOF
+
+          chmod +x /tmp/fix-issue.sh
+          /tmp/fix-issue.sh ${{ github.event.issue.number }}
 
       - name: Check for changes
         id: changes
@@ -89,15 +99,11 @@ EOF
             echo "HAS_CHANGES=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Commit changes
+      - name: Commit changes if any
         if: steps.changes.outputs.HAS_CHANGES == 'true'
         run: |
-          git add .
-          git commit -m "fix: Resolve issue #${{ github.event.issue.number }}
-
-This automated fix addresses the reported issue.
-
-Fixes #${{ github.event.issue.number }}"
+          git add -A
+          git commit -m "fix: Resolve issue #${{ github.event.issue.number }}"
           git push origin "fix/issue-${{ github.event.issue.number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
