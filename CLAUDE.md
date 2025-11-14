@@ -23,8 +23,11 @@ The repository follows a standard MkDocs structure with organized topic sections
   - `claude-wrapper.sh` - AWS Bedrock wrapper for Claude Code with model switching
   - `shell-setup.sh` - Comprehensive shell and SSH setup automation
   - `nodejs-install-check.sh` - Node.js installation verification
+  - `vim-wrapper.sh` - Simple vim editor wrapper with easy-edit mode (double-escape to save/quit)
+- `.github/workflows/` - GitHub Actions automation
+  - `deploy.yml` - Builds and deploys documentation to GitHub Pages
+  - `auto-fix-issue.yml` - Triggered on new issues, runs Claude Code to analyze and fix problems
 - `mkdocs.yml` - Site configuration with navigation structure
-- `.github/workflows/deploy.yml` - Automated GitHub Pages deployment
 
 ### Key Scripts
 
@@ -32,7 +35,9 @@ The scripts directory contains production-ready automation tools documented in t
 
 1. **claude-wrapper.sh**: Wraps Claude Code CLI with AWS Bedrock integration, providing easy model switching (opus/sonnet/haiku) and permission management. Self-installs to `~/bin/claude`.
 
-2. **shell-setup.sh**: Idempotent setup script that configures a complete development environment including PATH, SSH keys with passphrases, GPG keys for Git signing, keychain for SSH key management, and Vim configuration. Supports `--force` mode with backups and `--revert` to undo all changes.
+2. **shell-setup.sh**: Idempotent setup script that configures a complete development environment including PATH, SSH keys with passphrases, GPG keys for Git signing, keychain for SSH key management, Vim configuration, and vim-wrapper installation. Supports `--force` mode with backups and `--revert` to undo all changes.
+
+3. **vim-wrapper.sh**: Simple vim wrapper that starts in insert mode and provides a double-escape (within 500ms) interface to save/quit without needing `:wq` or colon commands. Only prompts to save if changes were made. Installed as `~/bin/vim-wrapper` with symlink `~/bin/edr` for easy access.
 
 ## Common Commands
 
@@ -84,6 +89,38 @@ Manual deployment (if needed):
 ```bash
 mkdocs gh-deploy
 ```
+
+### Automated Issue Resolution Workflow
+
+GitHub Actions automatically resolves issues by triggering Claude Code to analyze, fix, and create pull requests:
+
+**Trigger**: New GitHub issue created
+
+**Workflow Steps**:
+1. Sets up Node.js runner (modern LTS version)
+2. Installs Claude Code globally via npm: `npm i -g @anthropic-ai/claude-code`
+3. Configures AWS credentials from GitHub Secrets (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+4. Creates feature branch based on issue ID: `fix/issue-{issue_number}`
+5. Clones repository and checks out new branch
+6. Executes Claude Code in batch mode with automated fix prompt:
+   - Reads issue description and context
+   - Analyzes the problem
+   - Makes necessary code/documentation changes
+   - Commits changes with reference to issue
+   - Creates and submits pull request
+7. Links pull request to original issue with resolution context
+
+**Configuration**:
+- AWS Bedrock credentials must be stored as GitHub repository secrets:
+  - `BEDROCK_AWS_ACCESS_KEY_ID`
+  - `BEDROCK_AWS_SECRET_ACCESS_KEY`
+- Claude Code uses AWS Bedrock for model inference
+- Supports model selection via environment variables (haiku/sonnet/opus)
+
+**Security**:
+- AWS credentials used only in GitHub Actions runners
+- Pull requests reviewed before merge
+- All operations logged and traceable to issue source
 
 ## Documentation Philosophy
 
