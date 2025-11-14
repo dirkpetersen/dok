@@ -135,21 +135,26 @@ jobs:
           ISSUE_TITLE="${{ steps.issue_data.outputs.title }}"
           BRANCH="fix/issue-$ISSUE_NUM"
 
-          # Create PR using gh CLI
+          # Create PR using gh CLI with heredoc for multiline body
+          PR_BODY=$(cat <<EOF
+          ## Automated Fix
+
+          This PR automatically addresses issue #$ISSUE_NUM.
+
+          **Issue**: $ISSUE_TITLE
+
+          Please review and merge if the fix looks good.
+
+          Fixes #$ISSUE_NUM
+          EOF
+          )
+
           PR_URL=$(gh pr create \
             --repo dirkpetersen/dok \
             --head "$BRANCH" \
             --base main \
             --title "Fix: Resolve issue #$ISSUE_NUM" \
-            --body "## Automated Fix
-
-This PR automatically addresses issue #$ISSUE_NUM.
-
-**Issue**: $ISSUE_TITLE
-
-Please review and merge if the fix looks good.
-
-Fixes #$ISSUE_NUM")
+            --body "$PR_BODY")
 
           echo "Created PR: $PR_URL"
 
