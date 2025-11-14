@@ -129,7 +129,7 @@ jobs:
       - name: Create Pull Request
         if: steps.changes.outputs.HAS_CHANGES == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           ISSUE_NUM=${{ steps.issue_data.outputs.number }}
           ISSUE_TITLE="${{ steps.issue_data.outputs.title }}"
