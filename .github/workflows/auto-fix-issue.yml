@@ -56,7 +56,6 @@ jobs:
           AWS_REGION: us-west-2
           CLAUDE_CODE_USE_BEDROCK: 1
         run: |
-          ISSUE_NUM=${{ github.event.issue.number }}
           cat > /tmp/fix-prompt.md <<'PROMPT_EOF'
           # Fix GitHub Issue
 
@@ -74,8 +73,8 @@ jobs:
           When done, I will commit and create a PR automatically.
           PROMPT_EOF
 
-          # Run Claude Code
-          claude /tmp/fix-prompt.md
+          # Run Claude Code with stdin
+          cat /tmp/fix-prompt.md | claude
 
       - name: Check for changes
         id: changes
