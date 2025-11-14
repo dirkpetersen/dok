@@ -67,10 +67,11 @@ jobs:
 
           ## Your Task
           1. Analyze the issue
-          2. Make necessary changes to fix it
+          2. Make necessary changes to fix it (use Edit tool to modify files)
           3. Keep changes minimal and focused
+          4. Test your changes if possible
 
-          When done, I will commit and create a PR automatically.
+          When done, I will automatically commit and create a PR.
           PROMPT_EOF
 
           # Run Claude Code with stdin
