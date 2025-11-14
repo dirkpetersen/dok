@@ -142,8 +142,8 @@ Understanding the differences between the three available models helps you choos
 | **Speed** | ⚡ Fast | ⚡⚡ Medium | 🐌 Slow |
 | **Cost** | 💰 $0.80/MTok | 💰💰 $3.00/MTok | 💰💰💰 $15.00/MTok |
 | **Performance** | Excellent | Very Good | Superior |
-| **Complex Tasks** | ⭐ | ⭐⭐⭐ Medium | ⭐⭐⭐⭐⭐ High |
-| **Coding Skills** | ⭐⭐ Medium | ⭐⭐⭐ Good | ⭐⭐⭐⭐⭐ Excellent |
+| **Complex Tasks** | ⭐⭐⭐ Medium | ⭐⭐⭐⭐ High | ⭐⭐⭐⭐⭐ Excellent |
+| **Coding Skills** | ⭐⭐⭐⭐ High | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐⭐ Excellent |
 
 ## Usage
 
