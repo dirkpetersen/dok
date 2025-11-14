@@ -74,8 +74,8 @@ jobs:
           When done, I will automatically commit and create a PR.
           PROMPT_EOF
 
-          # Run Claude Code with stdin
-          cat /tmp/fix-prompt.md | claude
+          # Run Claude Code with stdin in fully automated mode
+          cat /tmp/fix-prompt.md | claude --dangerously-skip-permissions
 
       - name: Check for changes
         id: changes
