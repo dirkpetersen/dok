@@ -189,6 +189,14 @@ revert_changes() {
           ((skipped++))
           ;;
         "GIT_CONFIG")
+          # Check if Git is installed before attempting to revert Git config
+          if ! command -v git &> /dev/null; then
+            echo -e "${YELLOW}⊘${NC} Git not installed, skipping Git config revert"
+            skipped_items+=("Git config (Git not installed)")
+            ((skipped++))
+            continue
+          fi
+
           local config=$(echo "$details" | cut -d'=' -f1)
           local old_value=$(echo "$details" | cut -d'=' -f2-)
           if [[ "$old_value" == "UNSET" ]]; then
@@ -1037,6 +1045,13 @@ setup_git_config() {
   local git_name="$1"
   local git_email="$2"
 
+  # Check if Git is installed
+  if ! command -v git &> /dev/null; then
+    echo -e "${YELLOW}Git not installed. Skipping Git configuration.${NC}"
+    echo -e "${YELLOW}To install: sudo apt install git (or brew install git on macOS)${NC}"
+    return 0
+  fi
+
   # Check if git is already configured
   local current_name=$(git config --global user.name 2>/dev/null)
   local current_email=$(git config --global user.email 2>/dev/null)
@@ -1186,7 +1201,7 @@ setup_git_config "$user_name" "$user_email"
 
 # Configure GPG signing if we have a GPG key
 previous_signing_key=""
-if [[ -n "$gpg_key_id" ]]; then
+if [[ -n "$gpg_key_id" ]] && command -v git &> /dev/null; then
   # Check if Git signing is already configured with a different key
   current_signing_key=$(git config --global user.signingkey 2>/dev/null || echo "")
   current_gpgsign=$(git config --global commit.gpgsign 2>/dev/null || echo "false")
