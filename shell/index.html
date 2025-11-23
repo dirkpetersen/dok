@@ -2895,7 +2895,22 @@
 <span class="normal">1267</span>
 <span class="normal">1268</span>
 <span class="normal">1269</span>
-<span class="normal">1270</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1270</span>
+<span class="normal">1271</span>
+<span class="normal">1272</span>
+<span class="normal">1273</span>
+<span class="normal">1274</span>
+<span class="normal">1275</span>
+<span class="normal">1276</span>
+<span class="normal">1277</span>
+<span class="normal">1278</span>
+<span class="normal">1279</span>
+<span class="normal">1280</span>
+<span class="normal">1281</span>
+<span class="normal">1282</span>
+<span class="normal">1283</span>
+<span class="normal">1284</span>
+<span class="normal">1285</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3086,6 +3101,14 @@ revert_changes<span class="o">()</span><span class="w"> </span><span class="o">{
 <span class="w">          </span><span class="o">((</span>skipped++<span class="o">))</span>
 <span class="w">          </span><span class="p">;;</span>
 <span class="w">        </span><span class="s2">&quot;GIT_CONFIG&quot;</span><span class="o">)</span>
+<span class="w">          </span><span class="c1"># Check if Git is installed before attempting to revert Git config</span>
+<span class="w">          </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>git<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⊘</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Git not installed, skipping Git config revert&quot;</span>
+<span class="w">            </span><span class="nv">skipped_items</span><span class="o">+=(</span><span class="s2">&quot;Git config (Git not installed)&quot;</span><span class="o">)</span>
+<span class="w">            </span><span class="o">((</span>skipped++<span class="o">))</span>
+<span class="w">            </span><span class="k">continue</span>
+<span class="w">          </span><span class="k">fi</span>
+
 <span class="w">          </span><span class="nb">local</span><span class="w"> </span><span class="nv">config</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$details</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;=&#39;</span><span class="w"> </span>-f1<span class="k">)</span>
 <span class="w">          </span><span class="nb">local</span><span class="w"> </span><span class="nv">old_value</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$details</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;=&#39;</span><span class="w"> </span>-f2-<span class="k">)</span>
 <span class="w">          </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$old_value</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;UNSET&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -3934,6 +3957,13 @@ setup_git_config<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">git_name</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">git_email</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
 
+<span class="w">  </span><span class="c1"># Check if Git is installed</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>git<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Git not installed. Skipping Git configuration.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">To install: sudo apt install git (or brew install git on macOS)</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">fi</span>
+
 <span class="w">  </span><span class="c1"># Check if git is already configured</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">current_name</span><span class="o">=</span><span class="k">$(</span>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="k">)</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">current_email</span><span class="o">=</span><span class="k">$(</span>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="k">)</span>
@@ -4083,7 +4113,7 @@ setup_git_config<span class="w"> </span><span class="s2">&quot;</span><span clas
 
 <span class="c1"># Configure GPG signing if we have a GPG key</span>
 <span class="nv">previous_signing_key</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$gpg_key_id</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$gpg_key_id</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>git<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="c1"># Check if Git signing is already configured with a different key</span>
 <span class="w">  </span><span class="nv">current_signing_key</span><span class="o">=</span><span class="k">$(</span>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.signingkey<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="k">)</span>
 <span class="w">  </span><span class="nv">current_gpgsign</span><span class="o">=</span><span class="k">$(</span>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>commit.gpgsign<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;false&quot;</span><span class="k">)</span>
