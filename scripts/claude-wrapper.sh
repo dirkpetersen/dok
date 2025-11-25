@@ -243,18 +243,10 @@ if [[ "$1" == "--install" ]]; then
   install_wrapper
 fi
 
-# Check if wrapper is already installed and properly configured
+# Check if wrapper is already installed
 if [[ -L "$SYMLINK_PATH" && -f "$WRAPPER_PATH" ]]; then
-  # Wrapper is installed, check if symlink points to correct target
-  current_target=$(readlink "$SYMLINK_PATH")
-  if [[ "$current_target" == "$SCRIPT_NAME" ]]; then
-    # Already properly installed, skip installation
-    :
-  else
-    # Symlink exists but points elsewhere, need to reinstall
-    echo -e "${YELLOW}Claude Code wrapper symlink needs updating.${NC}"
-    install_wrapper
-  fi
+  echo -e "${GREEN}✓${NC} Wrapper already installed. Reinstalling to ensure latest version..."
+  install_wrapper
 elif [[ "$(readlink -f "$0" 2>/dev/null)" != "$(readlink -f "$WRAPPER_PATH" 2>/dev/null)" ]]; then
   # Script is not in ~/bin yet, auto-install or prompt
   echo -e "${YELLOW}Claude Code wrapper is not installed yet.${NC}"
