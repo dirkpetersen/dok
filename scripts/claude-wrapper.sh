@@ -244,13 +244,20 @@ if [[ "$1" == "--install" ]]; then
 fi
 
 # Check if wrapper is already installed
-SHOULD_RUN_WRAPPER=true
-if [[ -L "$SYMLINK_PATH" && -f "$WRAPPER_PATH" ]]; then
+# If we're being run from the installed location, skip installation checks
+CURRENT_SCRIPT_PATH="$(readlink -f "$0" 2>/dev/null || echo "")"
+INSTALLED_WRAPPER_PATH="$(readlink -f "$WRAPPER_PATH" 2>/dev/null || echo "")"
+
+if [[ -n "$CURRENT_SCRIPT_PATH" && "$CURRENT_SCRIPT_PATH" == "$INSTALLED_WRAPPER_PATH" ]]; then
+  # We're running from the installed location - proceed to wrapper functionality
+  :
+elif [[ -L "$SYMLINK_PATH" && -f "$WRAPPER_PATH" ]]; then
+  # Wrapper is installed but we're running from a different location (e.g., git repo)
   echo -e "${GREEN}✓${NC} Wrapper already installed. Reinstalling to ensure latest version..."
   install_wrapper
-  SHOULD_RUN_WRAPPER=false
-elif [[ "$(readlink -f "$0" 2>/dev/null)" != "$(readlink -f "$WRAPPER_PATH" 2>/dev/null)" ]]; then
-  # Script is not in ~/bin yet, auto-install or prompt
+  exit 0
+else
+  # Script is not installed yet, auto-install or prompt
   echo -e "${YELLOW}Claude Code wrapper is not installed yet.${NC}"
 
   # Check if stdin is a terminal (interactive) or pipe (non-interactive)
@@ -260,7 +267,7 @@ elif [[ "$(readlink -f "$0" 2>/dev/null)" != "$(readlink -f "$WRAPPER_PATH" 2>/d
 
     if [[ "$install_confirm" == "y" || "$install_confirm" == "Y" ]]; then
       install_wrapper
-      SHOULD_RUN_WRAPPER=false
+      # install_wrapper exits, so we won't reach here
     else
       echo "Installation cancelled. Run with --install to install later."
       exit 1
@@ -269,13 +276,8 @@ elif [[ "$(readlink -f "$0" 2>/dev/null)" != "$(readlink -f "$WRAPPER_PATH" 2>/d
     # Non-interactive mode (piped) - auto-install
     echo -e "${YELLOW}Running in non-interactive mode. Auto-installing...${NC}"
     install_wrapper
-    SHOULD_RUN_WRAPPER=false
+    # install_wrapper exits, so we won't reach here
   fi
-fi
-
-# Only continue to wrapper functionality if not installing
-if [[ "$SHOULD_RUN_WRAPPER" == "false" ]]; then
-  exit 0
 fi
 
 # ============================================================================
@@ -289,7 +291,7 @@ export AWS_PROFILE=bedrock
 
 # Model Configuration
 export ANTHROPIC_DEFAULT_HAIKU_MODEL="us.anthropic.claude-haiku-4-5-20251001-v1:0"
-export ANTHROPIC_DEFAULT_SONNET_MODEL="us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="us.anthropic.claude-sonnet-4-5-20250929-v1:0[1m]"
 export ANTHROPIC_DEFAULT_OPUS_MODEL="global.anthropic.claude-opus-4-5-20251101-v1:0"
 export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 
@@ -298,18 +300,18 @@ mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 
 # Check first argument for model selection
 if [[ "$1" == "opus" ]]; then
-  mymodel="opus"
+  mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}"
   shift
 elif [[ "$1" == "sonnet" ]]; then
-  mymodel="sonnet[1m]"
+  mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}"
   shift
 elif [[ "$1" == "haiku" ]]; then
-  mymodel="haiku"
+  mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
   shift
 fi
 
 # Set the model environment variable
-export ANTHROPIC_MODEL="us.anthropic.claude-${mymodel/-*/}-${mymodel/*-/}"
+export ANTHROPIC_MODEL="$mymodel"
 
 # Find the real claude binary
 REAL_CLAUDE=$(find_claude_binary)
