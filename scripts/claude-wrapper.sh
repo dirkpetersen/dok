@@ -243,8 +243,20 @@ if [[ "$1" == "--install" ]]; then
   install_wrapper
 fi
 
-# If script is not in ~/bin yet, auto-install or prompt
-if [[ "$(readlink -f "$0")" != "$(readlink -f "$WRAPPER_PATH")" ]]; then
+# Check if wrapper is already installed and properly configured
+if [[ -L "$SYMLINK_PATH" && -f "$WRAPPER_PATH" ]]; then
+  # Wrapper is installed, check if symlink points to correct target
+  local current_target=$(readlink "$SYMLINK_PATH")
+  if [[ "$current_target" == "$SCRIPT_NAME" ]]; then
+    # Already properly installed, skip installation
+    :
+  else
+    # Symlink exists but points elsewhere, need to reinstall
+    echo -e "${YELLOW}Claude Code wrapper symlink needs updating.${NC}"
+    install_wrapper
+  fi
+elif [[ "$(readlink -f "$0" 2>/dev/null)" != "$(readlink -f "$WRAPPER_PATH" 2>/dev/null)" ]]; then
+  # Script is not in ~/bin yet, auto-install or prompt
   echo -e "${YELLOW}Claude Code wrapper is not installed yet.${NC}"
 
   # Check if stdin is a terminal (interactive) or pipe (non-interactive)
