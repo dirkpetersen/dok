@@ -244,9 +244,11 @@ if [[ "$1" == "--install" ]]; then
 fi
 
 # Check if wrapper is already installed
+SHOULD_RUN_WRAPPER=true
 if [[ -L "$SYMLINK_PATH" && -f "$WRAPPER_PATH" ]]; then
   echo -e "${GREEN}✓${NC} Wrapper already installed. Reinstalling to ensure latest version..."
   install_wrapper
+  SHOULD_RUN_WRAPPER=false
 elif [[ "$(readlink -f "$0" 2>/dev/null)" != "$(readlink -f "$WRAPPER_PATH" 2>/dev/null)" ]]; then
   # Script is not in ~/bin yet, auto-install or prompt
   echo -e "${YELLOW}Claude Code wrapper is not installed yet.${NC}"
@@ -258,6 +260,7 @@ elif [[ "$(readlink -f "$0" 2>/dev/null)" != "$(readlink -f "$WRAPPER_PATH" 2>/d
 
     if [[ "$install_confirm" == "y" || "$install_confirm" == "Y" ]]; then
       install_wrapper
+      SHOULD_RUN_WRAPPER=false
     else
       echo "Installation cancelled. Run with --install to install later."
       exit 1
@@ -266,7 +269,13 @@ elif [[ "$(readlink -f "$0" 2>/dev/null)" != "$(readlink -f "$WRAPPER_PATH" 2>/d
     # Non-interactive mode (piped) - auto-install
     echo -e "${YELLOW}Running in non-interactive mode. Auto-installing...${NC}"
     install_wrapper
+    SHOULD_RUN_WRAPPER=false
   fi
+fi
+
+# Only continue to wrapper functionality if not installing
+if [[ "$SHOULD_RUN_WRAPPER" == "false" ]]; then
+  exit 0
 fi
 
 # ============================================================================
