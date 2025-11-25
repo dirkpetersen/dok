@@ -175,26 +175,26 @@ install_wrapper() {
   mkdir -p "$INSTALL_DIR"
 
   # Copy or download wrapper script to ~/bin
-  if [[ ! -f "$WRAPPER_PATH" ]] || [[ "$(readlink -f "$0" 2>/dev/null || echo "")" != "$(readlink -f "$WRAPPER_PATH" 2>/dev/null)" ]]; then
-    # When script is piped (curl | bash), $0 will be "bash"
-    # Always download from GitHub in this case for reliability
-    if [[ "$0" == "bash" ]] || [[ ! -f "$0" ]]; then
-      echo -e "${YELLOW}Downloading wrapper script from GitHub...${NC}"
-      if curl -f -s -o "$WRAPPER_PATH" https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh; then
-        echo -e "${GREEN}✓${NC} Downloaded wrapper script"
-      else
-        echo -e "${RED}✗ Failed to download wrapper script${NC}" >&2
-        exit 1
-      fi
+  # When script is piped (curl | bash), $0 will be "bash"
+  # Always download from GitHub in this case to ensure latest version
+  if [[ "$0" == "bash" ]] || [[ ! -f "$0" ]]; then
+    echo -e "${YELLOW}Downloading wrapper script from GitHub...${NC}"
+    if curl -f -s -o "$WRAPPER_PATH" https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh; then
+      echo -e "${GREEN}✓${NC} Downloaded wrapper script"
     else
-      # Script is being run from a file, copy it
-      echo -e "${YELLOW}Copying wrapper script...${NC}"
-      if cp "$0" "$WRAPPER_PATH"; then
-        echo -e "${GREEN}✓${NC} Copied wrapper script"
-      else
-        echo -e "${RED}✗ Failed to copy wrapper script${NC}" >&2
-        exit 1
-      fi
+      echo -e "${RED}✗ Failed to download wrapper script${NC}" >&2
+      exit 1
+    fi
+    chmod +x "$WRAPPER_PATH"
+    echo -e "${GREEN}✓${NC} Installed wrapper to ~/bin/$SCRIPT_NAME"
+  elif [[ ! -f "$WRAPPER_PATH" ]] || [[ "$(readlink -f "$0" 2>/dev/null || echo "")" != "$(readlink -f "$WRAPPER_PATH" 2>/dev/null)" ]]; then
+    # Script is being run from a file, copy it if needed
+    echo -e "${YELLOW}Copying wrapper script...${NC}"
+    if cp "$0" "$WRAPPER_PATH"; then
+      echo -e "${GREEN}✓${NC} Copied wrapper script"
+    else
+      echo -e "${RED}✗ Failed to copy wrapper script${NC}" >&2
+      exit 1
     fi
     chmod +x "$WRAPPER_PATH"
     echo -e "${GREEN}✓${NC} Installed wrapper to ~/bin/$SCRIPT_NAME"
