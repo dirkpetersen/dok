@@ -246,7 +246,7 @@ fi
 # Check if wrapper is already installed and properly configured
 if [[ -L "$SYMLINK_PATH" && -f "$WRAPPER_PATH" ]]; then
   # Wrapper is installed, check if symlink points to correct target
-  local current_target=$(readlink "$SYMLINK_PATH")
+  current_target=$(readlink "$SYMLINK_PATH")
   if [[ "$current_target" == "$SCRIPT_NAME" ]]; then
     # Already properly installed, skip installation
     :
