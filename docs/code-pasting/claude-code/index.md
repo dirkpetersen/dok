@@ -140,7 +140,7 @@ Understanding the differences between the three available models helps you choos
 | Aspect | Haiku | Sonnet | Opus |
 |--------|-------|--------|------|
 | **Speed** | ⚡ Fast | ⚡⚡ Medium | 🐌 Slow |
-| **Cost** | 💰 $0.80/MTok | 💰💰 $3.00/MTok | 💰💰💰 $15.00/MTok |
+| **Cost** | 💰 $1.00/MTok | 💰💰 $3.00/MTok | 💰💰💰 $5.00/MTok |
 | **Performance** | Excellent | Very Good | Superior |
 | **Complex Tasks** | ⭐⭐⭐ Medium | ⭐⭐⭐⭐ High | ⭐⭐⭐⭐⭐ Excellent |
 | **Coding Skills** | ⭐⭐⭐⭐ High | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐⭐ Excellent |
