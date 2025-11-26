@@ -291,7 +291,7 @@ export AWS_PROFILE=bedrock
 
 # Model Configuration
 export ANTHROPIC_DEFAULT_HAIKU_MODEL="us.anthropic.claude-haiku-4-5-20251001-v1:0"
-export ANTHROPIC_DEFAULT_SONNET_MODEL="us.anthropic.claude-sonnet-4-5-20250929-v1:0[1m]"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 export ANTHROPIC_DEFAULT_OPUS_MODEL="global.anthropic.claude-opus-4-5-20251101-v1:0"
 export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 
