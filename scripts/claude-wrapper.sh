@@ -284,6 +284,27 @@ fi
 # WRAPPER FUNCTIONALITY
 # ============================================================================
 
+# Check if ANTHROPIC_BASE_URL is set (for local LLM usage)
+if [[ -n "$ANTHROPIC_BASE_URL" ]]; then
+  echo -e "${GREEN}Using custom ANTHROPIC_BASE_URL: $ANTHROPIC_BASE_URL${NC}" >&2
+
+  # Set ANTHROPIC_API_KEY to dummy value if not set or invalid
+  if [[ -z "$ANTHROPIC_API_KEY" ]] || [[ ! "$ANTHROPIC_API_KEY" =~ ^sk-ant- ]]; then
+    export ANTHROPIC_API_KEY="sk-ant-dummy"
+    echo -e "${YELLOW}Set ANTHROPIC_API_KEY to dummy value for local LLM${NC}" >&2
+  fi
+
+  # Find the real claude binary
+  REAL_CLAUDE=$(find_claude_binary)
+  if [[ $? -ne 0 ]]; then
+    exit 1
+  fi
+
+  # Execute Claude Code with custom base URL (skip all Bedrock/AWS config)
+  # Note: Using --dangerously-skip-permissions for unrestricted access
+  exec "$REAL_CLAUDE" --dangerously-skip-permissions "$@"
+fi
+
 # AWS Bedrock Configuration
 export CLAUDE_CODE_USE_BEDROCK=1
 export AWS_REGION=us-west-2
