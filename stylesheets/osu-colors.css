@@ -1,0 +1,83 @@
+/* Oregon State University Brand Colors */
+/* https://communications.oregonstate.edu/brand-guide/colors */
+
+:root {
+  /* Primary Colors */
+  --osu-solar-flare: #D3832B;
+  --osu-beaver-orange: #D73F09;
+  --osu-paddletail-black: #000000;
+
+  /* Secondary Colors */
+  --osu-high-tide: #00859B;
+  --osu-pine-stand: #4A773C;
+
+  /* Web-Specific */
+  --osu-dark-background: #212529;
+}
+
+/* Light mode */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: var(--osu-solar-flare);
+  --md-primary-fg-color--light: #e9a05c;
+  --md-primary-fg-color--dark: #b36a1f;
+  --md-accent-fg-color: var(--osu-high-tide);
+  --md-typeset-a-color: var(--osu-solar-flare);
+}
+
+/* Dark mode */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: var(--osu-solar-flare);
+  --md-primary-fg-color--light: #e9a05c;
+  --md-primary-fg-color--dark: #b36a1f;
+  --md-accent-fg-color: var(--osu-high-tide);
+  --md-default-bg-color: var(--osu-dark-background);
+  --md-typeset-a-color: var(--osu-solar-flare);
+}
+
+/* Content links - Solar Flare */
+.md-typeset a {
+  color: var(--osu-solar-flare) !important;
+}
+
+.md-typeset a:hover {
+  opacity: 0.8;
+}
+
+/* Sidebar navigation links - Solar Flare */
+.md-nav__link {
+  color: var(--osu-solar-flare) !important;
+}
+
+.md-nav__link:hover {
+  opacity: 0.8;
+}
+
+/* Active/current links - Beaver Orange */
+.md-nav__link--active,
+.md-nav__link.md-nav__link--active {
+  color: var(--osu-beaver-orange) !important;
+}
+
+/* Header tabs - White on Solar Flare background */
+.md-header .md-tabs__link {
+  color: white !important;
+}
+
+.md-header .md-tabs__link:hover {
+  color: white !important;
+  opacity: 0.9;
+}
+
+/* Active header tab - Black */
+.md-header .md-tabs__link--active,
+.md-tabs__link--active,
+.md-tabs__item--active .md-tabs__link,
+.md-tabs__link[aria-selected="true"],
+.md-tabs__link.md-tabs__link--active {
+  color: var(--osu-paddletail-black) !important;
+}
+
+/* Header title/logo link */
+.md-header__topic a {
+  color: white !important;
+}
