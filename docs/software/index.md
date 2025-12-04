@@ -139,8 +139,14 @@ Alphabetical dictionary of all software, tools, and platforms mentioned in this 
 
 ## R
 
+**R** - Programming language for statistical computing and graphics. Widely used for data analysis, statistical modeling, and data visualization.
+- <a href="../search?q=R" data-md-component="skip">Search documentation</a>
+
 **Requests** - Python HTTP library. Simplifies making web requests and API calls with clean, intuitive API.
 - [View in documentation](../code-pasting/claude-code/tutorial.md)
+
+**RStudio** - Integrated development environment (IDE) for R programming. Provides comprehensive tools for R development, data analysis, and visualization.
+- [Installation guide for Ubuntu/WSL](rstudio.md)
 
 ## S
 
