@@ -341,7 +341,8 @@ OPTIONS:
 WHAT IT SETS UP:
   1. PATH directories (~/.local/bin and ~/bin)
      - Ensures ~/bin comes BEFORE ~/.local/bin in PATH
-     - Automatically detects and fixes Ubuntu default .profile ordering issue
+     - Removes PATH blocks from .profile (belong in .bashrc for batch mode support)
+     - Adds correct PATH configuration to .bashrc
   2. XDG_RUNTIME_DIR for container support (Linux only)
   3. Convenience settings (LS_COLORS cyan directories, history size)
   4. SSH key (ed25519 with mandatory passphrase)
@@ -471,92 +472,67 @@ check_path_order() {
   return $result
 }
 
-# Function to fix PATH ordering in profile files
-fix_path_order_in_profile() {
+# Function to remove PATH blocks from .profile (they belong in .bashrc)
+remove_path_from_profile() {
   # Temporarily disable set -e for this function
   local old_opts=$-
   set +e
 
   local profile_file="$1"
 
-  # Check if file has the Ubuntu default pattern with wrong order
-  # Pattern: bin setup first, then .local/bin setup second
-  if grep -q 'if \[ -d "$HOME/bin" \]' "$profile_file" 2>/dev/null && \
+  # Check if file has the Ubuntu default PATH blocks
+  if grep -q 'if \[ -d "$HOME/bin" \]' "$profile_file" 2>/dev/null || \
      grep -q 'if \[ -d "$HOME/.local/bin" \]' "$profile_file" 2>/dev/null; then
 
-    # Check which one comes first (find the if statements)
-    local bin_if_line=$(grep -n 'if \[ -d "$HOME/bin" \]' "$profile_file" | head -1 | cut -d: -f1)
-    local local_bin_if_line=$(grep -n 'if \[ -d "$HOME/.local/bin" \]' "$profile_file" | head -1 | cut -d: -f1)
+    echo -e "${YELLOW}Found PATH configuration in $profile_file${NC}"
+    echo -e "${YELLOW}These settings belong in .bashrc, not .profile${NC}"
+    echo ""
+    echo ".profile is only read for interactive login shells, not batch mode."
+    echo "PATH settings should be in .bashrc to work in all contexts."
+    echo ""
 
-    if [[ $bin_if_line -lt $local_bin_if_line ]]; then
-      echo -e "${YELLOW}Found problematic PATH configuration in $profile_file${NC}"
-      echo -e "${YELLOW}Issue: \$HOME/.local/bin is added after \$HOME/bin, causing it to appear first in PATH${NC}"
-      echo ""
-      echo "Current configuration adds directories in this order:"
-      echo "  1. \$HOME/bin is prepended to PATH"
-      echo "  2. \$HOME/.local/bin is prepended to PATH (moving it in front of bin)"
-      echo ""
-      echo "Result: \$HOME/.local/bin comes BEFORE \$HOME/bin in final PATH"
-      echo ""
-
-      if [[ "$FORCE_MODE" != true ]]; then
-        read -p "Fix this by reordering the blocks in $profile_file? (y/N): " fix_order
-        if [[ "$fix_order" != "y" && "$fix_order" != "Y" ]]; then
-          echo -e "${YELLOW}Skipping PATH order fix${NC}"
-          [[ $old_opts == *e* ]] && set -e
-          return 1
-        fi
+    if [[ "$FORCE_MODE" != true ]]; then
+      read -p "Remove PATH blocks from $profile_file? (y/N): " remove_path
+      if [[ "$remove_path" != "y" && "$remove_path" != "Y" ]]; then
+        echo -e "${YELLOW}Skipping PATH removal from .profile${NC}"
+        [[ $old_opts == *e* ]] && set -e
+        return 1
       fi
-
-      echo -e "${YELLOW}Fixing PATH order by swapping the if-blocks...${NC}"
-
-      # Create backup
-      cp "$profile_file" "${profile_file}.bak.$(date +%Y%m%d_%H%M%S)"
-
-      # Extract just the 3-line if-blocks (if + PATH= + fi), leaving comments in place
-      # Since both comments are identical in Ubuntu's .profile, we only swap the code blocks
-      local bin_block_end=$((bin_if_line + 2))
-      local local_bin_block_end=$((local_bin_if_line + 2))
-
-      # Extract the if-blocks (3 lines each: if, PATH=, fi)
-      local bin_if_block=$(sed -n "${bin_if_line},${bin_block_end}p" "$profile_file")
-      local local_bin_if_block=$(sed -n "${local_bin_if_line},${local_bin_block_end}p" "$profile_file")
-
-      # Use sed to swap the blocks in place
-      # First, replace the bin block with a placeholder
-      # Then replace the local_bin block with the bin block
-      # Finally replace the placeholder with the local_bin block
-      local temp_file="${profile_file}.tmp"
-      cp "$profile_file" "$temp_file"
-
-      # Create the swapped version line by line
-      {
-        # Everything before bin_if_line
-        sed -n "1,$((bin_if_line - 1))p" "$profile_file"
-        # Put local_bin block where bin block was
-        echo "$local_bin_if_block"
-        # Everything between bin block and local_bin block (including blank lines and comments)
-        sed -n "$((bin_block_end + 1)),$((local_bin_if_line - 1))p" "$profile_file"
-        # Put bin block where local_bin block was
-        echo "$bin_if_block"
-        # Everything after local_bin block
-        sed -n "$((local_bin_block_end + 1)),\$p" "$profile_file"
-      } > "$temp_file"
-
-      mv "$temp_file" "$profile_file"
-
-      log_change "ADDED_TO_FILE" "$profile_file|Fixed PATH order: swapped bin and .local/bin if-blocks"
-
-      echo -e "${GREEN}✓${NC} Fixed PATH ordering in $profile_file"
-      echo -e "${GREEN}   .local/bin block is now configured before bin block${NC}"
-      echo -e "${GREEN}   Result: \$HOME/bin will come BEFORE \$HOME/.local/bin in PATH${NC}"
-      echo ""
-      echo -e "${YELLOW}Note: You need to reload your profile for this to take effect:${NC}"
-      echo "   . $profile_file"
-      echo ""
-      [[ $old_opts == *e* ]] && set -e
-      return 0
     fi
+
+    echo -e "${YELLOW}Removing PATH blocks from $profile_file...${NC}"
+
+    # Create backup
+    cp "$profile_file" "${profile_file}.bak.$(date +%Y%m%d_%H%M%S)"
+
+    # Remove the PATH blocks using sed
+    # Pattern 1: comment + if block for $HOME/bin
+    # Pattern 2: comment + if block for $HOME/.local/bin
+    local temp_file="${profile_file}.tmp"
+
+    # Remove both blocks (comment line + if/then/PATH/fi)
+    # Use awk for multi-line pattern removal
+    awk '
+      /^# set PATH so it includes user.*private bin/ { skip=1; next }
+      /^if \[ -d "\$HOME\/bin" \]/ { skip=1; next }
+      /^if \[ -d "\$HOME\/\.local\/bin" \]/ { skip=1; next }
+      skip && /^[[:space:]]*PATH=/ { next }
+      skip && /^[[:space:]]*fi[[:space:]]*$/ { skip=0; next }
+      !skip { print }
+    ' "$profile_file" > "$temp_file"
+
+    # Clean up multiple consecutive blank lines
+    cat -s "$temp_file" > "${temp_file}.clean"
+    mv "${temp_file}.clean" "$profile_file"
+    rm -f "$temp_file"
+
+    log_change "ADDED_TO_FILE" "$profile_file|Removed PATH blocks (moved to .bashrc)"
+
+    echo -e "${GREEN}✓${NC} Removed PATH blocks from $profile_file"
+    echo -e "${GREEN}   PATH is now configured in .bashrc where it belongs${NC}"
+    echo ""
+    [[ $old_opts == *e* ]] && set -e
+    return 0
   fi
 
   [[ $old_opts == *e* ]] && set -e
@@ -597,25 +573,18 @@ add_to_begin_of_path() {
   if [[ $order_status -eq 0 ]]; then
     echo -e "${GREEN}✓${NC} PATH order is correct: \$HOME/bin comes before \$HOME/.local/bin"
   elif [[ $order_status -eq 1 ]]; then
-    echo -e "${RED}✗${NC} PATH order is incorrect: \$HOME/.local/bin comes before \$HOME/bin"
-    echo ""
-
-    # Try to fix the ordering in profile files
-    local fixed=false
-    for pfile in "$profile" "$HOME/.profile" "$HOME/.bash_profile" "$HOME/.zprofile"; do
-      if [[ -f "$pfile" ]] && fix_path_order_in_profile "$pfile"; then
-        fixed=true
-        break
-      fi
-    done
-
-    if [[ "$fixed" != true ]]; then
-      echo -e "${YELLOW}Could not automatically fix PATH order in profile files${NC}"
-      echo -e "${YELLOW}You may need to manually reorder PATH configuration in your profile${NC}"
-    fi
+    echo -e "${YELLOW}⚠${NC}  PATH order issue: \$HOME/.local/bin comes before \$HOME/bin"
+    echo -e "${YELLOW}   This will be fixed by the PATH configuration in .bashrc${NC}"
   else
     echo -e "${YELLOW}⚠${NC}  One or both directories not in PATH yet"
   fi
+
+  # Remove PATH blocks from .profile if present (they belong in .bashrc)
+  for pfile in "$profile" "$HOME/.profile"; do
+    if [[ -f "$pfile" ]]; then
+      remove_path_from_profile "$pfile"
+    fi
+  done
 
   # Check if PATH entries already exist in RC file
   # Look for the exact PATH export line we add
