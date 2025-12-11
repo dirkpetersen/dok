@@ -518,6 +518,10 @@ remove_path_from_profile() {
 
 # Function to add directories to beginning of PATH
 add_to_begin_of_path() {
+  # Temporarily disable set -e for this function
+  local old_opts=$-
+  set +e
+
   local shell_rc=$(get_login_shell_rc)
   local profile=$(get_login_profile)
   local bin_home="$HOME/bin"
@@ -543,9 +547,10 @@ add_to_begin_of_path() {
     echo -e "${GREEN}✓${NC} Directories already exist: $bin_home and $bin_local"
   fi
 
-  # Check PATH ordering (capture exit status without triggering set -e)
+  # Check PATH ordering
   local order_status
-  check_path_order && order_status=0 || order_status=$?
+  check_path_order
+  order_status=$?
 
   if [[ $order_status -eq 0 ]]; then
     echo -e "${GREEN}✓${NC} PATH order is correct: \$HOME/bin comes before \$HOME/.local/bin"
@@ -568,6 +573,7 @@ add_to_begin_of_path() {
   if grep -Fq "$marker" "$shell_rc" 2>/dev/null; then
     if [[ "$FORCE_MODE" != true ]]; then
       echo -e "${GREEN}✓${NC} PATH directories already configured in $shell_rc"
+      [[ $old_opts == *e* ]] && set -e
       return 0
     else
       echo -e "${YELLOW}Force mode: Removing existing PATH configuration${NC}"
@@ -583,6 +589,9 @@ add_to_begin_of_path() {
   log_change "ADDED_TO_FILE" "$shell_rc|$marker"
   log_change "ADDED_TO_FILE" "$shell_rc"'|export PATH=$HOME/bin:$HOME/.local/bin:$PATH'
   echo -e "${GREEN}✓${NC} Added PATH configuration to $shell_rc"
+
+  # Restore set -e if it was enabled
+  [[ $old_opts == *e* ]] && set -e
 }
 
 # Function to setup XDG_RUNTIME_DIR for container support (Linux only)
