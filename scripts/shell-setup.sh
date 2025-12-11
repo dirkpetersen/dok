@@ -586,24 +586,24 @@ add_to_begin_of_path() {
     fi
   done
 
-  # Check if PATH entries already exist in RC file
-  # Look for the exact PATH export line we add
-  if grep -Fq "export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH" "$shell_rc" 2>/dev/null; then
+  # Check if PATH entries already exist in RC file using unique marker
+  local marker="# Add local bin directories to PATH (shell-setup.sh)"
+  if grep -Fq "$marker" "$shell_rc" 2>/dev/null; then
     if [[ "$FORCE_MODE" != true ]]; then
       echo -e "${GREEN}✓${NC} PATH directories already configured in $shell_rc"
       return 0
     else
       echo -e "${YELLOW}Force mode: Removing existing PATH configuration${NC}"
-      grep -Fv "export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH" "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
-      grep -Fv "# Add local bin directories to PATH (front)" "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
+      grep -Fv "$marker" "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
+      grep -Fv 'export PATH=$HOME/bin:$HOME/.local/bin:$PATH' "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
     fi
   fi
 
   # Add to beginning of PATH (in correct order)
   echo "" >> "$shell_rc"
-  echo "# Add local bin directories to PATH (front)" >> "$shell_rc"
-  echo "export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH" >> "$shell_rc"
-  log_change "ADDED_TO_FILE" "$shell_rc|# Add local bin directories to PATH (front)"
+  echo "$marker" >> "$shell_rc"
+  echo 'export PATH=$HOME/bin:$HOME/.local/bin:$PATH' >> "$shell_rc"
+  log_change "ADDED_TO_FILE" "$shell_rc|$marker"
   log_change "ADDED_TO_FILE" "$shell_rc"'|export PATH=$HOME/bin:$HOME/.local/bin:$PATH'
   echo -e "${GREEN}✓${NC} Added PATH configuration to $shell_rc"
 }
@@ -617,25 +617,27 @@ setup_xdg_runtime_dir() {
   fi
 
   local shell_rc=$(get_login_shell_rc)
+  local marker="# Container support (shell-setup.sh)"
   local xdg_line='export XDG_RUNTIME_DIR="/run/user/$(id -u)"'
 
-  # Check if XDG_RUNTIME_DIR is already set in shell rc
-  if grep -q "export XDG_RUNTIME_DIR=" "$shell_rc" 2>/dev/null; then
+  # Check for our marker to ensure idempotency
+  if grep -Fq "$marker" "$shell_rc" 2>/dev/null; then
     if [[ "$FORCE_MODE" != true ]]; then
       echo -e "${GREEN}✓${NC} XDG_RUNTIME_DIR already configured in $shell_rc"
       return 0
     else
       echo -e "${YELLOW}Force mode: Removing existing XDG_RUNTIME_DIR configuration${NC}"
-      grep -Fv 'export XDG_RUNTIME_DIR=' "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
-      grep -Fv "# Container support" "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
+      # Remove our block (marker + xdg line)
+      grep -Fv "$marker" "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
+      grep -Fv 'XDG_RUNTIME_DIR=' "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
     fi
   fi
 
   # Add XDG_RUNTIME_DIR configuration
   echo "" >> "$shell_rc"
-  echo "# Container support" >> "$shell_rc"
+  echo "$marker" >> "$shell_rc"
   echo "$xdg_line" >> "$shell_rc"
-  log_change "ADDED_TO_FILE" "$shell_rc|# Container support"
+  log_change "ADDED_TO_FILE" "$shell_rc|$marker"
   log_change "ADDED_TO_FILE" "$shell_rc"'|export XDG_RUNTIME_DIR="/run/user/$(id -u)"'
   echo -e "${GREEN}✓${NC} Added XDG_RUNTIME_DIR configuration to $shell_rc"
 }
@@ -643,17 +645,18 @@ setup_xdg_runtime_dir() {
 # Function to setup convenience environment settings (LS_COLORS and history)
 setup_convenience_settings() {
   local shell_rc=$(get_login_shell_rc)
+  local marker="# Convenience environment settings (shell-setup.sh)"
   local needs_update=false
 
   # Check if our convenience settings marker exists
-  if grep -q "# Convenience environment settings" "$shell_rc" 2>/dev/null; then
+  if grep -Fq "$marker" "$shell_rc" 2>/dev/null; then
     if [[ "$FORCE_MODE" != true ]]; then
       echo -e "${GREEN}✓${NC} Convenience settings already configured in $shell_rc"
       return 0
     else
       echo -e "${YELLOW}Force mode: Removing existing convenience settings${NC}"
       # Remove old convenience settings block
-      sed -i.bak '/# Convenience environment settings/,/^$/d' "$shell_rc"
+      sed -i.bak "/$marker/,/^$/d" "$shell_rc"
       needs_update=true
     fi
   else
@@ -688,7 +691,7 @@ setup_convenience_settings() {
 
   # Add convenience settings block
   echo "" >> "$shell_rc"
-  echo "# Convenience environment settings" >> "$shell_rc"
+  echo "$marker" >> "$shell_rc"
   echo "" >> "$shell_rc"
   echo "# Change directory color from dark blue to cyan for better visibility" >> "$shell_rc"
   echo "export LS_COLORS=\"${new_ls_colors}\"" >> "$shell_rc"
@@ -703,7 +706,7 @@ setup_convenience_settings() {
   fi
 
   # Log changes
-  log_change "ADDED_TO_FILE" "$shell_rc|# Convenience environment settings"
+  log_change "ADDED_TO_FILE" "$shell_rc|$marker"
   log_change "ADDED_TO_FILE" "$shell_rc|# Change directory color from dark blue to cyan for better visibility"
   log_change "ADDED_TO_FILE" "$shell_rc|export LS_COLORS=\"${new_ls_colors}\""
   log_change "ADDED_TO_FILE" "$shell_rc|# Increase history size"
