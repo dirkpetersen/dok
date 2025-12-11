@@ -484,34 +484,14 @@ remove_path_from_profile() {
   if grep -q 'if \[ -d "$HOME/bin" \]' "$profile_file" 2>/dev/null || \
      grep -q 'if \[ -d "$HOME/.local/bin" \]' "$profile_file" 2>/dev/null; then
 
-    echo -e "${YELLOW}Found PATH configuration in $profile_file${NC}"
-    echo -e "${YELLOW}These settings belong in .bashrc, not .profile${NC}"
-    echo ""
-    echo ".profile is only read for interactive login shells, not batch mode."
-    echo "PATH settings should be in .bashrc to work in all contexts."
-    echo ""
-
-    if [[ "$FORCE_MODE" != true ]]; then
-      read -p "Remove PATH blocks from $profile_file? (y/N): " remove_path
-      if [[ "$remove_path" != "y" && "$remove_path" != "Y" ]]; then
-        echo -e "${YELLOW}Skipping PATH removal from .profile${NC}"
-        [[ $old_opts == *e* ]] && set -e
-        return 1
-      fi
-    fi
-
-    echo -e "${YELLOW}Removing PATH blocks from $profile_file...${NC}"
+    echo -e "${YELLOW}Found PATH configuration in $profile_file - moving to .bashrc${NC}"
 
     # Create backup
     cp "$profile_file" "${profile_file}.bak.$(date +%Y%m%d_%H%M%S)"
 
-    # Remove the PATH blocks using sed
-    # Pattern 1: comment + if block for $HOME/bin
-    # Pattern 2: comment + if block for $HOME/.local/bin
+    # Remove the PATH blocks using awk for multi-line pattern removal
     local temp_file="${profile_file}.tmp"
 
-    # Remove both blocks (comment line + if/then/PATH/fi)
-    # Use awk for multi-line pattern removal
     awk '
       /^# set PATH so it includes user.*private bin/ { skip=1; next }
       /^if \[ -d "\$HOME\/bin" \]/ { skip=1; next }
@@ -529,14 +509,11 @@ remove_path_from_profile() {
     log_change "ADDED_TO_FILE" "$profile_file|Removed PATH blocks (moved to .bashrc)"
 
     echo -e "${GREEN}✓${NC} Removed PATH blocks from $profile_file"
-    echo -e "${GREEN}   PATH is now configured in .bashrc where it belongs${NC}"
-    echo ""
-    [[ $old_opts == *e* ]] && set -e
-    return 0
   fi
 
+  # Restore set -e if it was enabled
   [[ $old_opts == *e* ]] && set -e
-  return 1
+  return 0
 }
 
 # Function to add directories to beginning of PATH
