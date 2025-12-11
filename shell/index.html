@@ -3146,30 +3146,7 @@
 <span class="normal">1427</span>
 <span class="normal">1428</span>
 <span class="normal">1429</span>
-<span class="normal">1430</span>
-<span class="normal">1431</span>
-<span class="normal">1432</span>
-<span class="normal">1433</span>
-<span class="normal">1434</span>
-<span class="normal">1435</span>
-<span class="normal">1436</span>
-<span class="normal">1437</span>
-<span class="normal">1438</span>
-<span class="normal">1439</span>
-<span class="normal">1440</span>
-<span class="normal">1441</span>
-<span class="normal">1442</span>
-<span class="normal">1443</span>
-<span class="normal">1444</span>
-<span class="normal">1445</span>
-<span class="normal">1446</span>
-<span class="normal">1447</span>
-<span class="normal">1448</span>
-<span class="normal">1449</span>
-<span class="normal">1450</span>
-<span class="normal">1451</span>
-<span class="normal">1452</span>
-<span class="normal">1453</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1430</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3655,34 +3632,14 @@ remove_path_from_profile<span class="o">()</span><span class="w"> </span><span c
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;if \[ -d &quot;$HOME/bin&quot; \]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="se">\</span>
 <span class="w">     </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;if \[ -d &quot;$HOME/.local/bin&quot; \]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Found PATH configuration in </span><span class="nv">$profile_file</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">These settings belong in .bashrc, not .profile</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;.profile is only read for interactive login shells, not batch mode.&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;PATH settings should be in .bashrc to work in all contexts.&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_MODE</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Remove PATH blocks from </span><span class="nv">$profile_file</span><span class="s2">? (y/N): &quot;</span><span class="w"> </span>remove_path
-<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$remove_path</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;y&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$remove_path</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;Y&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">        </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Skipping PATH removal from .profile</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">        </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
-<span class="w">      </span><span class="k">fi</span>
-<span class="w">    </span><span class="k">fi</span>
-
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Removing PATH blocks from </span><span class="nv">$profile_file</span><span class="s2">...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Found PATH configuration in </span><span class="nv">$profile_file</span><span class="s2"> - moving to .bashrc</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 
 <span class="w">    </span><span class="c1"># Create backup</span>
 <span class="w">    </span>cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.bak.</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span><span class="s2">&quot;</span>
 
-<span class="w">    </span><span class="c1"># Remove the PATH blocks using sed</span>
-<span class="w">    </span><span class="c1"># Pattern 1: comment + if block for $HOME/bin</span>
-<span class="w">    </span><span class="c1"># Pattern 2: comment + if block for $HOME/.local/bin</span>
+<span class="w">    </span><span class="c1"># Remove the PATH blocks using awk for multi-line pattern removal</span>
 <span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">temp_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
 
-<span class="w">    </span><span class="c1"># Remove both blocks (comment line + if/then/PATH/fi)</span>
-<span class="w">    </span><span class="c1"># Use awk for multi-line pattern removal</span>
 <span class="w">    </span>awk<span class="w"> </span><span class="s1">&#39;</span>
 <span class="s1">      /^# set PATH so it includes user.*private bin/ { skip=1; next }</span>
 <span class="s1">      /^if \[ -d &quot;\$HOME\/bin&quot; \]/ { skip=1; next }</span>
@@ -3700,14 +3657,11 @@ remove_path_from_profile<span class="o">()</span><span class="w"> </span><span c
 <span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">|Removed PATH blocks (moved to .bashrc)&quot;</span>
 
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Removed PATH blocks from </span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">   PATH is now configured in .bashrc where it belongs</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">    </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">  </span><span class="k">fi</span>
 
+<span class="w">  </span><span class="c1"># Restore set -e if it was enabled</span>
 <span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
-<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="o">}</span>
 
 <span class="c1"># Function to add directories to beginning of PATH</span>
