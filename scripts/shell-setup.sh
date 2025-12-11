@@ -596,9 +596,14 @@ add_to_begin_of_path() {
 
 # Function to setup XDG_RUNTIME_DIR for container support (Linux only)
 setup_xdg_runtime_dir() {
+  # Temporarily disable set -e for this function
+  local old_opts=$-
+  set +e
+
   # Only run on Linux, skip on macOS
   if [[ "$(uname -s)" != "Linux" ]]; then
     echo -e "${GREEN}✓${NC} Skipping XDG_RUNTIME_DIR (not Linux)"
+    [[ $old_opts == *e* ]] && set -e
     return 0
   fi
 
@@ -610,6 +615,7 @@ setup_xdg_runtime_dir() {
   if grep -Fq "$marker" "$shell_rc" 2>/dev/null; then
     if [[ "$FORCE_MODE" != true ]]; then
       echo -e "${GREEN}✓${NC} XDG_RUNTIME_DIR already configured in $shell_rc"
+      [[ $old_opts == *e* ]] && set -e
       return 0
     else
       echo -e "${YELLOW}Force mode: Removing existing XDG_RUNTIME_DIR configuration${NC}"
@@ -626,10 +632,16 @@ setup_xdg_runtime_dir() {
   log_change "ADDED_TO_FILE" "$shell_rc|$marker"
   log_change "ADDED_TO_FILE" "$shell_rc"'|export XDG_RUNTIME_DIR="/run/user/$(id -u)"'
   echo -e "${GREEN}✓${NC} Added XDG_RUNTIME_DIR configuration to $shell_rc"
+
+  [[ $old_opts == *e* ]] && set -e
 }
 
 # Function to setup convenience environment settings (LS_COLORS and history)
 setup_convenience_settings() {
+  # Temporarily disable set -e for this function
+  local old_opts=$-
+  set +e
+
   local shell_rc=$(get_login_shell_rc)
   local marker="# Convenience environment settings (shell-setup.sh)"
   local needs_update=false
@@ -638,6 +650,7 @@ setup_convenience_settings() {
   if grep -Fq "$marker" "$shell_rc" 2>/dev/null; then
     if [[ "$FORCE_MODE" != true ]]; then
       echo -e "${GREEN}✓${NC} Convenience settings already configured in $shell_rc"
+      [[ $old_opts == *e* ]] && set -e
       return 0
     else
       echo -e "${YELLOW}Force mode: Removing existing convenience settings${NC}"
@@ -650,6 +663,7 @@ setup_convenience_settings() {
   fi
 
   if [[ "$needs_update" != true ]]; then
+    [[ $old_opts == *e* ]] && set -e
     return 0
   fi
 
@@ -734,6 +748,8 @@ setup_convenience_settings() {
   fi
 
   echo -e "${GREEN}✓${NC} Added convenience settings to $shell_rc"
+
+  [[ $old_opts == *e* ]] && set -e
 }
 
 # Function to check if SSH key has a password
