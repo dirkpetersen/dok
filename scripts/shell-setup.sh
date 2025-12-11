@@ -682,11 +682,30 @@ setup_convenience_settings() {
   new_ls_colors="${new_ls_colors//di=34/di=01;36}"
 
   # Check if HISTCONTROL is already set in the file
-  local histcontrol_line=""
+  local add_histcontrol=false
   if ! grep -q "^export HISTCONTROL=" "$shell_rc" 2>/dev/null && \
      ! grep -q "^HISTCONTROL=" "$shell_rc" 2>/dev/null; then
-    # HISTCONTROL not set, add it with ignoreboth
-    histcontrol_line="export HISTCONTROL=ignoreboth"
+    add_histcontrol=true
+  fi
+
+  # Check if HISTSIZE/HISTFILESIZE are already set - if so, edit in place
+  local add_histsize=true
+  local add_histfilesize=true
+
+  if grep -q "^HISTSIZE=" "$shell_rc" 2>/dev/null || grep -q "^export HISTSIZE=" "$shell_rc" 2>/dev/null; then
+    # Edit existing HISTSIZE in place
+    sed -i.bak 's/^HISTSIZE=.*/HISTSIZE=10000/' "$shell_rc"
+    sed -i.bak 's/^export HISTSIZE=.*/export HISTSIZE=10000/' "$shell_rc"
+    add_histsize=false
+    echo -e "${GREEN}✓${NC} Updated existing HISTSIZE to 10000"
+  fi
+
+  if grep -q "^HISTFILESIZE=" "$shell_rc" 2>/dev/null || grep -q "^export HISTFILESIZE=" "$shell_rc" 2>/dev/null; then
+    # Edit existing HISTFILESIZE in place
+    sed -i.bak 's/^HISTFILESIZE=.*/HISTFILESIZE=20000/' "$shell_rc"
+    sed -i.bak 's/^export HISTFILESIZE=.*/export HISTFILESIZE=20000/' "$shell_rc"
+    add_histfilesize=false
+    echo -e "${GREEN}✓${NC} Updated existing HISTFILESIZE to 20000"
   fi
 
   # Add convenience settings block
@@ -695,13 +714,21 @@ setup_convenience_settings() {
   echo "" >> "$shell_rc"
   echo "# Change directory color from dark blue to cyan for better visibility" >> "$shell_rc"
   echo "export LS_COLORS=\"${new_ls_colors}\"" >> "$shell_rc"
-  echo "" >> "$shell_rc"
-  echo "# Increase history size" >> "$shell_rc"
-  echo "export HISTSIZE=10000" >> "$shell_rc"
-  echo "export HISTFILESIZE=20000" >> "$shell_rc"
+
+  # Only add history settings if they weren't edited in place
+  if [[ "$add_histsize" == true ]] || [[ "$add_histfilesize" == true ]]; then
+    echo "" >> "$shell_rc"
+    echo "# Increase history size" >> "$shell_rc"
+    if [[ "$add_histsize" == true ]]; then
+      echo "export HISTSIZE=10000" >> "$shell_rc"
+    fi
+    if [[ "$add_histfilesize" == true ]]; then
+      echo "export HISTFILESIZE=20000" >> "$shell_rc"
+    fi
+  fi
 
   # Only add HISTCONTROL if it wasn't already set
-  if [[ -n "$histcontrol_line" ]]; then
+  if [[ "$add_histcontrol" == true ]]; then
     echo "export HISTCONTROL=ignoreboth" >> "$shell_rc"
   fi
 
@@ -709,12 +736,14 @@ setup_convenience_settings() {
   log_change "ADDED_TO_FILE" "$shell_rc|$marker"
   log_change "ADDED_TO_FILE" "$shell_rc|# Change directory color from dark blue to cyan for better visibility"
   log_change "ADDED_TO_FILE" "$shell_rc|export LS_COLORS=\"${new_ls_colors}\""
-  log_change "ADDED_TO_FILE" "$shell_rc|# Increase history size"
-  log_change "ADDED_TO_FILE" "$shell_rc|export HISTSIZE=10000"
-  log_change "ADDED_TO_FILE" "$shell_rc|export HISTFILESIZE=20000"
 
-  # Only log HISTCONTROL if we added it
-  if [[ -n "$histcontrol_line" ]]; then
+  if [[ "$add_histsize" == true ]]; then
+    log_change "ADDED_TO_FILE" "$shell_rc|export HISTSIZE=10000"
+  fi
+  if [[ "$add_histfilesize" == true ]]; then
+    log_change "ADDED_TO_FILE" "$shell_rc|export HISTFILESIZE=20000"
+  fi
+  if [[ "$add_histcontrol" == true ]]; then
     log_change "ADDED_TO_FILE" "$shell_rc|export HISTCONTROL=ignoreboth"
   fi
 
