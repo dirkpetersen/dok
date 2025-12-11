@@ -3732,9 +3732,9 @@ add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Directories already exist: </span><span class="nv">$bin_home</span><span class="s2"> and </span><span class="nv">$bin_local</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
 
-<span class="w">  </span><span class="c1"># Check PATH ordering</span>
-<span class="w">  </span>check_path_order
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">order_status</span><span class="o">=</span><span class="nv">$?</span>
+<span class="w">  </span><span class="c1"># Check PATH ordering (capture exit status without triggering set -e)</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span>order_status
+<span class="w">  </span>check_path_order<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">order_status</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nv">order_status</span><span class="o">=</span><span class="nv">$?</span>
 
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$order_status</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> PATH order is correct: \$HOME/bin comes before \$HOME/.local/bin&quot;</span>
