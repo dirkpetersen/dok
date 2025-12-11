@@ -428,6 +428,10 @@ get_login_profile() {
 
 # Function to check PATH ordering
 check_path_order() {
+  # Temporarily disable set -e for this function
+  local old_opts=$-
+  set +e
+
   local bin_home="$HOME/bin"
   local bin_local="$HOME/.local/bin"
 
@@ -450,21 +454,29 @@ check_path_order() {
     pos=$((pos + 1))
   done
 
+  local result=2  # Default: one or both not in PATH
+
   # Check if both exist in PATH
-  if [[ $bin_home_pos -eq -1 ]] || [[ $bin_local_pos -eq -1 ]]; then
-    return 2  # One or both not in PATH
+  if [[ $bin_home_pos -ne -1 ]] && [[ $bin_local_pos -ne -1 ]]; then
+    # Check if bin_home comes before bin_local
+    if [[ $bin_home_pos -lt $bin_local_pos ]]; then
+      result=0  # Correct order
+    else
+      result=1  # Wrong order
+    fi
   fi
 
-  # Check if bin_home comes before bin_local
-  if [[ $bin_home_pos -lt $bin_local_pos ]]; then
-    return 0  # Correct order
-  else
-    return 1  # Wrong order
-  fi
+  # Restore set -e if it was enabled
+  [[ $old_opts == *e* ]] && set -e
+  return $result
 }
 
 # Function to fix PATH ordering in profile files
 fix_path_order_in_profile() {
+  # Temporarily disable set -e for this function
+  local old_opts=$-
+  set +e
+
   local profile_file="$1"
 
   # Check if file has the Ubuntu default pattern with wrong order
@@ -491,6 +503,7 @@ fix_path_order_in_profile() {
         read -p "Fix this by reordering the blocks in $profile_file? (y/N): " fix_order
         if [[ "$fix_order" != "y" && "$fix_order" != "Y" ]]; then
           echo -e "${YELLOW}Skipping PATH order fix${NC}"
+          [[ $old_opts == *e* ]] && set -e
           return 1
         fi
       fi
@@ -542,10 +555,12 @@ fix_path_order_in_profile() {
       echo -e "${YELLOW}Note: You need to reload your profile for this to take effect:${NC}"
       echo "   . $profile_file"
       echo ""
+      [[ $old_opts == *e* ]] && set -e
       return 0
     fi
   fi
 
+  [[ $old_opts == *e* ]] && set -e
   return 1
 }
 
