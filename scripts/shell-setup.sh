@@ -576,9 +576,9 @@ add_to_begin_of_path() {
     echo -e "${GREEN}✓${NC} Directories already exist: $bin_home and $bin_local"
   fi
 
-  # Check PATH ordering
-  check_path_order
-  local order_status=$?
+  # Check PATH ordering (capture exit status without triggering set -e)
+  local order_status
+  check_path_order && order_status=0 || order_status=$?
 
   if [[ $order_status -eq 0 ]]; then
     echo -e "${GREEN}✓${NC} PATH order is correct: \$HOME/bin comes before \$HOME/.local/bin"
