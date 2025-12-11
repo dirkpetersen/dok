@@ -3603,7 +3603,7 @@ check_path_order<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$normalized_dir</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$bin_local</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">      </span><span class="nv">bin_local_pos</span><span class="o">=</span><span class="nv">$pos</span>
 <span class="w">    </span><span class="k">fi</span>
-<span class="w">    </span><span class="o">((</span>pos++<span class="o">))</span>
+<span class="w">    </span><span class="nv">pos</span><span class="o">=</span><span class="k">$((</span><span class="nv">pos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span>
 <span class="w">  </span><span class="k">done</span>
 
 <span class="w">  </span><span class="c1"># Check if both exist in PATH</span>
