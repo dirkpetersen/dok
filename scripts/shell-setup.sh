@@ -508,60 +508,44 @@ fix_path_order_in_profile() {
         fi
       fi
 
-      echo -e "${YELLOW}Fixing PATH order by moving .local/bin block before bin block...${NC}"
+      echo -e "${YELLOW}Fixing PATH order by swapping the if-blocks...${NC}"
 
       # Create backup
       cp "$profile_file" "${profile_file}.bak.$(date +%Y%m%d_%H%M%S)"
 
-      # Find block boundaries including comments
-      # bin block: check for comment line before the if statement
-      local bin_block_start=$bin_if_line
-      local prev_line=$((bin_if_line - 1))
-      if [[ $prev_line -ge 1 ]] && sed -n "${prev_line}p" "$profile_file" | grep -q "^#"; then
-        bin_block_start=$prev_line
-      fi
-      # Block ends 3 lines after the if (if + PATH + fi + blank or next)
-      local bin_block_end=$((bin_if_line + 2))  # if + PATH= + fi
+      # Extract just the 3-line if-blocks (if + PATH= + fi), leaving comments in place
+      # Since both comments are identical in Ubuntu's .profile, we only swap the code blocks
+      local bin_block_end=$((bin_if_line + 2))
+      local local_bin_block_end=$((local_bin_if_line + 2))
 
-      # local_bin block: check for comment line before the if statement
-      local local_bin_block_start=$local_bin_if_line
-      prev_line=$((local_bin_if_line - 1))
-      if [[ $prev_line -ge 1 ]] && sed -n "${prev_line}p" "$profile_file" | grep -q "^#"; then
-        local_bin_block_start=$prev_line
-      fi
-      local local_bin_block_end=$((local_bin_if_line + 2))  # if + PATH= + fi
+      # Extract the if-blocks (3 lines each: if, PATH=, fi)
+      local bin_if_block=$(sed -n "${bin_if_line},${bin_block_end}p" "$profile_file")
+      local local_bin_if_block=$(sed -n "${local_bin_if_line},${local_bin_block_end}p" "$profile_file")
 
-      # Extract both complete blocks
-      local bin_block=$(sed -n "${bin_block_start},${bin_block_end}p" "$profile_file")
-      local local_bin_block=$(sed -n "${local_bin_block_start},${local_bin_block_end}p" "$profile_file")
+      # Use sed to swap the blocks in place
+      # First, replace the bin block with a placeholder
+      # Then replace the local_bin block with the bin block
+      # Finally replace the placeholder with the local_bin block
+      local temp_file="${profile_file}.tmp"
+      cp "$profile_file" "$temp_file"
 
-      # Create new file with blocks swapped
-      # Get everything before the bin block
-      if [[ $bin_block_start -gt 1 ]]; then
-        sed -n "1,$((bin_block_start - 1))p" "$profile_file" > "${profile_file}.tmp"
-      else
-        : > "${profile_file}.tmp"
-      fi
+      # Create the swapped version line by line
+      {
+        # Everything before bin_if_line
+        sed -n "1,$((bin_if_line - 1))p" "$profile_file"
+        # Put local_bin block where bin block was
+        echo "$local_bin_if_block"
+        # Everything between bin block and local_bin block (including blank lines and comments)
+        sed -n "$((bin_block_end + 1)),$((local_bin_if_line - 1))p" "$profile_file"
+        # Put bin block where local_bin block was
+        echo "$bin_if_block"
+        # Everything after local_bin block
+        sed -n "$((local_bin_block_end + 1)),\$p" "$profile_file"
+      } > "$temp_file"
 
-      # Add .local/bin block first
-      echo "$local_bin_block" >> "${profile_file}.tmp"
-      echo "" >> "${profile_file}.tmp"
+      mv "$temp_file" "$profile_file"
 
-      # Add bin block second
-      echo "$bin_block" >> "${profile_file}.tmp"
-
-      # Add everything after the local_bin block (skip any blank line right after)
-      local after_line=$((local_bin_block_end + 1))
-      # Skip blank lines between blocks
-      while [[ -z "$(sed -n "${after_line}p" "$profile_file")" ]] && [[ $after_line -le $(wc -l < "$profile_file") ]]; do
-        after_line=$((after_line + 1))
-      done
-      sed -n "${after_line},\$p" "$profile_file" >> "${profile_file}.tmp"
-
-      # Move new file into place
-      mv "${profile_file}.tmp" "$profile_file"
-
-      log_change "ADDED_TO_FILE" "$profile_file|Fixed PATH order: moved .local/bin block before bin block"
+      log_change "ADDED_TO_FILE" "$profile_file|Fixed PATH order: swapped bin and .local/bin if-blocks"
 
       echo -e "${GREEN}✓${NC} Fixed PATH ordering in $profile_file"
       echo -e "${GREEN}   .local/bin block is now configured before bin block${NC}"
