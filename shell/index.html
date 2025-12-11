@@ -3154,7 +3154,22 @@
 <span class="normal">1435</span>
 <span class="normal">1436</span>
 <span class="normal">1437</span>
-<span class="normal">1438</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1438</span>
+<span class="normal">1439</span>
+<span class="normal">1440</span>
+<span class="normal">1441</span>
+<span class="normal">1442</span>
+<span class="normal">1443</span>
+<span class="normal">1444</span>
+<span class="normal">1445</span>
+<span class="normal">1446</span>
+<span class="normal">1447</span>
+<span class="normal">1448</span>
+<span class="normal">1449</span>
+<span class="normal">1450</span>
+<span class="normal">1451</span>
+<span class="normal">1452</span>
+<span class="normal">1453</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3584,6 +3599,10 @@ get_login_profile<span class="o">()</span><span class="w"> </span><span class="o
 
 <span class="c1"># Function to check PATH ordering</span>
 check_path_order<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="c1"># Temporarily disable set -e for this function</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">old_opts</span><span class="o">=</span><span class="nv">$-</span>
+<span class="w">  </span><span class="nb">set</span><span class="w"> </span>+e
+
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_home</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_local</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin&quot;</span>
 
@@ -3606,21 +3625,29 @@ check_path_order<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="w">    </span><span class="nv">pos</span><span class="o">=</span><span class="k">$((</span><span class="nv">pos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span>
 <span class="w">  </span><span class="k">done</span>
 
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">result</span><span class="o">=</span><span class="m">2</span><span class="w">  </span><span class="c1"># Default: one or both not in PATH</span>
+
 <span class="w">  </span><span class="c1"># Check if both exist in PATH</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$bin_home_pos</span><span class="w"> </span>-eq<span class="w"> </span>-1<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$bin_local_pos</span><span class="w"> </span>-eq<span class="w"> </span>-1<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">2</span><span class="w">  </span><span class="c1"># One or both not in PATH</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$bin_home_pos</span><span class="w"> </span>-ne<span class="w"> </span>-1<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$bin_local_pos</span><span class="w"> </span>-ne<span class="w"> </span>-1<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="c1"># Check if bin_home comes before bin_local</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$bin_home_pos</span><span class="w"> </span>-lt<span class="w"> </span><span class="nv">$bin_local_pos</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nv">result</span><span class="o">=</span><span class="m">0</span><span class="w">  </span><span class="c1"># Correct order</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">      </span><span class="nv">result</span><span class="o">=</span><span class="m">1</span><span class="w">  </span><span class="c1"># Wrong order</span>
+<span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">fi</span>
 
-<span class="w">  </span><span class="c1"># Check if bin_home comes before bin_local</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$bin_home_pos</span><span class="w"> </span>-lt<span class="w"> </span><span class="nv">$bin_local_pos</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span><span class="w">  </span><span class="c1"># Correct order</span>
-<span class="w">  </span><span class="k">else</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span><span class="w">  </span><span class="c1"># Wrong order</span>
-<span class="w">  </span><span class="k">fi</span>
+<span class="w">  </span><span class="c1"># Restore set -e if it was enabled</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nv">$result</span>
 <span class="o">}</span>
 
 <span class="c1"># Function to fix PATH ordering in profile files</span>
 fix_path_order_in_profile<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="c1"># Temporarily disable set -e for this function</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">old_opts</span><span class="o">=</span><span class="nv">$-</span>
+<span class="w">  </span><span class="nb">set</span><span class="w"> </span>+e
+
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">profile_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
 <span class="w">  </span><span class="c1"># Check if file has the Ubuntu default pattern with wrong order</span>
@@ -3647,6 +3674,7 @@ fix_path_order_in_profile<span class="o">()</span><span class="w"> </span><span 
 <span class="w">        </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Fix this by reordering the blocks in </span><span class="nv">$profile_file</span><span class="s2">? (y/N): &quot;</span><span class="w"> </span>fix_order
 <span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$fix_order</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;y&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$fix_order</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;Y&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">          </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Skipping PATH order fix</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">          </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
 <span class="w">          </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="w">        </span><span class="k">fi</span>
 <span class="w">      </span><span class="k">fi</span>
@@ -3698,10 +3726,12 @@ fix_path_order_in_profile<span class="o">()</span><span class="w"> </span><span 
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Note: You need to reload your profile for this to take effect:</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   . </span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">      </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">fi</span>
 
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
 <span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="o">}</span>
 
