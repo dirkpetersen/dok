@@ -3146,7 +3146,16 @@
 <span class="normal">1427</span>
 <span class="normal">1428</span>
 <span class="normal">1429</span>
-<span class="normal">1430</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1430</span>
+<span class="normal">1431</span>
+<span class="normal">1432</span>
+<span class="normal">1433</span>
+<span class="normal">1434</span>
+<span class="normal">1435</span>
+<span class="normal">1436</span>
+<span class="normal">1437</span>
+<span class="normal">1438</span>
+<span class="normal">1439</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3666,6 +3675,10 @@ remove_path_from_profile<span class="o">()</span><span class="w"> </span><span c
 
 <span class="c1"># Function to add directories to beginning of PATH</span>
 add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="c1"># Temporarily disable set -e for this function</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">old_opts</span><span class="o">=</span><span class="nv">$-</span>
+<span class="w">  </span><span class="nb">set</span><span class="w"> </span>+e
+
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">shell_rc</span><span class="o">=</span><span class="k">$(</span>get_login_shell_rc<span class="k">)</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">profile</span><span class="o">=</span><span class="k">$(</span>get_login_profile<span class="k">)</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_home</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
@@ -3691,9 +3704,10 @@ add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Directories already exist: </span><span class="nv">$bin_home</span><span class="s2"> and </span><span class="nv">$bin_local</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
 
-<span class="w">  </span><span class="c1"># Check PATH ordering (capture exit status without triggering set -e)</span>
+<span class="w">  </span><span class="c1"># Check PATH ordering</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span>order_status
-<span class="w">  </span>check_path_order<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">order_status</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nv">order_status</span><span class="o">=</span><span class="nv">$?</span>
+<span class="w">  </span>check_path_order
+<span class="w">  </span><span class="nv">order_status</span><span class="o">=</span><span class="nv">$?</span>
 
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$order_status</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> PATH order is correct: \$HOME/bin comes before \$HOME/.local/bin&quot;</span>
@@ -3716,6 +3730,7 @@ add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-Fq<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_MODE</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> PATH directories already configured in </span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">else</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Force mode: Removing existing PATH configuration</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -3731,6 +3746,9 @@ add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class
 <span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|</span><span class="nv">$marker</span><span class="s2">&quot;</span>
 <span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="s1">&#39;|export PATH=$HOME/bin:$HOME/.local/bin:$PATH&#39;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Added PATH configuration to </span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+
+<span class="w">  </span><span class="c1"># Restore set -e if it was enabled</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
 <span class="o">}</span>
 
 <span class="c1"># Function to setup XDG_RUNTIME_DIR for container support (Linux only)</span>
