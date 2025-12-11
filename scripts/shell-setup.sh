@@ -447,7 +447,7 @@ check_path_order() {
     elif [[ "$normalized_dir" == "$bin_local" ]]; then
       bin_local_pos=$pos
     fi
-    ((pos++))
+    pos=$((pos + 1))
   done
 
   # Check if both exist in PATH
