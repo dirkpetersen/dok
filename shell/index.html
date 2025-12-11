@@ -3171,7 +3171,8 @@
 <span class="normal">1452</span>
 <span class="normal">1453</span>
 <span class="normal">1454</span>
-<span class="normal">1455</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1455</span>
+<span class="normal">1456</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3221,7 +3222,8 @@
 <span class="c1"># Detect if script is being sourced or executed</span>
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">BASH_SOURCE</span><span class="p">[0]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nv">SCRIPT_MODE</span><span class="o">=</span><span class="s2">&quot;execute&quot;</span>
-<span class="w">  </span><span class="nb">set</span><span class="w"> </span>-e
+<span class="w">  </span><span class="c1"># Note: Not using set -e as it causes premature exits with grep/sed/awk</span>
+<span class="w">  </span><span class="c1"># Each function handles its own error checking</span>
 <span class="k">else</span>
 <span class="w">  </span><span class="nv">SCRIPT_MODE</span><span class="o">=</span><span class="s2">&quot;source&quot;</span>
 <span class="k">fi</span>
