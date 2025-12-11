@@ -3137,38 +3137,7 @@
 <span class="normal">1418</span>
 <span class="normal">1419</span>
 <span class="normal">1420</span>
-<span class="normal">1421</span>
-<span class="normal">1422</span>
-<span class="normal">1423</span>
-<span class="normal">1424</span>
-<span class="normal">1425</span>
-<span class="normal">1426</span>
-<span class="normal">1427</span>
-<span class="normal">1428</span>
-<span class="normal">1429</span>
-<span class="normal">1430</span>
-<span class="normal">1431</span>
-<span class="normal">1432</span>
-<span class="normal">1433</span>
-<span class="normal">1434</span>
-<span class="normal">1435</span>
-<span class="normal">1436</span>
-<span class="normal">1437</span>
-<span class="normal">1438</span>
-<span class="normal">1439</span>
-<span class="normal">1440</span>
-<span class="normal">1441</span>
-<span class="normal">1442</span>
-<span class="normal">1443</span>
-<span class="normal">1444</span>
-<span class="normal">1445</span>
-<span class="normal">1446</span>
-<span class="normal">1447</span>
-<span class="normal">1448</span>
-<span class="normal">1449</span>
-<span class="normal">1450</span>
-<span class="normal">1451</span>
-<span class="normal">1452</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1421</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3511,7 +3480,8 @@ show_help<span class="o">()</span><span class="w"> </span><span class="o">{</spa
 <span class="s">WHAT IT SETS UP:</span>
 <span class="s">  1. PATH directories (~/.local/bin and ~/bin)</span>
 <span class="s">     - Ensures ~/bin comes BEFORE ~/.local/bin in PATH</span>
-<span class="s">     - Automatically detects and fixes Ubuntu default .profile ordering issue</span>
+<span class="s">     - Removes PATH blocks from .profile (belong in .bashrc for batch mode support)</span>
+<span class="s">     - Adds correct PATH configuration to .bashrc</span>
 <span class="s">  2. XDG_RUNTIME_DIR for container support (Linux only)</span>
 <span class="s">  3. Convenience settings (LS_COLORS cyan directories, history size)</span>
 <span class="s">  4. SSH key (ed25519 with mandatory passphrase)</span>
@@ -3641,92 +3611,67 @@ check_path_order<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nv">$result</span>
 <span class="o">}</span>
 
-<span class="c1"># Function to fix PATH ordering in profile files</span>
-fix_path_order_in_profile<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="c1"># Function to remove PATH blocks from .profile (they belong in .bashrc)</span>
+remove_path_from_profile<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="c1"># Temporarily disable set -e for this function</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">old_opts</span><span class="o">=</span><span class="nv">$-</span>
 <span class="w">  </span><span class="nb">set</span><span class="w"> </span>+e
 
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">profile_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
-<span class="w">  </span><span class="c1"># Check if file has the Ubuntu default pattern with wrong order</span>
-<span class="w">  </span><span class="c1"># Pattern: bin setup first, then .local/bin setup second</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;if \[ -d &quot;$HOME/bin&quot; \]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="c1"># Check if file has the Ubuntu default PATH blocks</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;if \[ -d &quot;$HOME/bin&quot; \]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="se">\</span>
 <span class="w">     </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;if \[ -d &quot;$HOME/.local/bin&quot; \]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 
-<span class="w">    </span><span class="c1"># Check which one comes first (find the if statements)</span>
-<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_if_line</span><span class="o">=</span><span class="k">$(</span>grep<span class="w"> </span>-n<span class="w"> </span><span class="s1">&#39;if \[ -d &quot;$HOME/bin&quot; \]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d:<span class="w"> </span>-f1<span class="k">)</span>
-<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">local_bin_if_line</span><span class="o">=</span><span class="k">$(</span>grep<span class="w"> </span>-n<span class="w"> </span><span class="s1">&#39;if \[ -d &quot;$HOME/.local/bin&quot; \]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d:<span class="w"> </span>-f1<span class="k">)</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Found PATH configuration in </span><span class="nv">$profile_file</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">These settings belong in .bashrc, not .profile</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;.profile is only read for interactive login shells, not batch mode.&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;PATH settings should be in .bashrc to work in all contexts.&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$bin_if_line</span><span class="w"> </span>-lt<span class="w"> </span><span class="nv">$local_bin_if_line</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Found problematic PATH configuration in </span><span class="nv">$profile_file</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Issue: \$HOME/.local/bin is added after \$HOME/bin, causing it to appear first in PATH</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Current configuration adds directories in this order:&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  1. \$HOME/bin is prepended to PATH&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  2. \$HOME/.local/bin is prepended to PATH (moving it in front of bin)&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Result: \$HOME/.local/bin comes BEFORE \$HOME/bin in final PATH&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-
-<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_MODE</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">        </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Fix this by reordering the blocks in </span><span class="nv">$profile_file</span><span class="s2">? (y/N): &quot;</span><span class="w"> </span>fix_order
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$fix_order</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;y&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$fix_order</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;Y&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">          </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Skipping PATH order fix</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">          </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
-<span class="w">          </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
-<span class="w">        </span><span class="k">fi</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_MODE</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Remove PATH blocks from </span><span class="nv">$profile_file</span><span class="s2">? (y/N): &quot;</span><span class="w"> </span>remove_path
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$remove_path</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;y&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$remove_path</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;Y&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Skipping PATH removal from .profile</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="w">      </span><span class="k">fi</span>
-
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Fixing PATH order by swapping the if-blocks...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-
-<span class="w">      </span><span class="c1"># Create backup</span>
-<span class="w">      </span>cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.bak.</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span><span class="s2">&quot;</span>
-
-<span class="w">      </span><span class="c1"># Extract just the 3-line if-blocks (if + PATH= + fi), leaving comments in place</span>
-<span class="w">      </span><span class="c1"># Since both comments are identical in Ubuntu&#39;s .profile, we only swap the code blocks</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_block_end</span><span class="o">=</span><span class="k">$((</span><span class="nv">bin_if_line</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="k">))</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">local_bin_block_end</span><span class="o">=</span><span class="k">$((</span><span class="nv">local_bin_if_line</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="k">))</span>
-
-<span class="w">      </span><span class="c1"># Extract the if-blocks (3 lines each: if, PATH=, fi)</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_if_block</span><span class="o">=</span><span class="k">$(</span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">bin_if_line</span><span class="si">}</span><span class="s2">,</span><span class="si">${</span><span class="nv">bin_block_end</span><span class="si">}</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="k">)</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">local_bin_if_block</span><span class="o">=</span><span class="k">$(</span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">local_bin_if_line</span><span class="si">}</span><span class="s2">,</span><span class="si">${</span><span class="nv">local_bin_block_end</span><span class="si">}</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="k">)</span>
-
-<span class="w">      </span><span class="c1"># Use sed to swap the blocks in place</span>
-<span class="w">      </span><span class="c1"># First, replace the bin block with a placeholder</span>
-<span class="w">      </span><span class="c1"># Then replace the local_bin block with the bin block</span>
-<span class="w">      </span><span class="c1"># Finally replace the placeholder with the local_bin block</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">temp_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
-<span class="w">      </span>cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span>
-
-<span class="w">      </span><span class="c1"># Create the swapped version line by line</span>
-<span class="w">      </span><span class="o">{</span>
-<span class="w">        </span><span class="c1"># Everything before bin_if_line</span>
-<span class="w">        </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;1,</span><span class="k">$((</span><span class="nv">bin_if_line</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="k">))</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
-<span class="w">        </span><span class="c1"># Put local_bin block where bin block was</span>
-<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$local_bin_if_block</span><span class="s2">&quot;</span>
-<span class="w">        </span><span class="c1"># Everything between bin block and local_bin block (including blank lines and comments)</span>
-<span class="w">        </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="k">$((</span><span class="nv">bin_block_end</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span><span class="s2">,</span><span class="k">$((</span><span class="nv">local_bin_if_line</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="k">))</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
-<span class="w">        </span><span class="c1"># Put bin block where local_bin block was</span>
-<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$bin_if_block</span><span class="s2">&quot;</span>
-<span class="w">        </span><span class="c1"># Everything after local_bin block</span>
-<span class="w">        </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="k">$((</span><span class="nv">local_bin_block_end</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span><span class="s2">,\$p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="o">}</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span>
-
-<span class="w">      </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
-
-<span class="w">      </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">|Fixed PATH order: swapped bin and .local/bin if-blocks&quot;</span>
-
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Fixed PATH ordering in </span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">   .local/bin block is now configured before bin block</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">   Result: \$HOME/bin will come BEFORE \$HOME/.local/bin in PATH</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Note: You need to reload your profile for this to take effect:</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   . </span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">      </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
-<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">fi</span>
+
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Removing PATH blocks from </span><span class="nv">$profile_file</span><span class="s2">...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="w">    </span><span class="c1"># Create backup</span>
+<span class="w">    </span>cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.bak.</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="w">    </span><span class="c1"># Remove the PATH blocks using sed</span>
+<span class="w">    </span><span class="c1"># Pattern 1: comment + if block for $HOME/bin</span>
+<span class="w">    </span><span class="c1"># Pattern 2: comment + if block for $HOME/.local/bin</span>
+<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">temp_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
+
+<span class="w">    </span><span class="c1"># Remove both blocks (comment line + if/then/PATH/fi)</span>
+<span class="w">    </span><span class="c1"># Use awk for multi-line pattern removal</span>
+<span class="w">    </span>awk<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">      /^# set PATH so it includes user.*private bin/ { skip=1; next }</span>
+<span class="s1">      /^if \[ -d &quot;\$HOME\/bin&quot; \]/ { skip=1; next }</span>
+<span class="s1">      /^if \[ -d &quot;\$HOME\/\.local\/bin&quot; \]/ { skip=1; next }</span>
+<span class="s1">      skip &amp;&amp; /^[[:space:]]*PATH=/ { next }</span>
+<span class="s1">      skip &amp;&amp; /^[[:space:]]*fi[[:space:]]*$/ { skip=0; next }</span>
+<span class="s1">      !skip { print }</span>
+<span class="s1">    &#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span>
+
+<span class="w">    </span><span class="c1"># Clean up multiple consecutive blank lines</span>
+<span class="w">    </span>cat<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">temp_file</span><span class="si">}</span><span class="s2">.clean&quot;</span>
+<span class="w">    </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">temp_file</span><span class="si">}</span><span class="s2">.clean&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
+<span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span>
+
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">|Removed PATH blocks (moved to .bashrc)&quot;</span>
+
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Removed PATH blocks from </span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">   PATH is now configured in .bashrc where it belongs</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
@@ -3767,25 +3712,18 @@ add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$order_status</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> PATH order is correct: \$HOME/bin comes before \$HOME/.local/bin&quot;</span>
 <span class="w">  </span><span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$order_status</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> PATH order is incorrect: \$HOME/.local/bin comes before \$HOME/bin&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-
-<span class="w">    </span><span class="c1"># Try to fix the ordering in profile files</span>
-<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">fixed</span><span class="o">=</span><span class="nb">false</span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span>pfile<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.profile&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bash_profile&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.zprofile&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pfile</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>fix_path_order_in_profile<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pfile</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">        </span><span class="nv">fixed</span><span class="o">=</span><span class="nb">true</span>
-<span class="w">        </span><span class="k">break</span>
-<span class="w">      </span><span class="k">fi</span>
-<span class="w">    </span><span class="k">done</span>
-
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$fixed</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Could not automatically fix PATH order in profile files</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">You may need to manually reorder PATH configuration in your profile</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="k">fi</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">  PATH order issue: \$HOME/.local/bin comes before \$HOME/bin&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">   This will be fixed by the PATH configuration in .bashrc</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">  One or both directories not in PATH yet&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Remove PATH blocks from .profile if present (they belong in .bashrc)</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span>pfile<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.profile&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pfile</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span>remove_path_from_profile<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pfile</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">done</span>
 
 <span class="w">  </span><span class="c1"># Check if PATH entries already exist in RC file</span>
 <span class="w">  </span><span class="c1"># Look for the exact PATH export line we add</span>
