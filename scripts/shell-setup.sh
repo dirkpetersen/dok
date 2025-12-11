@@ -48,7 +48,8 @@ fi
 # Detect if script is being sourced or executed
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   SCRIPT_MODE="execute"
-  set -e
+  # Note: Not using set -e as it causes premature exits with grep/sed/awk
+  # Each function handles its own error checking
 else
   SCRIPT_MODE="source"
 fi
