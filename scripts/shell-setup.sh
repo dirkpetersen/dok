@@ -1447,9 +1447,26 @@ if [[ -n "$gpg_key_id" ]]; then
   step=$((step + 1))
   echo "$step. Your SSH key passphrase will be loaded on next login via keychain"
   echo "   (GPG key has no passphrase - only used for commit signing)"
+
+  # Check if HPC was configured in SSH config
+  if grep -q "^Host hpc" "$HOME/.ssh/config" 2>/dev/null; then
+    step=$((step + 1))
+    echo ""
+    echo "$step. Connect to your HPC system:"
+    echo "   ssh hpc"
+    echo "   (This uses the jump host configuration you set up)"
+  fi
 else
   echo "4. Your SSH key passphrase will be loaded on next login via keychain"
   echo "   (no need to run keychain manually)"
+
+  # Check if HPC was configured in SSH config
+  if grep -q "^Host hpc" "$HOME/.ssh/config" 2>/dev/null; then
+    echo ""
+    echo "5. Connect to your HPC system:"
+    echo "   ssh hpc"
+    echo "   (This uses the jump host configuration you set up)"
+  fi
 fi
 echo ""
 
