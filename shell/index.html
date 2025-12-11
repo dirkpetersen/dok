@@ -3168,23 +3168,7 @@
 <span class="normal">1449</span>
 <span class="normal">1450</span>
 <span class="normal">1451</span>
-<span class="normal">1452</span>
-<span class="normal">1453</span>
-<span class="normal">1454</span>
-<span class="normal">1455</span>
-<span class="normal">1456</span>
-<span class="normal">1457</span>
-<span class="normal">1458</span>
-<span class="normal">1459</span>
-<span class="normal">1460</span>
-<span class="normal">1461</span>
-<span class="normal">1462</span>
-<span class="normal">1463</span>
-<span class="normal">1464</span>
-<span class="normal">1465</span>
-<span class="normal">1466</span>
-<span class="normal">1467</span>
-<span class="normal">1468</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1452</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3694,60 +3678,44 @@ fix_path_order_in_profile<span class="o">()</span><span class="w"> </span><span 
 <span class="w">        </span><span class="k">fi</span>
 <span class="w">      </span><span class="k">fi</span>
 
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Fixing PATH order by moving .local/bin block before bin block...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Fixing PATH order by swapping the if-blocks...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 
 <span class="w">      </span><span class="c1"># Create backup</span>
 <span class="w">      </span>cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.bak.</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span><span class="s2">&quot;</span>
 
-<span class="w">      </span><span class="c1"># Find block boundaries including comments</span>
-<span class="w">      </span><span class="c1"># bin block: check for comment line before the if statement</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_block_start</span><span class="o">=</span><span class="nv">$bin_if_line</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">prev_line</span><span class="o">=</span><span class="k">$((</span><span class="nv">bin_if_line</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="k">))</span>
-<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$prev_line</span><span class="w"> </span>-ge<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">prev_line</span><span class="si">}</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^#&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">        </span><span class="nv">bin_block_start</span><span class="o">=</span><span class="nv">$prev_line</span>
-<span class="w">      </span><span class="k">fi</span>
-<span class="w">      </span><span class="c1"># Block ends 3 lines after the if (if + PATH + fi + blank or next)</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_block_end</span><span class="o">=</span><span class="k">$((</span><span class="nv">bin_if_line</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="k">))</span><span class="w">  </span><span class="c1"># if + PATH= + fi</span>
+<span class="w">      </span><span class="c1"># Extract just the 3-line if-blocks (if + PATH= + fi), leaving comments in place</span>
+<span class="w">      </span><span class="c1"># Since both comments are identical in Ubuntu&#39;s .profile, we only swap the code blocks</span>
+<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_block_end</span><span class="o">=</span><span class="k">$((</span><span class="nv">bin_if_line</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="k">))</span>
+<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">local_bin_block_end</span><span class="o">=</span><span class="k">$((</span><span class="nv">local_bin_if_line</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="k">))</span>
 
-<span class="w">      </span><span class="c1"># local_bin block: check for comment line before the if statement</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">local_bin_block_start</span><span class="o">=</span><span class="nv">$local_bin_if_line</span>
-<span class="w">      </span><span class="nv">prev_line</span><span class="o">=</span><span class="k">$((</span><span class="nv">local_bin_if_line</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="k">))</span>
-<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$prev_line</span><span class="w"> </span>-ge<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">prev_line</span><span class="si">}</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^#&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">        </span><span class="nv">local_bin_block_start</span><span class="o">=</span><span class="nv">$prev_line</span>
-<span class="w">      </span><span class="k">fi</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">local_bin_block_end</span><span class="o">=</span><span class="k">$((</span><span class="nv">local_bin_if_line</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="k">))</span><span class="w">  </span><span class="c1"># if + PATH= + fi</span>
+<span class="w">      </span><span class="c1"># Extract the if-blocks (3 lines each: if, PATH=, fi)</span>
+<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_if_block</span><span class="o">=</span><span class="k">$(</span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">bin_if_line</span><span class="si">}</span><span class="s2">,</span><span class="si">${</span><span class="nv">bin_block_end</span><span class="si">}</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">local_bin_if_block</span><span class="o">=</span><span class="k">$(</span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">local_bin_if_line</span><span class="si">}</span><span class="s2">,</span><span class="si">${</span><span class="nv">local_bin_block_end</span><span class="si">}</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="k">)</span>
 
-<span class="w">      </span><span class="c1"># Extract both complete blocks</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">bin_block</span><span class="o">=</span><span class="k">$(</span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">bin_block_start</span><span class="si">}</span><span class="s2">,</span><span class="si">${</span><span class="nv">bin_block_end</span><span class="si">}</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="k">)</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">local_bin_block</span><span class="o">=</span><span class="k">$(</span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">local_bin_block_start</span><span class="si">}</span><span class="s2">,</span><span class="si">${</span><span class="nv">local_bin_block_end</span><span class="si">}</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="w">      </span><span class="c1"># Use sed to swap the blocks in place</span>
+<span class="w">      </span><span class="c1"># First, replace the bin block with a placeholder</span>
+<span class="w">      </span><span class="c1"># Then replace the local_bin block with the bin block</span>
+<span class="w">      </span><span class="c1"># Finally replace the placeholder with the local_bin block</span>
+<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">temp_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
+<span class="w">      </span>cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span>
 
-<span class="w">      </span><span class="c1"># Create new file with blocks swapped</span>
-<span class="w">      </span><span class="c1"># Get everything before the bin block</span>
-<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$bin_block_start</span><span class="w"> </span>-gt<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">        </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;1,</span><span class="k">$((</span><span class="nv">bin_block_start</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="k">))</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
-<span class="w">      </span><span class="k">else</span>
-<span class="w">        </span>:<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
-<span class="w">      </span><span class="k">fi</span>
+<span class="w">      </span><span class="c1"># Create the swapped version line by line</span>
+<span class="w">      </span><span class="o">{</span>
+<span class="w">        </span><span class="c1"># Everything before bin_if_line</span>
+<span class="w">        </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;1,</span><span class="k">$((</span><span class="nv">bin_if_line</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="k">))</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="c1"># Put local_bin block where bin block was</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$local_bin_if_block</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="c1"># Everything between bin block and local_bin block (including blank lines and comments)</span>
+<span class="w">        </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="k">$((</span><span class="nv">bin_block_end</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span><span class="s2">,</span><span class="k">$((</span><span class="nv">local_bin_if_line</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="k">))</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="c1"># Put bin block where local_bin block was</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$bin_if_block</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="c1"># Everything after local_bin block</span>
+<span class="w">        </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="k">$((</span><span class="nv">local_bin_block_end</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span><span class="s2">,\$p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="o">}</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span>
 
-<span class="w">      </span><span class="c1"># Add .local/bin block first</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$local_bin_block</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
+<span class="w">      </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
 
-<span class="w">      </span><span class="c1"># Add bin block second</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$bin_block</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
-
-<span class="w">      </span><span class="c1"># Add everything after the local_bin block (skip any blank line right after)</span>
-<span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">after_line</span><span class="o">=</span><span class="k">$((</span><span class="nv">local_bin_block_end</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span>
-<span class="w">      </span><span class="c1"># Skip blank lines between blocks</span>
-<span class="w">      </span><span class="k">while</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">after_line</span><span class="si">}</span><span class="s2">p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$after_line</span><span class="w"> </span>-le<span class="w"> </span><span class="k">$(</span>wc<span class="w"> </span>-l<span class="w"> </span>&lt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="k">)</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<span class="w">        </span><span class="nv">after_line</span><span class="o">=</span><span class="k">$((</span><span class="nv">after_line</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span>
-<span class="w">      </span><span class="k">done</span>
-<span class="w">      </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">after_line</span><span class="si">}</span><span class="s2">,\$p&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
-
-<span class="w">      </span><span class="c1"># Move new file into place</span>
-<span class="w">      </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
-
-<span class="w">      </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">|Fixed PATH order: moved .local/bin block before bin block&quot;</span>
+<span class="w">      </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">|Fixed PATH order: swapped bin and .local/bin if-blocks&quot;</span>
 
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Fixed PATH ordering in </span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">   .local/bin block is now configured before bin block</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
