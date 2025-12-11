@@ -484,11 +484,11 @@ fix_path_order_in_profile() {
   if grep -q 'if \[ -d "$HOME/bin" \]' "$profile_file" 2>/dev/null && \
      grep -q 'if \[ -d "$HOME/.local/bin" \]' "$profile_file" 2>/dev/null; then
 
-    # Check which one comes first
-    local bin_line=$(grep -n 'if \[ -d "$HOME/bin" \]' "$profile_file" | head -1 | cut -d: -f1)
-    local local_bin_line=$(grep -n 'if \[ -d "$HOME/.local/bin" \]' "$profile_file" | head -1 | cut -d: -f1)
+    # Check which one comes first (find the if statements)
+    local bin_if_line=$(grep -n 'if \[ -d "$HOME/bin" \]' "$profile_file" | head -1 | cut -d: -f1)
+    local local_bin_if_line=$(grep -n 'if \[ -d "$HOME/.local/bin" \]' "$profile_file" | head -1 | cut -d: -f1)
 
-    if [[ $bin_line -lt $local_bin_line ]]; then
+    if [[ $bin_if_line -lt $local_bin_if_line ]]; then
       echo -e "${YELLOW}Found problematic PATH configuration in $profile_file${NC}"
       echo -e "${YELLOW}Issue: \$HOME/.local/bin is added after \$HOME/bin, causing it to appear first in PATH${NC}"
       echo ""
@@ -513,25 +513,35 @@ fix_path_order_in_profile() {
       # Create backup
       cp "$profile_file" "${profile_file}.bak.$(date +%Y%m%d_%H%M%S)"
 
-      # Extract the two blocks (each block is 4 lines including comments)
-      local bin_block_start=$bin_line
-      local bin_block_end=$((bin_line + 3))
-
-      # Find the actual .local/bin block (search for the comment line before it)
-      local local_bin_block_start=$((local_bin_line - 1))
-      # Check if line before is a comment
-      if ! sed -n "${local_bin_block_start}p" "$profile_file" | grep -q "^#"; then
-        local_bin_block_start=$local_bin_line
+      # Find block boundaries including comments
+      # bin block: check for comment line before the if statement
+      local bin_block_start=$bin_if_line
+      local prev_line=$((bin_if_line - 1))
+      if [[ $prev_line -ge 1 ]] && sed -n "${prev_line}p" "$profile_file" | grep -q "^#"; then
+        bin_block_start=$prev_line
       fi
-      local local_bin_block_end=$((local_bin_block_start + 3))
+      # Block ends 3 lines after the if (if + PATH + fi + blank or next)
+      local bin_block_end=$((bin_if_line + 2))  # if + PATH= + fi
 
-      # Extract both blocks
+      # local_bin block: check for comment line before the if statement
+      local local_bin_block_start=$local_bin_if_line
+      prev_line=$((local_bin_if_line - 1))
+      if [[ $prev_line -ge 1 ]] && sed -n "${prev_line}p" "$profile_file" | grep -q "^#"; then
+        local_bin_block_start=$prev_line
+      fi
+      local local_bin_block_end=$((local_bin_if_line + 2))  # if + PATH= + fi
+
+      # Extract both complete blocks
       local bin_block=$(sed -n "${bin_block_start},${bin_block_end}p" "$profile_file")
       local local_bin_block=$(sed -n "${local_bin_block_start},${local_bin_block_end}p" "$profile_file")
 
       # Create new file with blocks swapped
-      # First, get everything before the bin block
-      sed -n "1,$((bin_block_start - 1))p" "$profile_file" > "${profile_file}.tmp"
+      # Get everything before the bin block
+      if [[ $bin_block_start -gt 1 ]]; then
+        sed -n "1,$((bin_block_start - 1))p" "$profile_file" > "${profile_file}.tmp"
+      else
+        : > "${profile_file}.tmp"
+      fi
 
       # Add .local/bin block first
       echo "$local_bin_block" >> "${profile_file}.tmp"
@@ -540,8 +550,13 @@ fix_path_order_in_profile() {
       # Add bin block second
       echo "$bin_block" >> "${profile_file}.tmp"
 
-      # Add everything after the .local/bin block
-      sed -n "$((local_bin_block_end + 1)),\$p" "$profile_file" >> "${profile_file}.tmp"
+      # Add everything after the local_bin block (skip any blank line right after)
+      local after_line=$((local_bin_block_end + 1))
+      # Skip blank lines between blocks
+      while [[ -z "$(sed -n "${after_line}p" "$profile_file")" ]] && [[ $after_line -le $(wc -l < "$profile_file") ]]; do
+        after_line=$((after_line + 1))
+      done
+      sed -n "${after_line},\$p" "$profile_file" >> "${profile_file}.tmp"
 
       # Move new file into place
       mv "${profile_file}.tmp" "$profile_file"
