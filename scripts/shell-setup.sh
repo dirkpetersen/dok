@@ -340,6 +340,8 @@ OPTIONS:
 
 WHAT IT SETS UP:
   1. PATH directories (~/.local/bin and ~/bin)
+     - Ensures ~/bin comes BEFORE ~/.local/bin in PATH
+     - Automatically detects and fixes Ubuntu default .profile ordering issue
   2. XDG_RUNTIME_DIR for container support (Linux only)
   3. Convenience settings (LS_COLORS cyan directories, history size)
   4. SSH key (ed25519 with mandatory passphrase)
@@ -424,9 +426,133 @@ get_login_profile() {
   esac
 }
 
+# Function to check PATH ordering
+check_path_order() {
+  local bin_home="$HOME/bin"
+  local bin_local="$HOME/.local/bin"
+
+  # Get position of each directory in current PATH
+  local bin_home_pos=-1
+  local bin_local_pos=-1
+  local pos=0
+
+  IFS=':' read -ra PATH_ARRAY <<< "$PATH"
+  for dir in "${PATH_ARRAY[@]}"; do
+    # Normalize path (resolve ~ and remove trailing slashes)
+    local normalized_dir="${dir/#\~/$HOME}"
+    normalized_dir="${normalized_dir%/}"
+
+    if [[ "$normalized_dir" == "$bin_home" ]]; then
+      bin_home_pos=$pos
+    elif [[ "$normalized_dir" == "$bin_local" ]]; then
+      bin_local_pos=$pos
+    fi
+    ((pos++))
+  done
+
+  # Check if both exist in PATH
+  if [[ $bin_home_pos -eq -1 ]] || [[ $bin_local_pos -eq -1 ]]; then
+    return 2  # One or both not in PATH
+  fi
+
+  # Check if bin_home comes before bin_local
+  if [[ $bin_home_pos -lt $bin_local_pos ]]; then
+    return 0  # Correct order
+  else
+    return 1  # Wrong order
+  fi
+}
+
+# Function to fix PATH ordering in profile files
+fix_path_order_in_profile() {
+  local profile_file="$1"
+
+  # Check if file has the Ubuntu default pattern with wrong order
+  # Pattern: bin setup first, then .local/bin setup second
+  if grep -q 'if \[ -d "$HOME/bin" \]' "$profile_file" 2>/dev/null && \
+     grep -q 'if \[ -d "$HOME/.local/bin" \]' "$profile_file" 2>/dev/null; then
+
+    # Check which one comes first
+    local bin_line=$(grep -n 'if \[ -d "$HOME/bin" \]' "$profile_file" | head -1 | cut -d: -f1)
+    local local_bin_line=$(grep -n 'if \[ -d "$HOME/.local/bin" \]' "$profile_file" | head -1 | cut -d: -f1)
+
+    if [[ $bin_line -lt $local_bin_line ]]; then
+      echo -e "${YELLOW}Found problematic PATH configuration in $profile_file${NC}"
+      echo -e "${YELLOW}Issue: \$HOME/.local/bin is added after \$HOME/bin, causing it to appear first in PATH${NC}"
+      echo ""
+      echo "Current configuration adds directories in this order:"
+      echo "  1. \$HOME/bin is prepended to PATH"
+      echo "  2. \$HOME/.local/bin is prepended to PATH (moving it in front of bin)"
+      echo ""
+      echo "Result: \$HOME/.local/bin comes BEFORE \$HOME/bin in final PATH"
+      echo ""
+
+      if [[ "$FORCE_MODE" != true ]]; then
+        read -p "Fix this by reordering the blocks in $profile_file? (y/N): " fix_order
+        if [[ "$fix_order" != "y" && "$fix_order" != "Y" ]]; then
+          echo -e "${YELLOW}Skipping PATH order fix${NC}"
+          return 1
+        fi
+      fi
+
+      echo -e "${YELLOW}Fixing PATH order by moving .local/bin block before bin block...${NC}"
+
+      # Create backup
+      cp "$profile_file" "${profile_file}.bak.$(date +%Y%m%d_%H%M%S)"
+
+      # Extract the two blocks (each block is 4 lines including comments)
+      local bin_block_start=$bin_line
+      local bin_block_end=$((bin_line + 3))
+
+      # Find the actual .local/bin block (search for the comment line before it)
+      local local_bin_block_start=$((local_bin_line - 1))
+      # Check if line before is a comment
+      if ! sed -n "${local_bin_block_start}p" "$profile_file" | grep -q "^#"; then
+        local_bin_block_start=$local_bin_line
+      fi
+      local local_bin_block_end=$((local_bin_block_start + 3))
+
+      # Extract both blocks
+      local bin_block=$(sed -n "${bin_block_start},${bin_block_end}p" "$profile_file")
+      local local_bin_block=$(sed -n "${local_bin_block_start},${local_bin_block_end}p" "$profile_file")
+
+      # Create new file with blocks swapped
+      # First, get everything before the bin block
+      sed -n "1,$((bin_block_start - 1))p" "$profile_file" > "${profile_file}.tmp"
+
+      # Add .local/bin block first
+      echo "$local_bin_block" >> "${profile_file}.tmp"
+      echo "" >> "${profile_file}.tmp"
+
+      # Add bin block second
+      echo "$bin_block" >> "${profile_file}.tmp"
+
+      # Add everything after the .local/bin block
+      sed -n "$((local_bin_block_end + 1)),\$p" "$profile_file" >> "${profile_file}.tmp"
+
+      # Move new file into place
+      mv "${profile_file}.tmp" "$profile_file"
+
+      log_change "ADDED_TO_FILE" "$profile_file|Fixed PATH order: moved .local/bin block before bin block"
+
+      echo -e "${GREEN}✓${NC} Fixed PATH ordering in $profile_file"
+      echo -e "${GREEN}   .local/bin block is now configured before bin block${NC}"
+      echo -e "${GREEN}   Result: \$HOME/bin will come BEFORE \$HOME/.local/bin in PATH${NC}"
+      echo ""
+      echo -e "${YELLOW}Note: You need to reload your profile for this to take effect:${NC}"
+      echo "   . $profile_file"
+      echo ""
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
 # Function to add directories to beginning of PATH
 add_to_begin_of_path() {
   local shell_rc=$(get_login_shell_rc)
+  local profile=$(get_login_profile)
   local bin_home="$HOME/bin"
   local bin_local="$HOME/.local/bin"
   local created_any=false
@@ -448,6 +574,33 @@ add_to_begin_of_path() {
     echo -e "${GREEN}✓${NC} Created directories: $bin_home and $bin_local"
   else
     echo -e "${GREEN}✓${NC} Directories already exist: $bin_home and $bin_local"
+  fi
+
+  # Check PATH ordering
+  check_path_order
+  local order_status=$?
+
+  if [[ $order_status -eq 0 ]]; then
+    echo -e "${GREEN}✓${NC} PATH order is correct: \$HOME/bin comes before \$HOME/.local/bin"
+  elif [[ $order_status -eq 1 ]]; then
+    echo -e "${RED}✗${NC} PATH order is incorrect: \$HOME/.local/bin comes before \$HOME/bin"
+    echo ""
+
+    # Try to fix the ordering in profile files
+    local fixed=false
+    for pfile in "$profile" "$HOME/.profile" "$HOME/.bash_profile" "$HOME/.zprofile"; do
+      if [[ -f "$pfile" ]] && fix_path_order_in_profile "$pfile"; then
+        fixed=true
+        break
+      fi
+    done
+
+    if [[ "$fixed" != true ]]; then
+      echo -e "${YELLOW}Could not automatically fix PATH order in profile files${NC}"
+      echo -e "${YELLOW}You may need to manually reorder PATH configuration in your profile${NC}"
+    fi
+  else
+    echo -e "${YELLOW}⚠${NC}  One or both directories not in PATH yet"
   fi
 
   # Check if PATH entries already exist in RC file
