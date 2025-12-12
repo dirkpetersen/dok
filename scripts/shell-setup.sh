@@ -1421,16 +1421,12 @@ install_keychain
 echo -e "\n${YELLOW}Step 6: Configuring keychain in login profile${NC}"
 setup_keychain_profile
 
-# Step 7: Setup SSH config
-echo -e "\n${YELLOW}Step 7: Setting up SSH configuration${NC}"
-setup_ssh_config
-
-# Step 8: Setup Vim
-echo -e "\n${YELLOW}Step 8: Configuring Vim${NC}"
+# Step 7: Setup Vim
+echo -e "\n${YELLOW}Step 7: Configuring Vim${NC}"
 setup_vim_config
 
-# Step 9: Setup Git
-echo -e "\n${YELLOW}Step 9: Configuring Git${NC}"
+# Step 8: Setup Git
+echo -e "\n${YELLOW}Step 8: Configuring Git${NC}"
 setup_git_config "$user_name" "$user_email"
 
 # Configure GPG signing if we have a GPG key
@@ -1456,13 +1452,17 @@ if [[ -n "$gpg_key_id" ]] && command -v git &> /dev/null; then
   fi
 fi
 
+# Step 9: Setup SSH config
+echo -e "\n${YELLOW}Step 9: Setting up SSH configuration${NC}"
+setup_ssh_config
+
 # Inform user about revert option
 echo ""
 echo -e "${YELLOW}Note:${NC} All changes have been logged to: ${YELLOW}~/.local/state/shell-setup/shell-setup.log${NC}"
 echo -e "To revert these changes later, run: ${YELLOW}bash ~/temp/shell-setup.sh --revert${NC}"
 echo ""
 
-# Step 10: Display completion summary
+# Display completion summary
 echo -e "${GREEN}=== Setup Complete! ===${NC}\n"
 
 echo -e "${YELLOW}Next steps:${NC}\n"
