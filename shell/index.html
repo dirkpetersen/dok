@@ -3252,49 +3252,7 @@
 <span class="normal">1533</span>
 <span class="normal">1534</span>
 <span class="normal">1535</span>
-<span class="normal">1536</span>
-<span class="normal">1537</span>
-<span class="normal">1538</span>
-<span class="normal">1539</span>
-<span class="normal">1540</span>
-<span class="normal">1541</span>
-<span class="normal">1542</span>
-<span class="normal">1543</span>
-<span class="normal">1544</span>
-<span class="normal">1545</span>
-<span class="normal">1546</span>
-<span class="normal">1547</span>
-<span class="normal">1548</span>
-<span class="normal">1549</span>
-<span class="normal">1550</span>
-<span class="normal">1551</span>
-<span class="normal">1552</span>
-<span class="normal">1553</span>
-<span class="normal">1554</span>
-<span class="normal">1555</span>
-<span class="normal">1556</span>
-<span class="normal">1557</span>
-<span class="normal">1558</span>
-<span class="normal">1559</span>
-<span class="normal">1560</span>
-<span class="normal">1561</span>
-<span class="normal">1562</span>
-<span class="normal">1563</span>
-<span class="normal">1564</span>
-<span class="normal">1565</span>
-<span class="normal">1566</span>
-<span class="normal">1567</span>
-<span class="normal">1568</span>
-<span class="normal">1569</span>
-<span class="normal">1570</span>
-<span class="normal">1571</span>
-<span class="normal">1572</span>
-<span class="normal">1573</span>
-<span class="normal">1574</span>
-<span class="normal">1575</span>
-<span class="normal">1576</span>
-<span class="normal">1577</span>
-<span class="normal">1578</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1536</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -4551,58 +4509,16 @@ setup_vim_config<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Added desert color scheme to ~/.vimrc&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
 
-<span class="w">  </span><span class="c1"># Install vim wrapper script</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vim_wrapper</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_MODE</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin&quot;</span>
+<span class="w">  </span><span class="c1"># Always install/update vim wrapper script</span>
+<span class="w">  </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin&quot;</span>
 
-<span class="w">    </span><span class="c1"># Download or copy vim-wrapper.sh</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span><span class="s2">&quot;https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/vim-wrapper.sh&quot;</span><span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vim_wrapper</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span>chmod<span class="w"> </span>+x<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vim_wrapper</span><span class="s2">&quot;</span>
-<span class="w">      </span>log_change<span class="w"> </span><span class="s2">&quot;CREATED_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vim_wrapper</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Installed vim wrapper to ~/.local/bin/vim-wrapper&quot;</span>
-<span class="w">    </span><span class="k">else</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Could not download vim-wrapper.sh from GitHub</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Creating vim wrapper locally...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">      </span>cat<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vim_wrapper</span><span class="s2">&quot;</span><span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
-<span class="s">#!/bin/bash</span>
-<span class="s"># vim-wrapper.sh - Simple vim wrapper for easy editing</span>
-<span class="s"># Starts in insert mode and uses double-escape to save/quit</span>
-
-<span class="s">vim -c &quot;startinsert&quot; \</span>
-<span class="s">    -c &quot;let g:esc_pressed = 0&quot; \</span>
-<span class="s">    -c &quot;function! SaveAndQuit()</span>
-<span class="s">        if &amp;modified</span>
-<span class="s">            let choice = confirm(&#39;Save changes?&#39;, \&quot;&amp;Yes\n&amp;No\n&amp;Cancel\&quot;, 1)</span>
-<span class="s">            if choice == 1</span>
-<span class="s">                wq</span>
-<span class="s">            elseif choice == 2</span>
-<span class="s">                q!</span>
-<span class="s">            endif</span>
-<span class="s">        else</span>
-<span class="s">            q</span>
-<span class="s">        endif</span>
-<span class="s">    endfunction&quot; \</span>
-<span class="s">    -c &quot;function! HandleEscape()</span>
-<span class="s">        if g:esc_pressed</span>
-<span class="s">            let g:esc_pressed = 0</span>
-<span class="s">            call SaveAndQuit()</span>
-<span class="s">        else</span>
-<span class="s">            let g:esc_pressed = 1</span>
-<span class="s">            call timer_start(500, {-&gt; execute(&#39;let g:esc_pressed = 0&#39;)})</span>
-<span class="s">            return \&quot;\\&lt;Esc&gt;\&quot;</span>
-<span class="s">        endif</span>
-<span class="s">        return &#39;&#39;</span>
-<span class="s">    endfunction&quot; \</span>
-<span class="s">    -c &quot;inoremap &lt;expr&gt; &lt;Esc&gt; HandleEscape()&quot; \</span>
-<span class="s">    -c &quot;nnoremap &lt;Esc&gt;&lt;Esc&gt; :call SaveAndQuit()&lt;CR&gt;&quot; \</span>
-<span class="s">    &quot;$@&quot;</span>
-<span class="s">EOF</span>
-<span class="w">      </span>chmod<span class="w"> </span>+x<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vim_wrapper</span><span class="s2">&quot;</span>
-<span class="w">      </span>log_change<span class="w"> </span><span class="s2">&quot;CREATED_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vim_wrapper</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Created vim wrapper at ~/.local/bin/vim-wrapper&quot;</span>
-<span class="w">    </span><span class="k">fi</span>
+<span class="w">  </span><span class="c1"># Download vim-wrapper.sh from GitHub</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span><span class="s2">&quot;https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/vim-wrapper.sh&quot;</span><span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vim_wrapper</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>chmod<span class="w"> </span>+x<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vim_wrapper</span><span class="s2">&quot;</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;CREATED_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vim_wrapper</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Installed vim wrapper to ~/.local/bin/vim-wrapper&quot;</span>
 <span class="w">  </span><span class="k">else</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Vim wrapper already installed&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Could not download vim-wrapper.sh from GitHub&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="c1"># Always create/update edr symlink in ~/bin pointing to ~/.local/bin/vim-wrapper</span>
