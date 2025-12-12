@@ -1309,15 +1309,11 @@ EOF
     echo -e "${GREEN}✓${NC} Vim wrapper already installed"
   fi
 
-  # Create edr symlink in ~/bin pointing to ~/.local/bin/vim-wrapper
+  # Always create/update edr symlink in ~/bin pointing to ~/.local/bin/vim-wrapper
   mkdir -p "$HOME/bin"
-  if [[ ! -L "$edr_symlink" ]] || [[ "$FORCE_MODE" == true ]]; then
-    ln -sf "$vim_wrapper" "$edr_symlink"
-    log_change "CREATED_FILE" "$edr_symlink"
-    echo -e "${GREEN}✓${NC} Created symlink ~/bin/edr -> ~/.local/bin/vim-wrapper"
-  else
-    echo -e "${GREEN}✓${NC} Symlink ~/bin/edr already exists"
-  fi
+  ln -sf "$vim_wrapper" "$edr_symlink"
+  log_change "CREATED_FILE" "$edr_symlink"
+  echo -e "${GREEN}✓${NC} Created symlink ~/bin/edr -> ~/.local/bin/vim-wrapper"
 }
 
 # Function to setup git configuration
