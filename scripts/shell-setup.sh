@@ -922,7 +922,7 @@ install_keychain() {
 
   echo -e "${YELLOW}Installing keychain...${NC}"
   mkdir -p "$HOME/bin"
-  curl -s https://raw.githubusercontent.com/danielrobbins/keychain/refs/heads/master/keychain.sh -o "$HOME/bin/keychain"
+  curl -fsSL https://raw.githubusercontent.com/danielrobbins/keychain/refs/heads/master/keychain.sh -o "$HOME/bin/keychain"
   chmod +x "$HOME/bin/keychain"
   echo -e "${GREEN}✓${NC} Keychain installed to $HOME/bin/keychain"
 }

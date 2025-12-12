@@ -179,7 +179,7 @@ install_wrapper() {
   # Always download from GitHub in this case to ensure latest version
   if [[ "$0" == "bash" ]] || [[ ! -f "$0" ]]; then
     echo -e "${YELLOW}Downloading wrapper script from GitHub...${NC}"
-    if curl -f -s -o "$WRAPPER_PATH" https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh; then
+    if curl -fsSL -o "$WRAPPER_PATH" https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh; then
       echo -e "${GREEN}✓${NC} Downloaded wrapper script"
     else
       echo -e "${RED}✗ Failed to download wrapper script${NC}" >&2

@@ -97,7 +97,7 @@ echo -e "${YELLOW}Installing NVM (Node Version Manager)...${NC}"
 
 # Check if NVM already installed
 if [[ ! -d "$HOME/.nvm" ]]; then
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+  curl -fsSL -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 
   if [[ ! -f "$HOME/.nvm/nvm.sh" ]]; then
     echo -e "${RED}✗ Failed to install NVM${NC}"
