@@ -10,7 +10,6 @@ if [[ "$vim_major" -ge 8 ]]; then
     # Vim 8+ with timer support
     vim -c "set nomore" \
         -c "set t_u7=" \
-        -c "startinsert" \
         -c "let g:esc_pressed = 0" \
         -c "function! SaveAndQuit()
             stopinsert
@@ -41,12 +40,12 @@ if [[ "$vim_major" -ge 8 ]]; then
         endfunction" \
         -c "inoremap <expr> <Esc> HandleEscape()" \
         -c "nnoremap <Esc><Esc> :call SaveAndQuit()<CR>" \
+        -c "startinsert" \
         "$@"
 else
     # Vim 7.x fallback without timer (uses simple double-escape in normal mode)
     vim -c "set nomore" \
         -c "set t_u7=" \
-        -c "startinsert" \
         -c "function! SaveAndQuit()
             stopinsert
             if &modified
@@ -64,5 +63,6 @@ else
             endif
         endfunction" \
         -c "nnoremap <Esc><Esc> :call SaveAndQuit()<CR>" \
+        -c "startinsert" \
         "$@"
 fi
