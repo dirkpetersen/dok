@@ -3,14 +3,17 @@
 # Starts in insert mode and uses double-escape to save/quit
 
 EDRRC="$HOME/.edrrc"
+WRAPPER_PATH="${BASH_SOURCE[0]:-$0}"
 
 # Create or update ~/.edrrc if needed
 create_edrrc() {
     cat > "$EDRRC" << 'VIMRC'
 " Easy editor config - starts in insert mode, double-escape to save/quit
+" Version: 3
 set nomore
 set nocompatible
 set t_u7=
+set t_RV=
 
 let g:esc_pressed = 0
 
@@ -24,7 +27,7 @@ function! SaveAndQuit()
         elseif c ==? 'n'
             q!
         else
-            startinsert
+            call EnterInsertMode(0)
         endif
     else
         q
@@ -49,17 +52,31 @@ function! HandleEscape()
     return ''
 endfunction
 
+function! EnterInsertMode(timer)
+    if mode() !=# 'i'
+        call feedkeys('i', 'n')
+    endif
+endfunction
+
 inoremap <expr> <Esc> HandleEscape()
 nnoremap <Esc><Esc> :call SaveAndQuit()<CR>
 
-" Start in insert mode after vim fully loads
-autocmd VimEnter * startinsert
+" Start in insert mode - use timer for reliability if available
+if has('timers')
+    autocmd VimEnter * call timer_start(50, 'EnterInsertMode')
+else
+    autocmd VimEnter * call feedkeys('i', 'n')
+endif
 VIMRC
 }
 
 # Check if edrrc needs to be created or updated
-SCRIPT_VERSION="v2"
-if [[ ! -f "$EDRRC" ]] || ! grep -q "Easy editor config" "$EDRRC" 2>/dev/null; then
+# Recreate if: doesn't exist, doesn't have marker, or wrapper is newer
+if [[ ! -f "$EDRRC" ]]; then
+    create_edrrc
+elif ! grep -q "Easy editor config" "$EDRRC" 2>/dev/null; then
+    create_edrrc
+elif [[ -f "$WRAPPER_PATH" ]] && [[ "$WRAPPER_PATH" -nt "$EDRRC" ]]; then
     create_edrrc
 fi
 
