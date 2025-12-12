@@ -31,6 +31,10 @@ function! SaveAndQuit()
     endif
 endfunction
 
+function! ResetEscPressed(timer)
+    let g:esc_pressed = 0
+endfunction
+
 function! HandleEscape()
     if g:esc_pressed
         let g:esc_pressed = 0
@@ -38,7 +42,7 @@ function! HandleEscape()
     else
         let g:esc_pressed = 1
         if has('timers')
-            call timer_start(500, {-> execute('let g:esc_pressed = 0')})
+            call timer_start(500, 'ResetEscPressed')
         endif
         return "\<Esc>"
     endif
