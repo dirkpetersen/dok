@@ -524,9 +524,9 @@ remove_path_from_profile() {
 
   local profile_file="$1"
 
-  # Check if file has the Ubuntu default PATH blocks
-  if grep -q 'if \[ -d "$HOME/bin" \]' "$profile_file" 2>/dev/null || \
-     grep -q 'if \[ -d "$HOME/.local/bin" \]' "$profile_file" 2>/dev/null; then
+  # Check if file has the Ubuntu default PATH blocks (use -F for fixed string matching)
+  if grep -Fq 'if [ -d "$HOME/bin" ]' "$profile_file" 2>/dev/null || \
+     grep -Fq 'if [ -d "$HOME/.local/bin" ]' "$profile_file" 2>/dev/null; then
 
     echo -e "${YELLOW}Found PATH configuration in $profile_file - moving to .bashrc${NC}"
 
@@ -541,7 +541,7 @@ remove_path_from_profile() {
       /^if \[ -d "\$HOME\/bin" \]/ { skip=1; next }
       /^if \[ -d "\$HOME\/\.local\/bin" \]/ { skip=1; next }
       skip && /^[[:space:]]*PATH=/ { next }
-      skip && /^[[:space:]]*fi[[:space:]]*$/ { skip=0; next }
+      skip && /^[[:space:]]*fi$/ { skip=0; next }
       !skip { print }
     ' "$profile_file" > "$temp_file"
 
