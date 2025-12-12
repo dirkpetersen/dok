@@ -473,6 +473,49 @@ check_path_order() {
   return $result
 }
 
+# Function to remove RHEL9 default PATH block from .bashrc
+remove_rhel_path_from_bashrc() {
+  local old_opts=$-
+  set +e
+
+  local bashrc_file="$1"
+
+  # Check if file has the RHEL9 default PATH block
+  if grep -q 'if ! \[\[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" \]\]' "$bashrc_file" 2>/dev/null; then
+
+    echo -e "${YELLOW}Found RHEL9 default PATH configuration in $bashrc_file - removing${NC}"
+
+    # Create backup
+    cp "$bashrc_file" "${bashrc_file}.bak.$(date +%Y%m%d_%H%M%S)"
+
+    # Remove the RHEL9 PATH block using awk
+    local temp_file="${bashrc_file}.tmp"
+
+    awk '
+      /^# User specific environment/ { skip=1; next }
+      /^if ! \[\[ "\$PATH" =~ "\$HOME\/\.local\/bin:\$HOME\/bin:" \]\]/ { skip=1; next }
+      skip && /^then$/ { next }
+      skip && /^[[:space:]]*PATH=/ { next }
+      skip && /^fi$/ { skip=0; next }
+      skip && /^export PATH$/ { skip=0; next }
+      /^export PATH$/ && !skip { next }
+      !skip { print }
+    ' "$bashrc_file" > "$temp_file"
+
+    # Clean up multiple consecutive blank lines
+    cat -s "$temp_file" > "${temp_file}.clean"
+    mv "${temp_file}.clean" "$bashrc_file"
+    rm -f "$temp_file"
+
+    log_change "ADDED_TO_FILE" "$bashrc_file|Removed RHEL9 default PATH block"
+
+    echo -e "${GREEN}✓${NC} Removed RHEL9 PATH block from $bashrc_file"
+  fi
+
+  [[ $old_opts == *e* ]] && set -e
+  return 0
+}
+
 # Function to remove PATH blocks from .profile (they belong in .bashrc)
 remove_path_from_profile() {
   # Temporarily disable set -e for this function
@@ -568,6 +611,11 @@ add_to_begin_of_path() {
       remove_path_from_profile "$pfile"
     fi
   done
+
+  # Remove RHEL9 default PATH block from .bashrc if present
+  if [[ -f "$shell_rc" ]]; then
+    remove_rhel_path_from_bashrc "$shell_rc"
+  fi
 
   # Check if PATH entries already exist in RC file using unique marker
   local marker="# Add local bin directories to PATH (shell-setup.sh)"
