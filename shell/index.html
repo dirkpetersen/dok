@@ -3236,8 +3236,7 @@
 <span class="normal">1517</span>
 <span class="normal">1518</span>
 <span class="normal">1519</span>
-<span class="normal">1520</span>
-<span class="normal">1521</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1520</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3746,7 +3745,7 @@ remove_rhel_path_from_bashrc<span class="o">()</span><span class="w"> </span><sp
 <span class="w">    </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">temp_file</span><span class="si">}</span><span class="s2">.clean&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$bashrc_file</span><span class="s2">&quot;</span>
 <span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span>
 
-<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$bashrc_file</span><span class="s2">|Removed RHEL9 default PATH block&quot;</span>
+<span class="w">    </span><span class="c1"># Note: Not logging this removal as it can&#39;t be easily reverted</span>
 
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Removed RHEL9 PATH block from </span><span class="nv">$bashrc_file</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
@@ -3789,8 +3788,7 @@ remove_path_from_profile<span class="o">()</span><span class="w"> </span><span c
 <span class="w">    </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">temp_file</span><span class="si">}</span><span class="s2">.clean&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
 <span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span>
 
-<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">|Removed PATH blocks (moved to .bashrc)&quot;</span>
-
+<span class="w">    </span><span class="c1"># Note: Not logging this removal as it can&#39;t be easily reverted</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Removed PATH blocks from </span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
 
