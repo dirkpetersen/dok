@@ -1198,7 +1198,7 @@ EOF
 # Function to setup Vim configuration
 setup_vim_config() {
   local vimrc="$HOME/.vimrc"
-  local vim_wrapper="$HOME/bin/vim-wrapper"
+  local vim_wrapper="$HOME/.local/bin/vim-wrapper"
   local edr_symlink="$HOME/bin/edr"
 
   # Check if vim is installed
@@ -1257,13 +1257,13 @@ EOF
 
   # Install vim wrapper script
   if [[ ! -f "$vim_wrapper" ]] || [[ "$FORCE_MODE" == true ]]; then
-    mkdir -p "$HOME/bin"
+    mkdir -p "$HOME/.local/bin"
 
     # Download or copy vim-wrapper.sh
     if curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/vim-wrapper.sh" -o "$vim_wrapper" 2>/dev/null; then
       chmod +x "$vim_wrapper"
       log_change "CREATED_FILE" "$vim_wrapper"
-      echo -e "${GREEN}✓${NC} Installed vim wrapper to ~/bin/vim-wrapper"
+      echo -e "${GREEN}✓${NC} Installed vim wrapper to ~/.local/bin/vim-wrapper"
     else
       echo -e "${YELLOW}Could not download vim-wrapper.sh from GitHub${NC}"
       echo -e "${YELLOW}Creating vim wrapper locally...${NC}"
@@ -1303,17 +1303,18 @@ vim -c "startinsert" \
 EOF
       chmod +x "$vim_wrapper"
       log_change "CREATED_FILE" "$vim_wrapper"
-      echo -e "${GREEN}✓${NC} Created vim wrapper at ~/bin/vim-wrapper"
+      echo -e "${GREEN}✓${NC} Created vim wrapper at ~/.local/bin/vim-wrapper"
     fi
   else
     echo -e "${GREEN}✓${NC} Vim wrapper already installed"
   fi
 
-  # Create edr symlink
+  # Create edr symlink in ~/bin pointing to ~/.local/bin/vim-wrapper
+  mkdir -p "$HOME/bin"
   if [[ ! -L "$edr_symlink" ]] || [[ "$FORCE_MODE" == true ]]; then
-    ln -sf "vim-wrapper" "$edr_symlink"
+    ln -sf "$vim_wrapper" "$edr_symlink"
     log_change "CREATED_FILE" "$edr_symlink"
-    echo -e "${GREEN}✓${NC} Created symlink ~/bin/edr -> vim-wrapper"
+    echo -e "${GREEN}✓${NC} Created symlink ~/bin/edr -> ~/.local/bin/vim-wrapper"
   else
     echo -e "${GREEN}✓${NC} Symlink ~/bin/edr already exists"
   fi
