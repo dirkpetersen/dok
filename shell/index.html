@@ -3762,9 +3762,9 @@ remove_path_from_profile<span class="o">()</span><span class="w"> </span><span c
 
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">profile_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
-<span class="w">  </span><span class="c1"># Check if file has the Ubuntu default PATH blocks</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;if \[ -d &quot;$HOME/bin&quot; \]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;if \[ -d &quot;$HOME/.local/bin&quot; \]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="c1"># Check if file has the Ubuntu default PATH blocks (use -F for fixed string matching)</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-Fq<span class="w"> </span><span class="s1">&#39;if [ -d &quot;$HOME/bin&quot; ]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>grep<span class="w"> </span>-Fq<span class="w"> </span><span class="s1">&#39;if [ -d &quot;$HOME/.local/bin&quot; ]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Found PATH configuration in </span><span class="nv">$profile_file</span><span class="s2"> - moving to .bashrc</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 
@@ -3779,7 +3779,7 @@ remove_path_from_profile<span class="o">()</span><span class="w"> </span><span c
 <span class="s1">      /^if \[ -d &quot;\$HOME\/bin&quot; \]/ { skip=1; next }</span>
 <span class="s1">      /^if \[ -d &quot;\$HOME\/\.local\/bin&quot; \]/ { skip=1; next }</span>
 <span class="s1">      skip &amp;&amp; /^[[:space:]]*PATH=/ { next }</span>
-<span class="s1">      skip &amp;&amp; /^[[:space:]]*fi[[:space:]]*$/ { skip=0; next }</span>
+<span class="s1">      skip &amp;&amp; /^[[:space:]]*fi$/ { skip=0; next }</span>
 <span class="s1">      !skip { print }</span>
 <span class="s1">    &#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temp_file</span><span class="s2">&quot;</span>
 
