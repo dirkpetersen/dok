@@ -9,13 +9,19 @@ WRAPPER_PATH="${BASH_SOURCE[0]:-$0}"
 create_edrrc() {
     cat > "$EDRRC" << 'VIMRC'
 " Easy editor config - starts in insert mode, double-escape to save/quit
-" Version: 4
+" Version: 5
 set nomore
 set nocompatible
 set t_u7=
 set t_RV=
 set esckeys
 set ttimeoutlen=50
+
+" Enable syntax highlighting
+syntax on
+
+" Use desert color scheme
+colorscheme desert
 
 " Arrow key mappings for insert mode (needed when using -u)
 inoremap <Esc>[A <Up>
