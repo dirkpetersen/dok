@@ -2,67 +2,63 @@
 # vim-wrapper.sh - Simple vim wrapper for easy editing
 # Starts in insert mode and uses double-escape to save/quit
 
-# Check vim version for timer support (vim 8.0+)
-vim_version=$(vim --version 2>/dev/null | head -1 | grep -oP '\d+\.\d+' | head -1)
-vim_major=$(echo "$vim_version" | cut -d. -f1)
+EDRRC="$HOME/.edrrc"
 
-if [[ "$vim_major" -ge 8 ]]; then
-    # Vim 8+ with timer support
-    vim -c "set nomore" \
-        -c "set t_u7=" \
-        -c "let g:esc_pressed = 0" \
-        -c "function! SaveAndQuit()
-            stopinsert
-            if &modified
-                echohl Question | echo 'Save changes? (y/n/c): ' | echohl None
-                let c = nr2char(getchar())
-                if c ==? 'y'
-                    silent! wq
-                elseif c ==? 'n'
-                    q!
-                else
-                    startinsert
-                endif
-            else
-                q
-            endif
-        endfunction" \
-        -c "function! HandleEscape()
-            if g:esc_pressed
-                let g:esc_pressed = 0
-                call SaveAndQuit()
-            else
-                let g:esc_pressed = 1
-                call timer_start(500, {-> execute('let g:esc_pressed = 0')})
-                return \"\\<Esc>\"
-            endif
-            return ''
-        endfunction" \
-        -c "inoremap <expr> <Esc> HandleEscape()" \
-        -c "nnoremap <Esc><Esc> :call SaveAndQuit()<CR>" \
-        -c "call feedkeys('i', 'n')" \
-        "$@"
-else
-    # Vim 7.x fallback without timer (uses simple double-escape in normal mode)
-    vim -c "set nomore" \
-        -c "set t_u7=" \
-        -c "function! SaveAndQuit()
-            stopinsert
-            if &modified
-                echohl Question | echo 'Save changes? (y/n/c): ' | echohl None
-                let c = nr2char(getchar())
-                if c ==? 'y'
-                    silent! wq
-                elseif c ==? 'n'
-                    q!
-                else
-                    startinsert
-                endif
-            else
-                q
-            endif
-        endfunction" \
-        -c "nnoremap <Esc><Esc> :call SaveAndQuit()<CR>" \
-        -c "call feedkeys('i', 'n')" \
-        "$@"
+# Create or update ~/.edrrc if needed
+create_edrrc() {
+    cat > "$EDRRC" << 'VIMRC'
+" Easy editor config - starts in insert mode, double-escape to save/quit
+set nomore
+set nocompatible
+set t_u7=
+
+let g:esc_pressed = 0
+
+function! SaveAndQuit()
+    stopinsert
+    if &modified
+        echohl Question | echo 'Save changes? (y/n/c): ' | echohl None
+        let c = nr2char(getchar())
+        if c ==? 'y'
+            silent! wq
+        elseif c ==? 'n'
+            q!
+        else
+            startinsert
+        endif
+    else
+        q
+    endif
+endfunction
+
+function! HandleEscape()
+    if g:esc_pressed
+        let g:esc_pressed = 0
+        call SaveAndQuit()
+    else
+        let g:esc_pressed = 1
+        if has('timers')
+            call timer_start(500, {-> execute('let g:esc_pressed = 0')})
+        endif
+        return "\<Esc>"
+    endif
+    return ''
+endfunction
+
+inoremap <expr> <Esc> HandleEscape()
+nnoremap <Esc><Esc> :call SaveAndQuit()<CR>
+
+" Start in insert mode after vim fully loads
+autocmd VimEnter * startinsert
+VIMRC
+}
+
+# Check if edrrc needs to be created or updated
+SCRIPT_VERSION="v2"
+if [[ ! -f "$EDRRC" ]] || ! grep -q "Easy editor config" "$EDRRC" 2>/dev/null; then
+    create_edrrc
 fi
+
+# Run vim with our custom config
+# -N = nocompatible, -n = no swap file, -u = use our rc file
+vim -N -n -u "$EDRRC" "$@"
