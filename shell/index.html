@@ -3236,7 +3236,68 @@
 <span class="normal">1517</span>
 <span class="normal">1518</span>
 <span class="normal">1519</span>
-<span class="normal">1520</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1520</span>
+<span class="normal">1521</span>
+<span class="normal">1522</span>
+<span class="normal">1523</span>
+<span class="normal">1524</span>
+<span class="normal">1525</span>
+<span class="normal">1526</span>
+<span class="normal">1527</span>
+<span class="normal">1528</span>
+<span class="normal">1529</span>
+<span class="normal">1530</span>
+<span class="normal">1531</span>
+<span class="normal">1532</span>
+<span class="normal">1533</span>
+<span class="normal">1534</span>
+<span class="normal">1535</span>
+<span class="normal">1536</span>
+<span class="normal">1537</span>
+<span class="normal">1538</span>
+<span class="normal">1539</span>
+<span class="normal">1540</span>
+<span class="normal">1541</span>
+<span class="normal">1542</span>
+<span class="normal">1543</span>
+<span class="normal">1544</span>
+<span class="normal">1545</span>
+<span class="normal">1546</span>
+<span class="normal">1547</span>
+<span class="normal">1548</span>
+<span class="normal">1549</span>
+<span class="normal">1550</span>
+<span class="normal">1551</span>
+<span class="normal">1552</span>
+<span class="normal">1553</span>
+<span class="normal">1554</span>
+<span class="normal">1555</span>
+<span class="normal">1556</span>
+<span class="normal">1557</span>
+<span class="normal">1558</span>
+<span class="normal">1559</span>
+<span class="normal">1560</span>
+<span class="normal">1561</span>
+<span class="normal">1562</span>
+<span class="normal">1563</span>
+<span class="normal">1564</span>
+<span class="normal">1565</span>
+<span class="normal">1566</span>
+<span class="normal">1567</span>
+<span class="normal">1568</span>
+<span class="normal">1569</span>
+<span class="normal">1570</span>
+<span class="normal">1571</span>
+<span class="normal">1572</span>
+<span class="normal">1573</span>
+<span class="normal">1574</span>
+<span class="normal">1575</span>
+<span class="normal">1576</span>
+<span class="normal">1577</span>
+<span class="normal">1578</span>
+<span class="normal">1579</span>
+<span class="normal">1580</span>
+<span class="normal">1581</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3797,6 +3858,62 @@ remove_path_from_profile<span class="o">()</span><span class="w"> </span><span c
 <span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="o">}</span>
 
+<span class="c1"># Function to ensure login profile sources .bashrc</span>
+<span class="c1"># Interactive login shells read .profile/.bash_profile but not .bashrc by default</span>
+ensure_profile_sources_bashrc<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">old_opts</span><span class="o">=</span><span class="nv">$-</span>
+<span class="w">  </span><span class="nb">set</span><span class="w"> </span>+e
+
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">profile_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">shell_rc</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+
+<span class="w">  </span><span class="c1"># Skip if not bash or if profile doesn&#39;t exist</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Check if .bashrc is already being sourced (various patterns)</span>
+<span class="w">  </span><span class="c1"># Patterns: . ~/.bashrc, source ~/.bashrc, . &quot;$HOME/.bashrc&quot;, source &quot;$HOME/.bashrc&quot;</span>
+<span class="w">  </span><span class="c1"># Also with single quotes or no quotes</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-Eq<span class="w"> </span><span class="s1">&#39;(\.|source)[[:space:]]+(~|&quot;\$HOME&quot;|&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;\$HOME&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;|\$HOME)/\.bashrc&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>grep<span class="w"> </span>-Eq<span class="w"> </span><span class="s1">&#39;(\.|source)[[:space:]]+&quot;?~/\.bashrc&quot;?&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Login profile already sources .bashrc&quot;</span>
+<span class="w">    </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Also check for the common Ubuntu pattern: if [ -f &quot;$HOME/.bashrc&quot; ]; then . &quot;$HOME/.bashrc&quot;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;if.*-f.*\.bashrc&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Login profile already sources .bashrc&quot;</span>
+<span class="w">    </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># .bashrc is not being sourced, add it</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Adding .bashrc sourcing to </span><span class="nv">$profile_file</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="w">  </span><span class="c1"># Create backup</span>
+<span class="w">  </span>cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.bak.</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="w">  </span><span class="c1"># Add sourcing block (standard Ubuntu pattern)</span>
+<span class="w">  </span>cat<span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
+
+<span class="s"># Source .bashrc for interactive login shells (shell-setup.sh)</span>
+<span class="s">if [ -n &quot;$BASH_VERSION&quot; ]; then</span>
+<span class="s">    if [ -f &quot;$HOME/.bashrc&quot; ]; then</span>
+<span class="s">        . &quot;$HOME/.bashrc&quot;</span>
+<span class="s">    fi</span>
+<span class="s">fi</span>
+<span class="s">EOF</span>
+
+<span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">|# Source .bashrc for interactive login shells (shell-setup.sh)&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Added .bashrc sourcing to </span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
+
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="o">}</span>
+
 <span class="c1"># Function to add directories to beginning of PATH</span>
 add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="c1"># Temporarily disable set -e for this function</span>
@@ -3859,6 +3976,8 @@ add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-Fq<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_MODE</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> PATH directories already configured in </span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="c1"># Still verify login profile sources .bashrc</span>
+<span class="w">      </span>ensure_profile_sources_bashrc<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">else</span>
@@ -3875,6 +3994,9 @@ add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class
 <span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|</span><span class="nv">$marker</span><span class="s2">&quot;</span>
 <span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="s1">&#39;|export PATH=$HOME/bin:$HOME/.local/bin:$PATH&#39;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Added PATH configuration to </span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+
+<span class="w">  </span><span class="c1"># Ensure login profile sources .bashrc (for interactive login shells)</span>
+<span class="w">  </span>ensure_profile_sources_bashrc<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
 
 <span class="w">  </span><span class="c1"># Restore set -e if it was enabled</span>
 <span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
