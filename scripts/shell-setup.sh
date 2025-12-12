@@ -559,6 +559,62 @@ remove_path_from_profile() {
   return 0
 }
 
+# Function to ensure login profile sources .bashrc
+# Interactive login shells read .profile/.bash_profile but not .bashrc by default
+ensure_profile_sources_bashrc() {
+  local old_opts=$-
+  set +e
+
+  local profile_file="$1"
+  local shell_rc="$2"
+
+  # Skip if not bash or if profile doesn't exist
+  if [[ ! -f "$profile_file" ]]; then
+    [[ $old_opts == *e* ]] && set -e
+    return 0
+  fi
+
+  # Check if .bashrc is already being sourced (various patterns)
+  # Patterns: . ~/.bashrc, source ~/.bashrc, . "$HOME/.bashrc", source "$HOME/.bashrc"
+  # Also with single quotes or no quotes
+  if grep -Eq '(\.|source)[[:space:]]+(~|"\$HOME"|'"'"'\$HOME'"'"'|\$HOME)/\.bashrc' "$profile_file" 2>/dev/null || \
+     grep -Eq '(\.|source)[[:space:]]+"?~/\.bashrc"?' "$profile_file" 2>/dev/null; then
+    echo -e "${GREEN}✓${NC} Login profile already sources .bashrc"
+    [[ $old_opts == *e* ]] && set -e
+    return 0
+  fi
+
+  # Also check for the common Ubuntu pattern: if [ -f "$HOME/.bashrc" ]; then . "$HOME/.bashrc"
+  if grep -q 'if.*-f.*\.bashrc' "$profile_file" 2>/dev/null; then
+    echo -e "${GREEN}✓${NC} Login profile already sources .bashrc"
+    [[ $old_opts == *e* ]] && set -e
+    return 0
+  fi
+
+  # .bashrc is not being sourced, add it
+  echo -e "${YELLOW}Adding .bashrc sourcing to $profile_file${NC}"
+
+  # Create backup
+  cp "$profile_file" "${profile_file}.bak.$(date +%Y%m%d_%H%M%S)"
+
+  # Add sourcing block (standard Ubuntu pattern)
+  cat >> "$profile_file" << 'EOF'
+
+# Source .bashrc for interactive login shells (shell-setup.sh)
+if [ -n "$BASH_VERSION" ]; then
+    if [ -f "$HOME/.bashrc" ]; then
+        . "$HOME/.bashrc"
+    fi
+fi
+EOF
+
+  log_change "ADDED_TO_FILE" "$profile_file|# Source .bashrc for interactive login shells (shell-setup.sh)"
+  echo -e "${GREEN}✓${NC} Added .bashrc sourcing to $profile_file"
+
+  [[ $old_opts == *e* ]] && set -e
+  return 0
+}
+
 # Function to add directories to beginning of PATH
 add_to_begin_of_path() {
   # Temporarily disable set -e for this function
@@ -621,6 +677,8 @@ add_to_begin_of_path() {
   if grep -Fq "$marker" "$shell_rc" 2>/dev/null; then
     if [[ "$FORCE_MODE" != true ]]; then
       echo -e "${GREEN}✓${NC} PATH directories already configured in $shell_rc"
+      # Still verify login profile sources .bashrc
+      ensure_profile_sources_bashrc "$profile" "$shell_rc"
       [[ $old_opts == *e* ]] && set -e
       return 0
     else
@@ -637,6 +695,9 @@ add_to_begin_of_path() {
   log_change "ADDED_TO_FILE" "$shell_rc|$marker"
   log_change "ADDED_TO_FILE" "$shell_rc"'|export PATH=$HOME/bin:$HOME/.local/bin:$PATH'
   echo -e "${GREEN}✓${NC} Added PATH configuration to $shell_rc"
+
+  # Ensure login profile sources .bashrc (for interactive login shells)
+  ensure_profile_sources_bashrc "$profile" "$shell_rc"
 
   # Restore set -e if it was enabled
   [[ $old_opts == *e* ]] && set -e
