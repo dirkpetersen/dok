@@ -97,15 +97,15 @@ fi
 # Show help message if config was updated
 if [[ "$EDRRC_UPDATED" == true ]]; then
     echo -e "\033[33m"
-    echo "╔════════════════════════════════════════════════════════════════╗"
-    echo "║  Easy Editor (edr) - Configuration Updated                     ║"
-    echo "║                                                                ║"
-    echo "║  HOW TO USE:                                                   ║"
-    echo "║  • Just start typing - you're already in edit mode             ║"
-    echo "║  • Hit ESCAPE 2-3 times quickly to save and exit             ║"
-    echo "║    (You'll be asked: Save changes? y/n/c)                      ║"
-    echo "║  • Hit any key to continue !                                   ║"
-    echo "╚════════════════════════════════════════════════════════════════╝"
+    echo "╔══════════════════════════════════════════════════════╗"
+    echo "║  Easy Editor (edr) - Configuration Updated           ║"
+    echo "║                                                      ║"
+    echo "║  HOW TO USE:                                         ║"
+    echo "║  • Just start typing - you're already in edit mode   ║"
+    echo "║  • Hit ESCAPE 2-3 times quickly to save and exit     ║"
+    echo "║    (You'll be asked: Save changes? y/n/c)            ║"
+    echo "║  • Hit any key to continue !                         ║"
+    echo "╚══════════════════════════════════════════════════════╝"
     echo -e "\033[0m"
     read -n 1 -s
 fi

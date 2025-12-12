@@ -1255,58 +1255,16 @@ EOF
     echo -e "${GREEN}✓${NC} Added desert color scheme to ~/.vimrc"
   fi
 
-  # Install vim wrapper script
-  if [[ ! -f "$vim_wrapper" ]] || [[ "$FORCE_MODE" == true ]]; then
-    mkdir -p "$HOME/.local/bin"
+  # Always install/update vim wrapper script
+  mkdir -p "$HOME/.local/bin"
 
-    # Download or copy vim-wrapper.sh
-    if curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/vim-wrapper.sh" -o "$vim_wrapper" 2>/dev/null; then
-      chmod +x "$vim_wrapper"
-      log_change "CREATED_FILE" "$vim_wrapper"
-      echo -e "${GREEN}✓${NC} Installed vim wrapper to ~/.local/bin/vim-wrapper"
-    else
-      echo -e "${YELLOW}Could not download vim-wrapper.sh from GitHub${NC}"
-      echo -e "${YELLOW}Creating vim wrapper locally...${NC}"
-      cat > "$vim_wrapper" << 'EOF'
-#!/bin/bash
-# vim-wrapper.sh - Simple vim wrapper for easy editing
-# Starts in insert mode and uses double-escape to save/quit
-
-vim -c "startinsert" \
-    -c "let g:esc_pressed = 0" \
-    -c "function! SaveAndQuit()
-        if &modified
-            let choice = confirm('Save changes?', \"&Yes\n&No\n&Cancel\", 1)
-            if choice == 1
-                wq
-            elseif choice == 2
-                q!
-            endif
-        else
-            q
-        endif
-    endfunction" \
-    -c "function! HandleEscape()
-        if g:esc_pressed
-            let g:esc_pressed = 0
-            call SaveAndQuit()
-        else
-            let g:esc_pressed = 1
-            call timer_start(500, {-> execute('let g:esc_pressed = 0')})
-            return \"\\<Esc>\"
-        endif
-        return ''
-    endfunction" \
-    -c "inoremap <expr> <Esc> HandleEscape()" \
-    -c "nnoremap <Esc><Esc> :call SaveAndQuit()<CR>" \
-    "$@"
-EOF
-      chmod +x "$vim_wrapper"
-      log_change "CREATED_FILE" "$vim_wrapper"
-      echo -e "${GREEN}✓${NC} Created vim wrapper at ~/.local/bin/vim-wrapper"
-    fi
+  # Download vim-wrapper.sh from GitHub
+  if curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/vim-wrapper.sh" -o "$vim_wrapper" 2>/dev/null; then
+    chmod +x "$vim_wrapper"
+    log_change "CREATED_FILE" "$vim_wrapper"
+    echo -e "${GREEN}✓${NC} Installed vim wrapper to ~/.local/bin/vim-wrapper"
   else
-    echo -e "${GREEN}✓${NC} Vim wrapper already installed"
+    echo -e "${RED}✗${NC} Could not download vim-wrapper.sh from GitHub"
   fi
 
   # Always create/update edr symlink in ~/bin pointing to ~/.local/bin/vim-wrapper
