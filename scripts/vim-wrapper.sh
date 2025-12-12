@@ -84,12 +84,29 @@ VIMRC
 
 # Check if edrrc needs to be created or updated
 # Recreate if: doesn't exist, doesn't have marker, or wrapper is newer
+EDRRC_UPDATED=false
 if [[ ! -f "$EDRRC" ]]; then
     create_edrrc
 elif ! grep -q "Easy editor config" "$EDRRC" 2>/dev/null; then
     create_edrrc
 elif [[ -f "$WRAPPER_PATH" ]] && [[ "$WRAPPER_PATH" -nt "$EDRRC" ]]; then
     create_edrrc
+    EDRRC_UPDATED=true
+fi
+
+# Show help message if config was updated
+if [[ "$EDRRC_UPDATED" == true ]]; then
+    echo -e "\033[33m"
+    echo "╔════════════════════════════════════════════════════════════════╗"
+    echo "║  Easy Editor (edr) - Configuration Updated                     ║"
+    echo "║                                                                 ║"
+    echo "║  HOW TO USE:                                                    ║"
+    echo "║  • Just start typing - you're already in edit mode             ║"
+    echo "║  • Use arrow keys to move around                               ║"
+    echo "║  • Press ESCAPE 2-3 times quickly to save and exit             ║"
+    echo "║    (You'll be asked: Save changes? y/n/c)                      ║"
+    echo "╚════════════════════════════════════════════════════════════════╝"
+    echo -e "\033[0m"
 fi
 
 # Run vim with our custom config
