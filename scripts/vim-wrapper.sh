@@ -87,8 +87,10 @@ VIMRC
 EDRRC_UPDATED=false
 if [[ ! -f "$EDRRC" ]]; then
     create_edrrc
+    EDRRC_UPDATED=true
 elif ! grep -q "Easy editor config" "$EDRRC" 2>/dev/null; then
     create_edrrc
+    EDRRC_UPDATED=true
 elif [[ -f "$WRAPPER_PATH" ]] && [[ "$WRAPPER_PATH" -nt "$EDRRC" ]]; then
     create_edrrc
     EDRRC_UPDATED=true
