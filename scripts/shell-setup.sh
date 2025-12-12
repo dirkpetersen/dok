@@ -507,7 +507,7 @@ remove_rhel_path_from_bashrc() {
     mv "${temp_file}.clean" "$bashrc_file"
     rm -f "$temp_file"
 
-    log_change "ADDED_TO_FILE" "$bashrc_file|Removed RHEL9 default PATH block"
+    # Note: Not logging this removal as it can't be easily reverted
 
     echo -e "${GREEN}✓${NC} Removed RHEL9 PATH block from $bashrc_file"
   fi
@@ -550,8 +550,7 @@ remove_path_from_profile() {
     mv "${temp_file}.clean" "$profile_file"
     rm -f "$temp_file"
 
-    log_change "ADDED_TO_FILE" "$profile_file|Removed PATH blocks (moved to .bashrc)"
-
+    # Note: Not logging this removal as it can't be easily reverted
     echo -e "${GREEN}✓${NC} Removed PATH blocks from $profile_file"
   fi
 
