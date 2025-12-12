@@ -17,7 +17,7 @@ For a clean, optimized Python environment, use Indigo - a standalone Python dist
 1. **Download the latest Indigo release**
 
 ```bash
-curl -L https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.13.0b4+20240713-x86_64-unknown-linux-gnu.tar.zst -o python.tar.zst
+curl -fsSL https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.13.0b4+20240713-x86_64-unknown-linux-gnu.tar.zst -o python.tar.zst
 ```
 
 2. **Extract to your home directory**
@@ -48,7 +48,7 @@ UV is a fast, reliable package manager for Python projects.
 ### Installation
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -fsSL https://astral.sh/uv/install.sh | sh
 ```
 
 ### Creating a New Project

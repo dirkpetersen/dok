@@ -33,7 +33,7 @@ sudo apt-get install keychain
 **On macOS / RHEL flavours**
 
 ```bash
-curl -s https://raw.githubusercontent.com/danielrobbins/keychain/refs/heads/master/keychain.sh -o ~/bin/keychain
+curl -fsSL https://raw.githubusercontent.com/danielrobbins/keychain/refs/heads/master/keychain.sh -o ~/bin/keychain
 chmod +x ~/bin/keychain
 ```
 
