@@ -1656,7 +1656,7 @@
 </code></pre></div></td></tr></table></div>
 <p><strong>On macOS / RHEL flavours</strong></p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/danielrobbins/keychain/refs/heads/master/keychain.sh<span class="w"> </span>-o<span class="w"> </span>~/bin/keychain
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/danielrobbins/keychain/refs/heads/master/keychain.sh<span class="w"> </span>-o<span class="w"> </span>~/bin/keychain
 chmod<span class="w"> </span>+x<span class="w"> </span>~/bin/keychain
 </code></pre></div></td></tr></table></div>
 <p>Then add to one of login shell configuration files (<code>~/.profile</code> or <code>~/.bash_profile</code> or <code>~/.zprofile</code>, but not <code>~/.bashrc</code> or <code>~/.zshrc</code>):</p>

@@ -1916,7 +1916,7 @@
 <ol>
 <li><strong>Download the latest Indigo release</strong></li>
 </ol>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-L<span class="w"> </span>https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.13.0b4+20240713-x86_64-unknown-linux-gnu.tar.zst<span class="w"> </span>-o<span class="w"> </span>python.tar.zst
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.13.0b4+20240713-x86_64-unknown-linux-gnu.tar.zst<span class="w"> </span>-o<span class="w"> </span>python.tar.zst
 </code></pre></div></td></tr></table></div>
 <ol>
 <li><strong>Extract to your home directory</strong></li>
@@ -1939,7 +1939,7 @@ tar<span class="w"> </span>-I<span class="w"> </span>zstd<span class="w"> </span
 <h2 id="uv-package-manager">UV Package Manager<a class="headerlink" href="#uv-package-manager" title="Permanent link">&para;</a></h2>
 <p>UV is a fast, reliable package manager for Python projects.</p>
 <h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h3>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
 </code></pre></div></td></tr></table></div>
 <h3 id="creating-a-new-project">Creating a New Project<a class="headerlink" href="#creating-a-new-project" title="Permanent link">&para;</a></h3>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
