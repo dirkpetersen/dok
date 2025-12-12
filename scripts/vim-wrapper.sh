@@ -40,8 +40,7 @@ if [[ "$vim_major" -ge 8 ]]; then
         endfunction" \
         -c "inoremap <expr> <Esc> HandleEscape()" \
         -c "nnoremap <Esc><Esc> :call SaveAndQuit()<CR>" \
-        -c "autocmd VimEnter * startinsert" \
-        "$@"
+        "$@" +startinsert
 else
     # Vim 7.x fallback without timer (uses simple double-escape in normal mode)
     vim -c "set nomore" \
@@ -63,6 +62,5 @@ else
             endif
         endfunction" \
         -c "nnoremap <Esc><Esc> :call SaveAndQuit()<CR>" \
-        -c "autocmd VimEnter * startinsert" \
-        "$@"
+        "$@" +startinsert
 fi
