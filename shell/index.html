@@ -4675,16 +4675,12 @@ install_keychain
 <span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;\n</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Step 6: Configuring keychain in login profile</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 setup_keychain_profile
 
-<span class="c1"># Step 7: Setup SSH config</span>
-<span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;\n</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Step 7: Setting up SSH configuration</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
-setup_ssh_config
-
-<span class="c1"># Step 8: Setup Vim</span>
-<span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;\n</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Step 8: Configuring Vim</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="c1"># Step 7: Setup Vim</span>
+<span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;\n</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Step 7: Configuring Vim</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 setup_vim_config
 
-<span class="c1"># Step 9: Setup Git</span>
-<span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;\n</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Step 9: Configuring Git</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="c1"># Step 8: Setup Git</span>
+<span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;\n</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Step 8: Configuring Git</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 setup_git_config<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$user_name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$user_email</span><span class="s2">&quot;</span>
 
 <span class="c1"># Configure GPG signing if we have a GPG key</span>
@@ -4710,13 +4706,17 @@ setup_git_config<span class="w"> </span><span class="s2">&quot;</span><span clas
 <span class="w">  </span><span class="k">fi</span>
 <span class="k">fi</span>
 
+<span class="c1"># Step 9: Setup SSH config</span>
+<span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;\n</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Step 9: Setting up SSH configuration</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+setup_ssh_config
+
 <span class="c1"># Inform user about revert option</span>
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Note:</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> All changes have been logged to: </span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">~/.local/state/shell-setup/shell-setup.log</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;To revert these changes later, run: </span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">bash ~/temp/shell-setup.sh --revert</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 
-<span class="c1"># Step 10: Display completion summary</span>
+<span class="c1"># Display completion summary</span>
 <span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">=== Setup Complete! ===</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">\n&quot;</span>
 
 <span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Next steps:</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">\n&quot;</span>
