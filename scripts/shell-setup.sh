@@ -1443,8 +1443,8 @@ fi
 
 # Inform user about revert option
 echo ""
-echo -e "${YELLOW}Note:${NC} All changes have been logged to: ${YELLOW}$LOG_FILE${NC}"
-echo -e "To revert these changes later, run: ${YELLOW}$0 --revert${NC}"
+echo -e "${YELLOW}Note:${NC} All changes have been logged to: ${YELLOW}~/.local/state/shell-setup/shell-setup.log${NC}"
+echo -e "To revert these changes later, run: ${YELLOW}bash ~/temp/shell-setup.sh --revert${NC}"
 echo ""
 
 # Step 10: Display completion summary
