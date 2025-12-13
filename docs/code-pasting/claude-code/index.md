@@ -196,6 +196,74 @@ claude opus /path/to/project
 - **No Confirmation**: Configured to skip permission prompts for streamlined workflow
 - **Model Selection**: Easy switching between Haiku (fast), Sonnet (balanced), and Opus (capable)
 
+## Secure Setup: Sandboxed Claude Code with Bubblewrap
+
+For maximum security when working with sensitive projects, you can run Claude Code in an isolated sandbox using bubblewrap (bwrap). This approach protects your AWS credentials and SSH keys by:
+
+- Limiting AWS credentials to only the Bedrock profile (not your entire credentials file)
+- Making SSH keys available read-only for authentication without exposing private keys
+- Creating temporary in-memory filesystems for sensitive data that are wiped when the session ends
+
+### Prerequisites
+
+Install bubblewrap on your system:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install bubblewrap
+
+# macOS (via Homebrew)
+brew install bubblewrap
+
+# Fedora/RHEL
+sudo dnf install bubblewrap
+```
+
+### Setup Steps
+
+**1. Extract Bedrock credentials to a separate file:**
+
+```bash
+grep -F -A 2 '[bedrock]' ~/.aws/credentials > ~/.aws/credentials.bedrock
+```
+
+This creates a minimal credentials file containing only your Bedrock profile.
+
+**2. Run Claude Code in sandbox:**
+
+```bash
+bwrap \
+  --bind / / \
+  --tmpfs ~/.ssh \
+  --bind ~/.ssh/known_hosts ~/.ssh/known_hosts \
+  --bind ~/.ssh/config ~/.ssh/config \
+  --tmpfs ~/.aws \
+  --bind ~/.aws/credentials.bedrock ~/.aws/credentials \
+  --bind ~/.aws/config ~/.aws/config \
+  --dev /dev \
+  --proc /proc \
+  claude
+```
+
+### How It Works
+
+- `--bind / /` - Bind the entire filesystem as read-only
+- `--tmpfs ~/.ssh` - Create an in-memory temporary filesystem for SSH (sensitive keys stay in agent memory)
+- `--bind ~/.ssh/known_hosts` - Mount only the known hosts file (no private keys)
+- `--bind ~/.aws/credentials.bedrock ~/.aws/credentials` - Mount only Bedrock credentials, not your full credentials file
+- `--tmpfs ~/.aws` - Create in-memory temporary filesystem for AWS config
+- `--dev /dev --proc /proc` - Provide necessary system interfaces
+
+### Security Benefits
+
+✅ **Limited AWS Credentials** - Claude Code only sees the Bedrock profile, not other AWS account credentials
+✅ **SSH Key Protection** - Private keys remain in ssh-agent; Claude Code only accesses known hosts
+✅ **Temporary Storage** - Sensitive files exist only in RAM and are wiped when the sandbox exits
+✅ **Filesystem Isolation** - Reduces risk of accidental credential leakage to untrusted projects
+
+!!! note "Convenience vs Security Trade-off"
+    This sandbox approach provides maximum security but requires more setup. For routine development with trusted projects, the standard setup is sufficient. Use sandboxing for sensitive work or unfamiliar codebases.
+
 ## Tips and Best Practices
 
 - Use **Haiku** for quick fixes and simple tasks
