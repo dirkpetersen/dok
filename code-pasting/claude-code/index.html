@@ -1027,6 +1027,67 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#secure-setup-sandboxed-claude-code-with-bubblewrap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secure Setup: Sandboxed Claude Code with Bubblewrap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secure Setup: Sandboxed Claude Code with Bubblewrap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup Steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security-benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Benefits
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#tips-and-best-practices" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1810,6 +1871,67 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#secure-setup-sandboxed-claude-code-with-bubblewrap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secure Setup: Sandboxed Claude Code with Bubblewrap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secure Setup: Sandboxed Claude Code with Bubblewrap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup Steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security-benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Benefits
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2774,6 +2896,77 @@ git<span class="w"> </span>init
 <li><strong>No Confirmation</strong>: Configured to skip permission prompts for streamlined workflow</li>
 <li><strong>Model Selection</strong>: Easy switching between Haiku (fast), Sonnet (balanced), and Opus (capable)</li>
 </ul>
+<h2 id="secure-setup-sandboxed-claude-code-with-bubblewrap">Secure Setup: Sandboxed Claude Code with Bubblewrap<a class="headerlink" href="#secure-setup-sandboxed-claude-code-with-bubblewrap" title="Permanent link">&para;</a></h2>
+<p>For maximum security when working with sensitive projects, you can run Claude Code in an isolated sandbox using bubblewrap (bwrap). This approach protects your AWS credentials and SSH keys by:</p>
+<ul>
+<li>Limiting AWS credentials to only the Bedrock profile (not your entire credentials file)</li>
+<li>Making SSH keys available read-only for authentication without exposing private keys</li>
+<li>Creating temporary in-memory filesystems for sensitive data that are wiped when the session ends</li>
+</ul>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<p>Install bubblewrap on your system:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Ubuntu/Debian</span>
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>bubblewrap
+
+<span class="c1"># macOS (via Homebrew)</span>
+brew<span class="w"> </span>install<span class="w"> </span>bubblewrap
+
+<span class="c1"># Fedora/RHEL</span>
+sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>bubblewrap
+</code></pre></div></td></tr></table></div>
+<h3 id="setup-steps">Setup Steps<a class="headerlink" href="#setup-steps" title="Permanent link">&para;</a></h3>
+<p><strong>1. Extract Bedrock credentials to a separate file:</strong></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>grep<span class="w"> </span>-F<span class="w"> </span>-A<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="s1">&#39;[bedrock]&#39;</span><span class="w"> </span>~/.aws/credentials<span class="w"> </span>&gt;<span class="w"> </span>~/.aws/credentials.bedrock
+</code></pre></div></td></tr></table></div>
+<p>This creates a minimal credentials file containing only your Bedrock profile.</p>
+<p><strong>2. Run Claude Code in sandbox:</strong></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code>bwrap<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--bind<span class="w"> </span>/<span class="w"> </span>/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tmpfs<span class="w"> </span>~/.ssh<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--bind<span class="w"> </span>~/.ssh/known_hosts<span class="w"> </span>~/.ssh/known_hosts<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--bind<span class="w"> </span>~/.ssh/config<span class="w"> </span>~/.ssh/config<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tmpfs<span class="w"> </span>~/.aws<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--bind<span class="w"> </span>~/.aws/credentials.bedrock<span class="w"> </span>~/.aws/credentials<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--bind<span class="w"> </span>~/.aws/config<span class="w"> </span>~/.aws/config<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dev<span class="w"> </span>/dev<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--proc<span class="w"> </span>/proc<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>claude
+</code></pre></div></td></tr></table></div>
+<h3 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>--bind / /</code> - Bind the entire filesystem as read-only</li>
+<li><code>--tmpfs ~/.ssh</code> - Create an in-memory temporary filesystem for SSH (sensitive keys stay in agent memory)</li>
+<li><code>--bind ~/.ssh/known_hosts</code> - Mount only the known hosts file (no private keys)</li>
+<li><code>--bind ~/.aws/credentials.bedrock ~/.aws/credentials</code> - Mount only Bedrock credentials, not your full credentials file</li>
+<li><code>--tmpfs ~/.aws</code> - Create in-memory temporary filesystem for AWS config</li>
+<li><code>--dev /dev --proc /proc</code> - Provide necessary system interfaces</li>
+</ul>
+<h3 id="security-benefits">Security Benefits<a class="headerlink" href="#security-benefits" title="Permanent link">&para;</a></h3>
+<p>✅ <strong>Limited AWS Credentials</strong> - Claude Code only sees the Bedrock profile, not other AWS account credentials
+✅ <strong>SSH Key Protection</strong> - Private keys remain in ssh-agent; Claude Code only accesses known hosts
+✅ <strong>Temporary Storage</strong> - Sensitive files exist only in RAM and are wiped when the sandbox exits
+✅ <strong>Filesystem Isolation</strong> - Reduces risk of accidental credential leakage to untrusted projects</p>
+<div class="admonition note">
+<p class="admonition-title">Convenience vs Security Trade-off</p>
+<p>This sandbox approach provides maximum security but requires more setup. For routine development with trusted projects, the standard setup is sufficient. Use sandboxing for sensitive work or unfamiliar codebases.</p>
+</div>
 <h2 id="tips-and-best-practices">Tips and Best Practices<a class="headerlink" href="#tips-and-best-practices" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Use <strong>Haiku</strong> for quick fixes and simple tasks</li>
