@@ -113,7 +113,120 @@ Create a tool that fetches weather data from OpenWeatherMap API, analyzes temper
 
 Save the file: `Ctrl+X`, then `Y`, then `Enter`.
 
-## Step 2: Planning with Sonnet
+## Step 2: Create CLAUDE.md Project Context
+
+### Create CLAUDE.md File
+
+Before launching Claude Code, create a CLAUDE.md file to provide project-wide context. This file gives Claude comprehensive information about your project and is always loaded when Claude Code runs.
+
+```bash
+nano CLAUDE.md
+```
+
+In the CLAUDE.md file, provide detailed project context:
+
+```markdown
+# Project Name
+
+## Project Overview
+
+[Brief description of what this project does and its purpose]
+
+## Architecture
+
+[Key components, modules, and how they interact]
+
+## Technology Stack
+
+- Language: Python 3.12
+- Key libraries: [list dependencies]
+- Framework: [if applicable]
+
+## Coding Conventions
+
+- [Code style guidelines]
+- [Naming conventions]
+- [File organization patterns]
+
+## Implementation Plan
+
+### Phase 1: Core Functionality
+- [ ] Task 1
+- [ ] Task 2
+
+### Phase 2: Additional Features
+- [ ] Task 3
+- [ ] Task 4
+
+## Testing Strategy
+
+[How to test the code]
+
+## Additional Notes
+
+[Any other important context for Claude Code]
+```
+
+**Example CLAUDE.md for Weather Data Analyzer:**
+
+```markdown
+# Weather Data Analyzer
+
+## Project Overview
+
+Python tool that fetches weather data from OpenWeatherMap API, analyzes temperature trends, and generates weekly reports with predictions.
+
+## Architecture
+
+- `weather_fetcher.py` - API client for OpenWeatherMap
+- `analyzer.py` - Temperature trend analysis using Pandas
+- `visualizer.py` - Chart generation with Matplotlib
+- `reporter.py` - Markdown report generation
+- `main.py` - Entry point, orchestrates workflow
+
+## Technology Stack
+
+- Language: Python 3.12
+- Data: Pandas, NumPy
+- Visualization: Matplotlib
+- HTTP: Requests library
+- API: OpenWeatherMap (free tier)
+
+## Coding Conventions
+
+- Use type hints for all function parameters and return values
+- Follow PEP 8 style guide
+- Store API key in environment variable (OPENWEATHER_API_KEY)
+- Cache API responses locally in .cache/ directory
+
+## Implementation Plan
+
+### Phase 1: Data Fetching
+- [ ] Create OpenWeatherMap API client
+- [ ] Implement response caching
+- [ ] Add rate limiting protection
+- [ ] Handle API errors gracefully
+
+### Phase 2: Analysis
+- [ ] Load data into Pandas DataFrame
+- [ ] Calculate 7-day temperature statistics
+- [ ] Identify trends and patterns
+- [ ] Generate 3-day predictions
+
+### Phase 3: Visualization & Reporting
+- [ ] Create line chart of temperature progression
+- [ ] Generate markdown report with embedded chart
+- [ ] Include severe weather alerts
+
+## Testing Strategy
+
+- Manual testing with San Francisco coordinates (37.7749, -122.4194)
+- Expected output: weather_report.md with chart and predictions
+- Verify caching works by checking .cache/ directory
+- Test rate limiting by making multiple rapid requests
+```
+
+Save the file: `Ctrl+X`, then `Y`, then `Enter`.
 
 ### Launch Claude with Sonnet Model
 
@@ -121,41 +234,25 @@ Save the file: `Ctrl+X`, then `Y`, then `Enter`.
 claude sonnet
 ```
 
-### Run Project Initialization
+Once Claude Code starts, it will automatically load the CLAUDE.md file and understand your project context.
 
-Once Claude Code is running:
+### Review and Refine Project Plan
+
+With CLAUDE.md loaded, Claude now understands your project. You can interact with it to refine the plan:
 
 ```
-/model sonnet
-/init
+Can you review the implementation plan in CLAUDE.md and suggest any improvements?
 ```
 
 Claude will:
-- Read the README.md file
-- Analyze your requirements
-- Create a project inventory
-- Generate a CLAUDE.md file with implementation tasks
+- Analyze your project structure
+- Validate the implementation plan
+- Suggest improvements or missing tasks
+- Identify potential issues
 
-Wait for Claude to complete the analysis. You should see:
-- List of identified tasks
-- File structure recommendations
-- Implementation strategy
-
-### Review Generated CLAUDE.md
-
-Open the generated CLAUDE.md file in another terminal:
-
-```bash
-cat CLAUDE.md
-# or edit if needed
-nano CLAUDE.md
-```
-
-This file contains:
-- Task breakdown
-- Implementation steps
-- Configuration notes
-- Testing strategy
+If Claude suggests changes, you can update CLAUDE.md either by:
+- Asking Claude to update it: "Please update CLAUDE.md with your suggestions"
+- Manually editing it in another terminal: `nano CLAUDE.md`
 
 ## Step 3: Validate with Sonnet Questions
 
@@ -192,13 +289,20 @@ Keep answering until Claude says it has no more questions. This ensures complete
 
 ### Switch to Opus Model
 
+If you want a more thorough architectural review, switch to the Opus model:
+
 ```
 /model opus
-/init
+```
+
+Then ask Opus to review your plan:
+
+```
+Can you review the CLAUDE.md file and the overall project architecture? Do you see any edge cases, potential issues, or optimizations we should consider?
 ```
 
 Opus will:
-- Review Sonnet's plan
+- Review the implementation plan
 - Identify edge cases
 - Ask additional architectural questions
 - Suggest optimizations
@@ -290,14 +394,19 @@ $ claude sonnet
 ### In Claude Code Session
 
 ```
-/model sonnet
-/init
+# Create CLAUDE.md first (as shown in Step 2)
+nano CLAUDE.md
+# [write comprehensive project context]
+# [save and exit]
+
+# Launch Claude Code with Sonnet
+claude sonnet
 ```
 
-*[Wait for analysis to complete]*
+*[Claude automatically loads CLAUDE.md]*
 
 ```
-Do you have any questions about this project?
+Can you review the implementation plan and let me know if you have any questions about this project?
 ```
 
 Claude asks: "Should the report include severity levels for weather alerts? Should predictions use machine learning or simple linear extrapolation? Should the script support multiple cities?"
@@ -324,16 +433,17 @@ Do you have more questions?
 
 Claude: "I believe I have all the information needed to create a solid plan."
 
-Now switch models:
+Now switch models for deeper review:
 
 ```
 /model opus
-/init
+
+Can you review the CLAUDE.md file and provide architectural feedback?
 ```
 
 *[Opus reviews and asks additional questions]*
 
-After Opus is satisfied:
+After Opus is satisfied and you've updated CLAUDE.md with any improvements:
 
 ```
 /model sonnet
@@ -429,11 +539,13 @@ During planning questions, you can be very specific:
 
 - [ ] Created project directory and git initialized
 - [ ] Wrote comprehensive README.md with all project details
-- [ ] Ran Sonnet with `/init` to generate plan
-- [ ] Reviewed generated CLAUDE.md file
+- [ ] Created CLAUDE.md file with project context and implementation plan
+- [ ] Launched Claude Code with Sonnet model
+- [ ] Reviewed and refined the implementation plan with Sonnet
 - [ ] Answered all Sonnet clarification questions
-- [ ] Ran Opus with `/init` for additional validation
+- [ ] Switched to Opus for deeper architectural review (optional)
 - [ ] Answered all Opus clarification questions
+- [ ] Updated CLAUDE.md with final improvements
 - [ ] Switched back to Sonnet for implementation
 - [ ] Ran and debugged the code
 - [ ] Tested the output thoroughly
@@ -461,14 +573,18 @@ echo $AWS_PROFILE  # Should be "bedrock"
 aws bedrock list-foundation-models --region us-west-2 --profile bedrock
 ```
 
-### /init command doesn't work
+### CLAUDE.md not being loaded
 
 ```bash
 # Make sure you're in a git repository
 git status  # Should show git repository info
 
-# Make sure README.md exists
-ls -la README.md
+# Make sure CLAUDE.md exists in the project root
+ls -la CLAUDE.md
+
+# Restart Claude Code to reload CLAUDE.md
+# Exit current session (Ctrl+D) and run:
+claude sonnet
 ```
 
 ### Model switching issues
@@ -479,7 +595,9 @@ claude sonnet
 
 # Then switch models
 /model opus
-/init
+
+# Ask a question to engage the model
+Can you help me review this code?
 ```
 
 ### Timeouts on large projects
@@ -488,8 +606,11 @@ Large projects may take 20-30 minutes. This is normal. Don't interrupt the proce
 
 ## FAQ
 
-**Q: Do I need to write the README perfectly?**
-A: No! The more detail the better, but Claude will ask clarifying questions if needed.
+**Q: Should I write both README.md and CLAUDE.md?**
+A: Yes. README.md is for humans (project documentation), while CLAUDE.md is for Claude Code (project context and implementation guidance). They serve different purposes.
+
+**Q: Can I skip creating CLAUDE.md and just use README.md?**
+A: You can, but CLAUDE.md provides better results because it's specifically designed for Claude Code with implementation plans, coding conventions, and architecture details that aren't usually in a README.
 
 **Q: Can I skip the Opus review?**
 A: You can, but we recommend it for important projects. Opus often catches issues Sonnet misses.

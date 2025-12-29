@@ -196,6 +196,126 @@ claude opus /path/to/project
 - **No Confirmation**: Configured to skip permission prompts for streamlined workflow
 - **Model Selection**: Easy switching between Haiku (fast), Sonnet (balanced), and Opus (capable)
 
+## Important Addon Tools
+
+While Claude Code is powerful on its own, certain tools can dramatically improve its effectiveness when working with codebases. These tools enhance Claude's ability to search, understand, and navigate code.
+
+### Enhanced Code Search with mgrep
+
+Traditional `grep` searches line-by-line for text patterns, which limits Claude Code's ability to understand code structure and context. Modern search tools provide semantic understanding, multiline pattern matching, and structural analysis - leading to significantly better results when Claude analyzes your codebase.
+
+The term "mgrep" (multiline grep) has become shorthand for these enhanced search capabilities that can deliver up to 250% better results compared to traditional text search. Read more about this approach in [this article on mgrep and Claude Code](https://medium.com/coding-nexus/me-and-claude-are-in-love-with-mgrep-for-250-better-results-6357351eaac0).
+
+#### Recommended Search Tools
+
+**1. ripgrep with Multiline Mode** - Fast and Practical
+
+The quickest way to enhance Claude's code search is enabling multiline mode in ripgrep:
+
+```bash
+# Install ripgrep
+sudo apt install ripgrep  # Ubuntu/Debian
+brew install ripgrep      # macOS
+
+# Create mgrep alias for multiline search
+echo "alias mgrep='rg -U'" >> ~/.bashrc
+source ~/.bashrc
+```
+
+Usage examples:
+```bash
+# Find function definitions spanning multiple lines
+mgrep 'function.*\{[\s\S]*?return'
+
+# Find class definitions with their methods
+mgrep 'class \w+.*\{[\s\S]*?\}'
+
+# Search with context lines
+rg -C 3 'pattern'
+```
+
+**Why it helps Claude Code:**
+- Search patterns spanning multiple lines (function definitions, class structures)
+- Much faster than traditional grep on large codebases
+- Respects `.gitignore` automatically, reducing noise from dependencies
+
+**2. ast-grep** - Structural Code Search
+
+For structural understanding of code patterns:
+
+```bash
+# Install via npm
+npm install -g @ast-grep/cli
+
+# Or via pip
+pip install ast-grep-cli
+```
+
+Usage examples:
+```bash
+# Find all function calls with specific structure
+ast-grep --pattern 'console.log($ARG)' --lang js
+
+# Find and replace code patterns
+ast-grep --pattern 'var $NAME = $VALUE' \
+         --rewrite 'const $NAME = $VALUE' \
+         --lang ts
+```
+
+**Why it helps Claude Code:**
+- Understands code structure, not just text
+- Identifies patterns based on Abstract Syntax Trees (AST)
+- Reduces false positives in search results
+- Excellent for refactoring and identifying deprecated patterns
+
+**3. SeaGOAT** - Semantic Code Search (Advanced)
+
+For semantic understanding using AI embeddings (fully local, privacy-safe):
+
+```bash
+# Requires Python 3.11+
+pip install seagoat
+
+# Start server for a repository
+seagoat-server start /path/to/your/repo
+
+# Search with natural language
+gt "Where are the numbers rounded"
+gt "Find authentication functions"
+```
+
+**Why it helps Claude Code:**
+- Natural language queries instead of exact pattern matching
+- Context-aware search based on code meaning
+- Finds related functionality across the codebase
+- All processing happens locally (privacy-safe)
+
+#### Quick Setup for Enhanced Search
+
+Add these aliases to your shell configuration:
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+cat >> ~/.bashrc <<'EOF'
+# Enhanced search tools for Claude Code
+alias mgrep='rg -U'           # Multiline grep
+alias cgrep='ast-grep'        # Structural code search
+alias sgrep='gt'              # Semantic search (requires SeaGOAT server)
+EOF
+
+source ~/.bashrc
+```
+
+#### When to Use Each Tool
+
+| Tool | Best For | Example Use Case |
+|------|----------|------------------|
+| **ripgrep -U (mgrep)** | Multiline patterns | Finding function definitions, class structures |
+| **ast-grep (cgrep)** | Structural patterns, refactoring | Identifying all uses of deprecated APIs |
+| **SeaGOAT (sgrep)** | Semantic exploration | "Find where user permissions are checked" |
+
+These tools help Claude Code provide more accurate analysis, better code suggestions, and faster navigation through your codebase.
+
 ## Secure Setup: Sandboxed Claude Code with Bubblewrap
 
 For maximum security when working with sensitive projects, you can run Claude Code in an isolated sandbox using bubblewrap (bwrap). This approach protects your AWS credentials and SSH keys by:

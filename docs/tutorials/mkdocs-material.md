@@ -91,14 +91,14 @@ This documentation site will be maintained using Claude Code with the following 
 ## Workflow
 
 1. Edit this README.md to describe documentation topics
-2. Launch Claude Code in this directory
-3. Run `/init` to create CLAUDE.md and initialize project structure
-4. Claude Code will:
+2. Create a CLAUDE.md file with project context for Claude Code
+3. Launch Claude Code in this directory
+4. Ask Claude Code to help you:
    - Create mkdocs.yml configuration
    - Set up docs/ directory structure
    - Create GitHub Actions workflow for deployment
    - Start local development server in .venv
-   - Restart server after each commit for testing
+   - Manage the server lifecycle
 
 ## Topics to Cover
 
@@ -134,32 +134,98 @@ Now start Claude Code to initialize your documentation project:
 claude
 ```
 
-## Step 5: Run /init Command
+## Step 5: Create CLAUDE.md and Initialize with Claude Code
 
-Once Claude Code is running, execute the `/init` command:
+Once Claude Code is running, create a CLAUDE.md file to provide project context, then ask Claude to help set up your documentation site.
+
+### Create CLAUDE.md
+
+First, create a CLAUDE.md file in your project root:
+
+```bash
+cat > CLAUDE.md << 'EOF'
+# MkDocs Material Documentation Site
+
+## Project Overview
+
+This is a personal documentation site built with MkDocs Material theme and deployed to GitHub Pages.
+
+## Architecture
+
+- **MkDocs**: Static site generator for project documentation
+- **Material Theme**: Modern, responsive documentation theme
+- **GitHub Actions**: Automatic deployment on push to main
+- **GitHub Pages**: Hosting at https://USERNAME.github.io/REPO_NAME/
+
+## Setup Tasks
+
+### Initial Setup
+- [ ] Create mkdocs.yml configuration with Material theme
+- [ ] Set up docs/ directory structure
+- [ ] Create initial docs/index.md homepage
+- [ ] Configure GitHub Actions workflow (.github/workflows/deploy.yml)
+- [ ] Create .gitignore for Python virtual environment and build artifacts
+
+### Development Environment
+- [ ] Create Python virtual environment (.venv)
+- [ ] Install mkdocs and mkdocs-material packages
+- [ ] Start local development server at http://127.0.0.1:8000/
+
+## Documentation Structure
 
 ```
-/init
+docs/
+├── index.md           # Homepage
+└── [topic-folders]/   # Organized by topic
 ```
 
-**What `/init` Does:**
+## Workflow
 
-The `/init` command will analyze your repository and README.md, then:
+1. Edit documentation in docs/ directory
+2. Preview locally at http://127.0.0.1:8000/
+3. Commit and push to trigger GitHub Actions deployment
+4. Site updates automatically at GitHub Pages URL
 
-1. **Create CLAUDE.md** - Guidance file for future Claude Code sessions
-2. **Generate mkdocs.yml** - MkDocs configuration with Material theme
-3. **Create docs/ Structure** - Documentation directory with initial pages
-4. **Set up GitHub Actions** - Workflow for automatic deployment
+## Commands
+
+```bash
+# Activate virtual environment
+source .venv/bin/activate
+
+# Start development server
+mkdocs serve
+
+# Build static site
+mkdocs build
+```
+EOF
+```
+
+### Ask Claude Code to Initialize
+
+Now ask Claude Code to set up your documentation site:
+
+```
+Please help me set up this MkDocs Material documentation site according to the CLAUDE.md file. Create all necessary files and start the development server.
+```
+
+**What Claude Code will do:**
+
+Claude Code will analyze your CLAUDE.md and README.md, then:
+
+1. **Create mkdocs.yml** - MkDocs configuration with Material theme
+2. **Create docs/ Structure** - Documentation directory with initial pages
+3. **Set up GitHub Actions** - Workflow for automatic deployment (.github/workflows/deploy.yml)
+4. **Create .gitignore** - Ignore .venv/, site/, and other build artifacts
 5. **Initialize Virtual Environment** - Python venv at .venv/
 6. **Install Dependencies** - mkdocs and mkdocs-material packages
 7. **Start Development Server** - Local server at http://127.0.0.1:8000/
 
-??? example "Example /init Output"
+??? example "Example Claude Code Response"
     ```
-    I'll analyze your repository and initialize the MkDocs Material documentation site.
+    I'll help you set up the MkDocs Material documentation site.
 
     Creating project structure:
-    ✓ Created CLAUDE.md
     ✓ Created mkdocs.yml
     ✓ Created docs/index.md
     ✓ Created .github/workflows/deploy.yml
@@ -167,8 +233,8 @@ The `/init` command will analyze your repository and README.md, then:
 
     Setting up Python environment:
     ✓ Created virtual environment at .venv/
-    ✓ Installed mkdocs==1.6.1
-    ✓ Installed mkdocs-material==9.6.23
+    ✓ Installed mkdocs
+    ✓ Installed mkdocs-material
 
     Starting development server:
     ✓ Server running at http://127.0.0.1:8000/
@@ -512,7 +578,7 @@ Let Claude Code manage commits:
 
 Trust Claude Code to handle the server:
 
-- Starts automatically after `/init`
+- Starts automatically after initial setup
 - Restarts after commits for testing
 - Runs in background without terminal blocking
 - Uses .venv for clean dependency isolation
@@ -584,9 +650,9 @@ This very documentation site you're reading was created using this exact process
 1. Created repository: `dirkpetersen/dok`
 2. Cloned via SSH
 3. Wrote README.md describing documentation goals
-4. Launched Claude Code and ran `/init`
-5. Claude Code created:
-   - CLAUDE.md with project guidance
+4. Created CLAUDE.md with project context and setup tasks
+5. Launched Claude Code and asked it to set up the site
+6. Claude Code created:
    - mkdocs.yml with Material theme configuration
    - docs/ structure with shell, cloud, and code-pasting sections
    - GitHub Actions workflow for deployment
@@ -607,11 +673,12 @@ Creating a personal documentation site with Claude Code:
 1. **Create repo**: `gh repo create dok --public`
 2. **Clone**: `git clone git@github.com:USERNAME/dok.git`
 3. **Write README.md**: Describe documentation intent and topics
-4. **Launch Claude Code**: `claude`
-5. **Initialize**: Run `/init` command
-6. **Develop**: Ask Claude Code to add content, make changes
-7. **Automatic deployment**: Push triggers GitHub Actions
-8. **Live site**: Available at `https://USERNAME.github.io/dok/`
+4. **Create CLAUDE.md**: Provide project context and setup tasks
+5. **Launch Claude Code**: `claude`
+6. **Initialize**: Ask Claude to set up the MkDocs site
+7. **Develop**: Ask Claude Code to add content, make changes
+8. **Automatic deployment**: Push triggers GitHub Actions
+9. **Live site**: Available at `https://USERNAME.github.io/dok/`
 
 Claude Code handles:
 - Project structure creation
