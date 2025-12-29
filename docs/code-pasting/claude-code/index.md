@@ -196,6 +196,108 @@ claude opus /path/to/project
 - **No Confirmation**: Configured to skip permission prompts for streamlined workflow
 - **Model Selection**: Easy switching between Haiku (fast), Sonnet (balanced), and Opus (capable)
 
+## Important Addon Tools for Enhanced Code Search
+
+While Claude Code has built-in code search capabilities, these addon tools can significantly improve your development workflow by providing semantic and structural code search that goes beyond simple text matching.
+
+### mgrep: Semantic Code Search
+
+[mgrep](https://www.npmjs.com/package/@mixedbread-ai/mgrep) is a semantic code search tool that understands code meaning rather than just matching text patterns. According to [this analysis](https://medium.com/coding-nexus/me-and-claude-are-in-love-with-mgrep-for-250-better-results-6357351eaac0), mgrep can provide dramatically better search results by understanding code semantics and context.
+
+**Key Benefits:**
+
+- **Semantic Understanding**: Finds code by meaning, not just keywords
+- **Better Claude Code Integration**: Provides more relevant context to Claude Code's AI models
+- **Cross-Language Support**: Works across multiple programming languages
+- **Improved Accuracy**: Reduces false positives compared to regex-based search
+
+**Installation:**
+
+```bash
+npm install -g @mixedbread-ai/mgrep
+```
+
+**Basic Usage:**
+
+```bash
+# Search for code related to authentication
+mgrep "user authentication logic"
+
+# Search in specific directory
+mgrep "database connection" ./src
+```
+
+### ripgrep: Lightning-Fast Text Search
+
+[ripgrep (rg)](https://github.com/BurntSushi/ripgrep) is an extremely fast command-line search tool that recursively searches directories for regex patterns. It's faster than grep, ag, and ack, with smart defaults like respecting `.gitignore` files.
+
+**Installation:**
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install ripgrep
+
+# Fedora/RHEL
+sudo dnf install ripgrep
+
+# macOS
+brew install ripgrep
+```
+
+**Basic Usage:**
+
+```bash
+# Search for a pattern in current directory
+rg "function.*authenticate"
+
+# Search with context lines
+rg -C 3 "TODO"
+
+# Search specific file types
+rg -t py "import.*requests"
+```
+
+### ast-grep: Structural Code Search
+
+[ast-grep (sg)](https://ast-grep.github.io/) searches code based on Abstract Syntax Tree (AST) patterns, making it perfect for finding structural patterns regardless of formatting or variable names.
+
+**Key Benefits:**
+
+- **Structural Matching**: Find code patterns by structure, not just text
+- **Language-Aware**: Understands syntax of different programming languages
+- **Refactoring Support**: Great for finding code patterns to refactor
+- **No Login Required**: Completely open-source and local
+
+**Installation:**
+
+```bash
+# Using cargo (Rust package manager)
+cargo install ast-grep
+
+# Or download pre-built binary from releases
+curl -L https://github.com/ast-grep/ast-grep/releases/latest/download/ast-grep-x86_64-unknown-linux-gnu.zip -o ast-grep.zip
+unzip ast-grep.zip
+sudo mv sg /usr/local/bin/
+```
+
+**Basic Usage:**
+
+```bash
+# Find all function definitions
+sg --pattern 'function $NAME($$$) { $$$ }'
+
+# Find specific React patterns
+sg --pattern 'useState($$$)' -l tsx
+```
+
+### Choosing the Right Tool
+
+- **Use mgrep** when you need semantic understanding and want to find code by meaning
+- **Use ripgrep** for fast text-based searches with regex patterns
+- **Use ast-grep** when searching for structural code patterns or doing refactoring
+
+These tools complement each other and can be used together to provide comprehensive code search capabilities for Claude Code workflows.
+
 ## Secure Setup: Sandboxed Claude Code with Bubblewrap
 
 For maximum security when working with sensitive projects, you can run Claude Code in an isolated sandbox using bubblewrap (bwrap). This approach protects your AWS credentials and SSH keys by:
