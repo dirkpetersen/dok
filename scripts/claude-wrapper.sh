@@ -344,12 +344,12 @@ if [[ "$1" == "--local" ]]; then
     echo -e "${RED}✗ Error: --local flag used but LOCAL_ANTHROPIC_BASE_URL is not set${NC}" >&2
     echo "" >&2
     echo "To use --local, set the LOCAL_ANTHROPIC_BASE_URL environment variable:" >&2
-    echo "  export LOCAL_ANTHROPIC_BASE_URL=\"http://localhost:8080\"" >&2
+    echo "  export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.run.university.edu/cc/v1\"" >&2
     echo "" >&2
     echo "Optionally, also set local model names:" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"glm-4.7\"" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"claude-sonnet-local\"" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"deepseek-v4\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"hc/glm-4.7\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"hc/glm-4.7\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"hc/glm-4.7\"" >&2
     exit 1
   fi
 fi
