@@ -344,7 +344,6 @@ else
   echo "   aws configure --profile bedrock" >&2
   echo "" >&2
   echo "2. Use --local flag with a local LLM endpoint:" >&2
-  echo "   export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.run.university.edu/cc/v1\"" >&2
   echo "   claude --local" >&2
   echo "" >&2
   echo "3. Bypass this wrapper and run Claude Code directly:" >&2
