@@ -333,6 +333,22 @@ elif grep -q "bedrock" "$HOME/.aws/config" 2>/dev/null; then
   export CLAUDE_CODE_USE_BEDROCK=1
   export AWS_DEFAULT_REGION=us-west-2
   export AWS_PROFILE=bedrock
+
+# No valid configuration found
+else
+  echo -e "${RED}✗ Error: No valid configuration found${NC}" >&2
+  echo "" >&2
+  echo "Options to fix this:" >&2
+  echo "" >&2
+  echo "1. Configure AWS Bedrock by adding a [profile bedrock] section to ~/.aws/config" >&2
+  echo "" >&2
+  echo "2. Use --local flag with a local LLM endpoint:" >&2
+  echo "   export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.run.university.edu/cc/v1\"" >&2
+  echo "   claude --local" >&2
+  echo "" >&2
+  echo "3. Bypass this wrapper and run Claude Code directly:" >&2
+  echo "   ~/.local/bin/claude" >&2
+  exit 1
 fi
 
 # Model Configuration (Bedrock model IDs, overridden by LOCAL_* variants if set above)
