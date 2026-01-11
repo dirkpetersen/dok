@@ -233,6 +233,21 @@ install_wrapper() {
   exit 0
 }
 
+# Create default .claude.json if it doesn't exist (must happen before any claude execution)
+if [[ ! -f "$HOME/.claude.json" ]]; then
+  cat > "$HOME/.claude.json" <<'EOF'
+{
+  "numStartups": 1,
+  "customApiKeyResponses": {
+    "approved": [
+      "sk-ant-dummy"
+    ],
+    "rejected": []
+  }
+}
+EOF
+fi
+
 # Verify PATH configuration first, before doing anything
 verify_path_configuration
 if [[ $? -ne 0 ]]; then
@@ -284,21 +299,6 @@ fi
 # ============================================================================
 # WRAPPER FUNCTIONALITY
 # ============================================================================
-
-# Create default .claude.json if it doesn't exist
-if [[ ! -f "$HOME/.claude.json" ]]; then
-  cat > "$HOME/.claude.json" <<'EOF'
-{
-  "numStartups": 1,
-  "customApiKeyResponses": {
-    "approved": [
-      "sk-ant-dummy"
-    ],
-    "rejected": []
-  }
-}
-EOF
-fi
 
 # Find the real claude binary once
 REAL_CLAUDE=$(find_claude_binary)
