@@ -174,6 +174,9 @@ install_wrapper() {
   # Create ~/bin if it doesn't exist
   mkdir -p "$INSTALL_DIR"
 
+  # Force remove old wrapper and symlink
+  rm -f "$WRAPPER_PATH" "$SYMLINK_PATH"
+
   # Copy or download wrapper script to ~/bin
   # When script is piped (curl | bash), $0 will be "bash"
   # Always download from GitHub in this case to ensure latest version
@@ -187,8 +190,8 @@ install_wrapper() {
     fi
     chmod +x "$WRAPPER_PATH"
     echo -e "${GREEN}✓${NC} Installed wrapper to ~/bin/$SCRIPT_NAME"
-  elif [[ ! -f "$WRAPPER_PATH" ]] || [[ "$(readlink -f "$0" 2>/dev/null || echo "")" != "$(readlink -f "$WRAPPER_PATH" 2>/dev/null)" ]]; then
-    # Script is being run from a file, copy it if needed
+  else
+    # Script is being run from a file, copy it
     echo -e "${YELLOW}Copying wrapper script...${NC}"
     if cp "$0" "$WRAPPER_PATH"; then
       echo -e "${GREEN}✓${NC} Copied wrapper script"
@@ -200,24 +203,9 @@ install_wrapper() {
     echo -e "${GREEN}✓${NC} Installed wrapper to ~/bin/$SCRIPT_NAME"
   fi
 
-  # Create symlink if it doesn't exist or points elsewhere
-  if [[ -L "$SYMLINK_PATH" ]]; then
-    local current_target=$(readlink "$SYMLINK_PATH")
-    if [[ "$current_target" != "$SCRIPT_NAME" ]]; then
-      rm "$SYMLINK_PATH"
-      ln -s "$SCRIPT_NAME" "$SYMLINK_PATH"
-      echo -e "${GREEN}✓${NC} Updated symlink ~/bin/claude"
-    else
-      echo -e "${GREEN}✓${NC} Wrapper already correctly configured"
-    fi
-  elif [[ -e "$SYMLINK_PATH" ]]; then
-    echo -e "${RED}✗ ~/bin/claude exists but is not a symlink${NC}"
-    echo "Please remove it manually and run this script again"
-    exit 1
-  else
-    ln -s "$SCRIPT_NAME" "$SYMLINK_PATH"
-    echo -e "${GREEN}✓${NC} Created symlink ~/bin/claude"
-  fi
+  # Create fresh symlink
+  ln -s "$SCRIPT_NAME" "$SYMLINK_PATH"
+  echo -e "${GREEN}✓${NC} Created symlink ~/bin/claude"
 
   echo ""
   echo -e "${GREEN}=== Installation Complete! ===${NC}"
