@@ -291,8 +291,6 @@ if [[ "$1" == "--local" ]]; then
 
   # Check if LOCAL_ANTHROPIC_BASE_URL is set
   if [[ -n "$LOCAL_ANTHROPIC_BASE_URL" ]]; then
-    echo -e "${GREEN}Using local LLM configuration from LOCAL_ANTHROPIC_BASE_URL${NC}" >&2
-
     # Set ANTHROPIC_BASE_URL from LOCAL_ANTHROPIC_BASE_URL
     export ANTHROPIC_BASE_URL="$LOCAL_ANTHROPIC_BASE_URL"
 
@@ -302,18 +300,36 @@ if [[ "$1" == "--local" ]]; then
     # Set model configurations if LOCAL_* variants exist
     if [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]]; then
       export ANTHROPIC_DEFAULT_HAIKU_MODEL="$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
-      echo -e "${GREEN}Using local Haiku model: $LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL${NC}" >&2
     fi
 
     if [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]]; then
       export ANTHROPIC_DEFAULT_SONNET_MODEL="$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
-      echo -e "${GREEN}Using local Sonnet model: $LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL${NC}" >&2
     fi
 
     if [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]]; then
       export ANTHROPIC_DEFAULT_OPUS_MODEL="$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
-      echo -e "${GREEN}Using local Opus model: $LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL${NC}" >&2
     fi
+
+    # Determine which model will be used (check first argument for model selection)
+    local selected_model="sonnet"  # default
+    if [[ "$1" == "opus" ]]; then
+      selected_model="opus"
+      shift
+    elif [[ "$1" == "sonnet" ]]; then
+      selected_model="sonnet"
+      shift
+    elif [[ "$1" == "haiku" ]]; then
+      selected_model="haiku"
+      shift
+    fi
+
+    # Get the actual model name for the selected model
+    local model_var="ANTHROPIC_DEFAULT_${selected_model^^}_MODEL"
+    local model_name="${!model_var}"
+
+    # Show status for the active model
+    echo -e "${GREEN}Using local $selected_model model: $model_name${NC}" >&2
+    echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
 
     # Find the real claude binary
     REAL_CLAUDE=$(find_claude_binary)
@@ -359,10 +375,28 @@ if [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   exec "$REAL_CLAUDE" --dangerously-skip-permissions "$@"
 fi
 
-# AWS Bedrock Configuration
-export CLAUDE_CODE_USE_BEDROCK=1
-export AWS_REGION=us-west-2
-export AWS_PROFILE=bedrock
+# Create default .claude.json if it doesn't exist
+if [[ ! -f "$HOME/.claude.json" ]]; then
+  mkdir -p "$HOME"
+  cat > "$HOME/.claude.json" <<'EOF'
+{
+  "numStartups": 1,
+  "customApiKeyResponses": {
+    "approved": [
+      "sk-ant-dummy"
+    ],
+    "rejected": []
+  }
+}
+EOF
+fi
+
+# AWS Bedrock Configuration - only enable if bedrock is configured
+if grep -q "bedrock" "$HOME/.aws/config" 2>/dev/null; then
+  export CLAUDE_CODE_USE_BEDROCK=1
+  export AWS_DEFAULT_REGION=us-west-2
+  export AWS_PROFILE=bedrock
+fi
 
 # Model Configuration
 export ANTHROPIC_DEFAULT_HAIKU_MODEL="us.anthropic.claude-haiku-4-5-20251001-v1:0"
