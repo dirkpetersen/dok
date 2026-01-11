@@ -2681,6 +2681,21 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
 <span class="o">}</span>
 
+<span class="c1"># Create default .claude.json if it doesn&#39;t exist (must happen before any claude execution)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude.json&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span>cat<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude.json&quot;</span><span class="w"> </span><span class="s">&lt;&lt;&#39;EOF&#39;</span>
+<span class="s">{</span>
+<span class="s">  &quot;numStartups&quot;: 1,</span>
+<span class="s">  &quot;customApiKeyResponses&quot;: {</span>
+<span class="s">    &quot;approved&quot;: [</span>
+<span class="s">      &quot;sk-ant-dummy&quot;</span>
+<span class="s">    ],</span>
+<span class="s">    &quot;rejected&quot;: []</span>
+<span class="s">  }</span>
+<span class="s">}</span>
+<span class="s">EOF</span>
+<span class="k">fi</span>
+
 <span class="c1"># Verify PATH configuration first, before doing anything</span>
 verify_path_configuration
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -2732,21 +2747,6 @@ verify_path_configuration
 <span class="c1"># ============================================================================</span>
 <span class="c1"># WRAPPER FUNCTIONALITY</span>
 <span class="c1"># ============================================================================</span>
-
-<span class="c1"># Create default .claude.json if it doesn&#39;t exist</span>
-<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude.json&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">  </span>cat<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude.json&quot;</span><span class="w"> </span><span class="s">&lt;&lt;&#39;EOF&#39;</span>
-<span class="s">{</span>
-<span class="s">  &quot;numStartups&quot;: 1,</span>
-<span class="s">  &quot;customApiKeyResponses&quot;: {</span>
-<span class="s">    &quot;approved&quot;: [</span>
-<span class="s">      &quot;sk-ant-dummy&quot;</span>
-<span class="s">    ],</span>
-<span class="s">    &quot;rejected&quot;: []</span>
-<span class="s">  }</span>
-<span class="s">}</span>
-<span class="s">EOF</span>
-<span class="k">fi</span>
 
 <span class="c1"># Find the real claude binary once</span>
 <span class="nv">REAL_CLAUDE</span><span class="o">=</span><span class="k">$(</span>find_claude_binary<span class="k">)</span>
