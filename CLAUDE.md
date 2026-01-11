@@ -23,6 +23,7 @@ The repository follows a standard MkDocs structure with organized topic sections
   - `claude-wrapper.sh` - AWS Bedrock wrapper for Claude Code with model switching
   - `shell-setup.sh` - Comprehensive shell and SSH setup automation
   - `nodejs-install-check.sh` - Node.js installation verification
+  - `python-build-standalone-install.sh` - Python Build Standalone installer
   - `vim-wrapper.sh` - Simple vim editor wrapper with easy-edit mode (double-escape to save/quit)
 - `.github/workflows/` - GitHub Actions automation
   - `deploy.yml` - Builds and deploys documentation to GitHub Pages
@@ -94,12 +95,14 @@ mkdocs gh-deploy
 
 GitHub Actions automatically resolves issues by triggering Claude Code to analyze, fix, and create pull requests:
 
-**Trigger**: New GitHub issue created
+**Triggers**:
+- Automatic: New GitHub issue created
+- Manual: Workflow dispatch with issue number parameter
 
 **Workflow Steps**:
 1. Sets up Node.js runner (modern LTS version)
 2. Installs Claude Code globally via npm: `npm i -g @anthropic-ai/claude-code`
-3. Configures AWS credentials from GitHub Secrets (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+3. Configures AWS credentials from GitHub Secrets
 4. Creates feature branch based on issue ID: `fix/issue-{issue_number}`
 5. Clones repository and checks out new branch
 6. Executes Claude Code in batch mode with automated fix prompt:
@@ -109,18 +112,24 @@ GitHub Actions automatically resolves issues by triggering Claude Code to analyz
    - Commits changes with reference to issue
    - Creates and submits pull request
 7. Links pull request to original issue with resolution context
+8. Optionally auto-merges PR if `ISSUE_AUTO_FIX_MERGE=yes` is set
 
 **Configuration**:
 - AWS Bedrock credentials must be stored as GitHub repository secrets:
   - `BEDROCK_AWS_ACCESS_KEY_ID`
   - `BEDROCK_AWS_SECRET_ACCESS_KEY`
-- Claude Code uses AWS Bedrock for model inference
-- Supports model selection via environment variables (haiku/sonnet/opus)
+- Model selection via repository variable:
+  - `CLAUDE_FIX_MODEL` - Set to `opus`, `sonnet`, or `haiku` (default: `opus`)
+- Auto-merge feature via repository variable:
+  - `ISSUE_AUTO_FIX_MERGE` - Set to `yes` to enable automatic PR merging
+- PAT token for PR operations (falls back to GITHUB_TOKEN):
+  - `PAT_TOKEN` - Personal access token with repo permissions
 
 **Security**:
 - AWS credentials used only in GitHub Actions runners
-- Pull requests reviewed before merge
+- Pull requests reviewed before merge (unless auto-merge enabled)
 - All operations logged and traceable to issue source
+- Uses dynamic repository references for portability across forks
 
 ## Documentation Philosophy
 

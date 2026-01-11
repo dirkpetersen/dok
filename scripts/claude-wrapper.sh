@@ -227,6 +227,7 @@ install_wrapper() {
   echo "  claude                # Launch with Haiku (fast/default)"
   echo "  claude sonnet         # Launch with Sonnet (balanced)"
   echo "  claude opus           # Launch with Opus (most capable)"
+  echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
   echo ""
 
   exit 0
@@ -284,6 +285,59 @@ fi
 # WRAPPER FUNCTIONALITY
 # ============================================================================
 
+# Check if --local flag is used
+if [[ "$1" == "--local" ]]; then
+  shift  # Remove --local from arguments
+
+  # Check if LOCAL_ANTHROPIC_BASE_URL is set
+  if [[ -n "$LOCAL_ANTHROPIC_BASE_URL" ]]; then
+    echo -e "${GREEN}Using local LLM configuration from LOCAL_ANTHROPIC_BASE_URL${NC}" >&2
+
+    # Set ANTHROPIC_BASE_URL from LOCAL_ANTHROPIC_BASE_URL
+    export ANTHROPIC_BASE_URL="$LOCAL_ANTHROPIC_BASE_URL"
+
+    # Set ANTHROPIC_API_KEY to dummy value
+    export ANTHROPIC_API_KEY="sk-ant-dummy"
+
+    # Set model configurations if LOCAL_* variants exist
+    if [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]]; then
+      export ANTHROPIC_DEFAULT_HAIKU_MODEL="$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
+      echo -e "${GREEN}Using local Haiku model: $LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL${NC}" >&2
+    fi
+
+    if [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]]; then
+      export ANTHROPIC_DEFAULT_SONNET_MODEL="$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
+      echo -e "${GREEN}Using local Sonnet model: $LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL${NC}" >&2
+    fi
+
+    if [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]]; then
+      export ANTHROPIC_DEFAULT_OPUS_MODEL="$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
+      echo -e "${GREEN}Using local Opus model: $LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL${NC}" >&2
+    fi
+
+    # Find the real claude binary
+    REAL_CLAUDE=$(find_claude_binary)
+    if [[ $? -ne 0 ]]; then
+      exit 1
+    fi
+
+    # Execute Claude Code with custom base URL (skip all Bedrock/AWS config)
+    # Note: Using --dangerously-skip-permissions for unrestricted access
+    exec "$REAL_CLAUDE" --dangerously-skip-permissions "$@"
+  else
+    echo -e "${RED}✗ Error: --local flag used but LOCAL_ANTHROPIC_BASE_URL is not set${NC}" >&2
+    echo "" >&2
+    echo "To use --local, set the LOCAL_ANTHROPIC_BASE_URL environment variable:" >&2
+    echo "  export LOCAL_ANTHROPIC_BASE_URL=\"http://localhost:8080\"" >&2
+    echo "" >&2
+    echo "Optionally, also set local model names:" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"glm-4.7\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"claude-sonnet-local\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"deepseek-v4\"" >&2
+    exit 1
+  fi
+fi
+
 # Check if ANTHROPIC_BASE_URL is set (for local LLM usage)
 if [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   echo -e "${GREEN}Using custom ANTHROPIC_BASE_URL: $ANTHROPIC_BASE_URL${NC}" >&2
@@ -291,7 +345,7 @@ if [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   # Set ANTHROPIC_API_KEY to dummy value if not set or invalid
   if [[ -z "$ANTHROPIC_API_KEY" ]] || [[ ! "$ANTHROPIC_API_KEY" =~ ^sk-ant- ]]; then
     export ANTHROPIC_API_KEY="sk-ant-dummy"
-    echo -e "${YELLOW}Set ANTHROPIC_API_KEY to dummy value for local LLM${NC}" >&2
+    # echo -e "${YELLOW}Set ANTHROPIC_API_KEY to dummy value for local LLM${NC}" >&2
   fi
 
   # Find the real claude binary
