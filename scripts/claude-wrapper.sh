@@ -285,99 +285,8 @@ fi
 # WRAPPER FUNCTIONALITY
 # ============================================================================
 
-# Check if --local flag is used
-if [[ "$1" == "--local" ]]; then
-  shift  # Remove --local from arguments
-
-  # Check if LOCAL_ANTHROPIC_BASE_URL is set
-  if [[ -n "$LOCAL_ANTHROPIC_BASE_URL" ]]; then
-    # Set ANTHROPIC_BASE_URL from LOCAL_ANTHROPIC_BASE_URL
-    export ANTHROPIC_BASE_URL="$LOCAL_ANTHROPIC_BASE_URL"
-
-    # Set ANTHROPIC_API_KEY to dummy value
-    export ANTHROPIC_API_KEY="sk-ant-dummy"
-
-    # Set model configurations if LOCAL_* variants exist
-    if [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]]; then
-      export ANTHROPIC_DEFAULT_HAIKU_MODEL="$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
-    fi
-
-    if [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]]; then
-      export ANTHROPIC_DEFAULT_SONNET_MODEL="$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
-    fi
-
-    if [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]]; then
-      export ANTHROPIC_DEFAULT_OPUS_MODEL="$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
-    fi
-
-    # Determine which model will be used (check first argument for model selection)
-    local selected_model="sonnet"  # default
-    if [[ "$1" == "opus" ]]; then
-      selected_model="opus"
-      shift
-    elif [[ "$1" == "sonnet" ]]; then
-      selected_model="sonnet"
-      shift
-    elif [[ "$1" == "haiku" ]]; then
-      selected_model="haiku"
-      shift
-    fi
-
-    # Get the actual model name for the selected model
-    local model_var="ANTHROPIC_DEFAULT_${selected_model^^}_MODEL"
-    local model_name="${!model_var}"
-
-    # Show status for the active model
-    echo -e "${GREEN}Using local $selected_model model: $model_name${NC}" >&2
-    echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
-
-    # Find the real claude binary
-    REAL_CLAUDE=$(find_claude_binary)
-    if [[ $? -ne 0 ]]; then
-      exit 1
-    fi
-
-    # Execute Claude Code with custom base URL (skip all Bedrock/AWS config)
-    # Note: Using --dangerously-skip-permissions for unrestricted access
-    exec "$REAL_CLAUDE" --dangerously-skip-permissions "$@"
-  else
-    echo -e "${RED}✗ Error: --local flag used but LOCAL_ANTHROPIC_BASE_URL is not set${NC}" >&2
-    echo "" >&2
-    echo "To use --local, set the LOCAL_ANTHROPIC_BASE_URL environment variable:" >&2
-    echo "  export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.run.university.edu/cc/v1\"" >&2
-    echo "" >&2
-    echo "Optionally, also set local model names:" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"hc/glm-4.7\"" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"hc/glm-4.7\"" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"hc/glm-4.7\"" >&2
-    exit 1
-  fi
-fi
-
-# Check if ANTHROPIC_BASE_URL is set (for local LLM usage)
-if [[ -n "$ANTHROPIC_BASE_URL" ]]; then
-  echo -e "${GREEN}Using custom ANTHROPIC_BASE_URL: $ANTHROPIC_BASE_URL${NC}" >&2
-
-  # Set ANTHROPIC_API_KEY to dummy value if not set or invalid
-  if [[ -z "$ANTHROPIC_API_KEY" ]] || [[ ! "$ANTHROPIC_API_KEY" =~ ^sk-ant- ]]; then
-    export ANTHROPIC_API_KEY="sk-ant-dummy"
-    # echo -e "${YELLOW}Set ANTHROPIC_API_KEY to dummy value for local LLM${NC}" >&2
-  fi
-
-  # Find the real claude binary
-  REAL_CLAUDE=$(find_claude_binary)
-  if [[ $? -ne 0 ]]; then
-    exit 1
-  fi
-
-  # Execute Claude Code with custom base URL (skip all Bedrock/AWS config)
-  # Note: Using --dangerously-skip-permissions for unrestricted access
-  exec "$REAL_CLAUDE" --dangerously-skip-permissions "$@"
-fi
-
 # Create default .claude.json if it doesn't exist
 if [[ ! -f "$HOME/.claude.json" ]]; then
-  mkdir -p "$HOME"
   cat > "$HOME/.claude.json" <<'EOF'
 {
   "numStartups": 1,
@@ -391,44 +300,85 @@ if [[ ! -f "$HOME/.claude.json" ]]; then
 EOF
 fi
 
-# AWS Bedrock Configuration - only enable if bedrock is configured
-if grep -q "bedrock" "$HOME/.aws/config" 2>/dev/null; then
-  export CLAUDE_CODE_USE_BEDROCK=1
-  export AWS_DEFAULT_REGION=us-west-2
-  export AWS_PROFILE=bedrock
-fi
-
-# Model Configuration
-export ANTHROPIC_DEFAULT_HAIKU_MODEL="us.anthropic.claude-haiku-4-5-20251001-v1:0"
-export ANTHROPIC_DEFAULT_SONNET_MODEL="us.anthropic.claude-sonnet-4-5-20250929-v1:0"
-export ANTHROPIC_DEFAULT_OPUS_MODEL="global.anthropic.claude-opus-4-5-20251101-v1:0"
-export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
-
-# Set default model to Haiku
-mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
-
-# Check first argument for model selection
-if [[ "$1" == "opus" ]]; then
-  mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}"
-  shift
-elif [[ "$1" == "sonnet" ]]; then
-  mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}"
-  shift
-elif [[ "$1" == "haiku" ]]; then
-  mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
-  shift
-fi
-
-# Set the model environment variable
-export ANTHROPIC_MODEL="$mymodel"
-
-# Find the real claude binary
+# Find the real claude binary once
 REAL_CLAUDE=$(find_claude_binary)
 if [[ $? -ne 0 ]]; then
   exit 1
 fi
 
-# Execute the real Claude Code with model selection
-# Note: Using --dangerously-skip-permissions for unrestricted access
-# Remove this flag if you want to use permission restrictions
+# Check if --local flag is used
+if [[ "$1" == "--local" ]]; then
+  shift  # Remove --local from arguments
+
+  # Check if LOCAL_ANTHROPIC_BASE_URL is set
+  if [[ -z "$LOCAL_ANTHROPIC_BASE_URL" ]]; then
+    echo -e "${RED}✗ Error: --local flag used but LOCAL_ANTHROPIC_BASE_URL is not set${NC}" >&2
+    echo "" >&2
+    echo "To use --local, set the LOCAL_ANTHROPIC_BASE_URL environment variable:" >&2
+    echo "  export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.run.university.edu/cc/v1\"" >&2
+    echo "" >&2
+    echo "Optionally, also set local model names:" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"hc/glm-4.7\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"hc/glm-4.7\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"hc/glm-4.7\"" >&2
+    exit 1
+  fi
+
+  # Set ANTHROPIC_BASE_URL from LOCAL_ANTHROPIC_BASE_URL
+  export ANTHROPIC_BASE_URL="$LOCAL_ANTHROPIC_BASE_URL"
+  export ANTHROPIC_API_KEY="sk-ant-dummy"
+
+  # Set model configurations if LOCAL_* variants exist
+  [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]] && export ANTHROPIC_DEFAULT_HAIKU_MODEL="$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
+  [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && export ANTHROPIC_DEFAULT_SONNET_MODEL="$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
+  [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]] && export ANTHROPIC_DEFAULT_OPUS_MODEL="$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
+
+# Check if ANTHROPIC_BASE_URL is already set (for local LLM usage without --local flag)
+elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
+  # Set ANTHROPIC_API_KEY to dummy value if not set or invalid
+  if [[ -z "$ANTHROPIC_API_KEY" ]] || [[ ! "$ANTHROPIC_API_KEY" =~ ^sk-ant- ]]; then
+    export ANTHROPIC_API_KEY="sk-ant-dummy"
+  fi
+
+# Default: AWS Bedrock Configuration - only enable if bedrock is configured
+elif grep -q "bedrock" "$HOME/.aws/config" 2>/dev/null; then
+  export CLAUDE_CODE_USE_BEDROCK=1
+  export AWS_DEFAULT_REGION=us-west-2
+  export AWS_PROFILE=bedrock
+fi
+
+# Model Configuration (Bedrock model IDs, overridden by LOCAL_* variants if set above)
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-us.anthropic.claude-haiku-4-5-20251001-v1:0}"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-us.anthropic.claude-sonnet-4-5-20250929-v1:0}"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-5-20251101-v1:0}"
+export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
+
+# Default model is Haiku
+mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
+model_name="haiku"
+
+# Check first argument for model selection
+if [[ "$1" == "opus" ]]; then
+  mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}"
+  model_name="opus"
+  shift
+elif [[ "$1" == "sonnet" ]]; then
+  mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}"
+  model_name="sonnet"
+  shift
+elif [[ "$1" == "haiku" ]]; then
+  mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
+  model_name="haiku"
+  shift
+fi
+
+export ANTHROPIC_MODEL="$mymodel"
+
+# Show status message for local/custom base URL
+if [[ -n "$ANTHROPIC_BASE_URL" ]]; then
+  echo -e "${GREEN}Using local $model_name model: $mymodel${NC}" >&2
+  echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
+fi
+
+# Execute Claude Code
 exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
