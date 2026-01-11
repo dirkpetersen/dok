@@ -2434,7 +2434,23 @@
 <span class="normal">369</span>
 <span class="normal">370</span>
 <span class="normal">371</span>
-<span class="normal">372</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
@@ -2769,6 +2785,22 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">1</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_DEFAULT_REGION</span><span class="o">=</span>us-west-2
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_PROFILE</span><span class="o">=</span>bedrock
+
+<span class="c1"># No valid configuration found</span>
+<span class="k">else</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: No valid configuration found</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Options to fix this:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;1. Configure AWS Bedrock by adding a [profile bedrock] section to ~/.aws/config&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;2. Use --local flag with a local LLM endpoint:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   export LOCAL_ANTHROPIC_BASE_URL=\&quot;http://llm.run.university.edu/cc/v1\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   claude --local&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;3. Bypass this wrapper and run Claude Code directly:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   ~/.local/bin/claude&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="k">fi</span>
 
 <span class="c1"># Model Configuration (Bedrock model IDs, overridden by LOCAL_* variants if set above)</span>
