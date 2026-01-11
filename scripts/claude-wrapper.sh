@@ -340,7 +340,8 @@ else
   echo "" >&2
   echo "Options to fix this:" >&2
   echo "" >&2
-  echo "1. Configure AWS Bedrock by adding a [profile bedrock] section to ~/.aws/config" >&2
+  echo "1. Configure AWS Bedrock by getting AWS creds and then executing:" >&2
+  echo "   aws configure --profile bedrock" >&2
   echo "" >&2
   echo "2. Use --local flag with a local LLM endpoint:" >&2
   echo "   export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.run.university.edu/cc/v1\"" >&2
