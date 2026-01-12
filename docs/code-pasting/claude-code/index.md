@@ -92,6 +92,33 @@ When Claude Code launches for the first time, it will:
 2. Initialize the Claude Code environment
 3. Start the interactive session in the git repository
 
+### 4. (Optional) Using Local LLM with --local Flag
+
+If you have a local LLM endpoint available, you can use the `--local` flag to bypass AWS Bedrock and connect to your local server:
+
+```bash
+# First, set the local endpoint
+export LOCAL_ANTHROPIC_BASE_URL="http://llm.run.university.edu/cc/v1"
+
+# Optionally, set custom model names for your local LLM
+export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL="hc/glm-4.7"
+export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL="hc/glm-4.7"
+export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL="hc/glm-4.7"
+
+# Run Claude Code with local LLM
+claude --local
+```
+
+**Environment Variables:**
+
+- `LOCAL_ANTHROPIC_BASE_URL` (required): The URL to your local LLM endpoint (e.g., `http://localhost:8000/v1` or `http://llm.run.university.edu/cc/v1`)
+- `LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL` (optional): Model name for fast inference
+- `LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL` (optional): Model name for balanced inference
+- `LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL` (optional): Model name for maximum capability
+
+!!! note "Using --local without setting LOCAL_ANTHROPIC_BASE_URL"
+    If you run `claude --local` without setting `LOCAL_ANTHROPIC_BASE_URL`, you'll see an error message with setup instructions reminding you to configure the required environment variable.
+
 ## Important: Git Repository Requirement
 
 **Claude Code must always be initialized inside a git repository.** This is a requirement for the tool to function properly.
