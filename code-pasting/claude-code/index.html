@@ -893,6 +893,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#4-optional-using-local-llm-with-local-flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. (Optional) Using Local LLM with --local Flag
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1735,6 +1746,17 @@
     <span class="md-ellipsis">
       
         4. Test Claude Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-optional-using-local-llm-with-local-flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. (Optional) Using Local LLM with --local Flag
       
     </span>
   </a>
@@ -2869,6 +2891,39 @@ claude
 1. Ask for your SSH keychain passphrase (cached for 4 hours)
 2. Initialize the Claude Code environment
 3. Start the interactive session in the git repository</p>
+<h3 id="4-optional-using-local-llm-with-local-flag">4. (Optional) Using Local LLM with --local Flag<a class="headerlink" href="#4-optional-using-local-llm-with-local-flag" title="Permanent link">&para;</a></h3>
+<p>If you have a local LLM endpoint available, you can use the <code>--local</code> flag to bypass AWS Bedrock and connect to your local server:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># First, set the local endpoint</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LOCAL_ANTHROPIC_BASE_URL</span><span class="o">=</span><span class="s2">&quot;http://llm.run.university.edu/cc/v1&quot;</span>
+
+<span class="c1"># Optionally, set custom model names for your local LLM</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="o">=</span><span class="s2">&quot;hc/glm-4.7&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="o">=</span><span class="s2">&quot;hc/glm-4.7&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="o">=</span><span class="s2">&quot;hc/glm-4.7&quot;</span>
+
+<span class="c1"># Run Claude Code with local LLM</span>
+claude<span class="w"> </span>--local
+</code></pre></div></td></tr></table></div>
+<p><strong>Environment Variables:</strong></p>
+<ul>
+<li><code>LOCAL_ANTHROPIC_BASE_URL</code> (required): The URL to your local LLM endpoint (e.g., <code>http://localhost:8000/v1</code> or <code>http://llm.run.university.edu/cc/v1</code>)</li>
+<li><code>LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</code> (optional): Model name for fast inference</li>
+<li><code>LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</code> (optional): Model name for balanced inference</li>
+<li><code>LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</code> (optional): Model name for maximum capability</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Using --local without setting LOCAL_ANTHROPIC_BASE_URL</p>
+<p>If you run <code>claude --local</code> without setting <code>LOCAL_ANTHROPIC_BASE_URL</code>, you'll see an error message with setup instructions reminding you to configure the required environment variable.</p>
+</div>
 <h2 id="important-git-repository-requirement">Important: Git Repository Requirement<a class="headerlink" href="#important-git-repository-requirement" title="Permanent link">&para;</a></h2>
 <p><strong>Claude Code must always be initialized inside a git repository.</strong> This is a requirement for the tool to function properly.</p>
 <h3 id="setting-up-a-git-repository">Setting Up a Git Repository<a class="headerlink" href="#setting-up-a-git-repository" title="Permanent link">&para;</a></h3>
