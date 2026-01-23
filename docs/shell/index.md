@@ -33,6 +33,26 @@ This script will:
     --8<-- "scripts/shell-setup.sh"
     ```
 
+### Quick Start Light (Minimal Setup)
+
+For a minimal, fully automated setup without credential configuration:
+
+```bash
+mkdir -p ~/temp && curl -fsSL -o ~/temp/shell-setup.sh "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/shell-setup.sh?$(date +%s)" && bash ~/temp/shell-setup.sh --light
+```
+
+This light mode will:
+- Add `~/bin` and `~/.local/bin` to your PATH
+- Configure XDG_RUNTIME_DIR for container support (Linux only)
+- Set up convenience settings (cyan directories, history size)
+- Configure Vim with desert theme and `edr` command (easy editor)
+- Set Git default branch to 'main' (if Git is installed)
+- **Skip** SSH key, GPG key, Git user config, and SSH config setup
+- **No prompts** - fully automated
+
+!!! tip "When to use light mode"
+    Use `--light` mode when you want minimal shell configuration without setting up credentials, or when running automated provisioning scripts. You can always run the full setup later.
+
 ### Manual Setup
 
 If you prefer to set up components manually:

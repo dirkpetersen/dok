@@ -323,6 +323,14 @@ OPTIONS:
               - Skips steps that are already configured
               - Safe for repeated runs (idempotent)
 
+  --light     Light mode - minimal automated setup
+              - Sets up PATH directories and convenience settings
+              - Configures Vim with desert theme and edr command
+              - Only sets Git default branch to 'main' if not set
+              - Skips SSH key, GPG key, Git user config, and SSH config setup
+              - No prompts, fully automated
+              - Use for: minimal shell configuration without credentials
+
   --force     Force mode - overwrites all settings
               - Backs up existing SSH keys to ~/.ssh/backup-TIMESTAMP/
               - Backs up existing GPG keys to ~/.gnupg/backup-TIMESTAMP/
@@ -362,6 +370,9 @@ EXAMPLES:
   # First time setup (interactive)
   ./shell-setup.sh
 
+  # Minimal setup without credentials (fully automated)
+  ./shell-setup.sh --light
+
   # Force reconfiguration with backups
   ./shell-setup.sh --force
 
@@ -378,10 +389,15 @@ EOF
 
 # Check for flags
 FORCE_MODE=false
+LIGHT_MODE=false
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
   show_help
 elif [[ "$1" == "--revert" ]]; then
   revert_changes
+elif [[ "$1" == "--light" ]]; then
+  LIGHT_MODE=true
+  echo -e "${YELLOW}=== Light Mode Enabled ===${NC}"
+  echo -e "${YELLOW}Minimal automated setup - no credential configuration${NC}\n"
 elif [[ "$1" == "--force" ]]; then
   FORCE_MODE=true
   echo -e "${YELLOW}=== Force Mode Enabled ===${NC}"
@@ -1333,39 +1349,41 @@ setup_git_config() {
 # MAIN SCRIPT
 # ============================================================================
 
-# Step 1: Get user information
-echo -e "${YELLOW}Step 1: User Information${NC}"
+# Step 1: Get user information (skip in light mode)
+if [[ "$LIGHT_MODE" != true ]]; then
+  echo -e "${YELLOW}Step 1: User Information${NC}"
 
-# Try to get existing git config (if git is installed)
-existing_name=""
-existing_email=""
-if command -v git &> /dev/null; then
-  existing_name=$(git config --global user.name 2>/dev/null || true)
-  existing_email=$(git config --global user.email 2>/dev/null || true)
-fi
+  # Try to get existing git config (if git is installed)
+  existing_name=""
+  existing_email=""
+  if command -v git &> /dev/null; then
+    existing_name=$(git config --global user.name 2>/dev/null || true)
+    existing_email=$(git config --global user.email 2>/dev/null || true)
+  fi
 
-if [[ -n "$existing_name" && -n "$existing_email" ]]; then
-  echo -e "${GREEN}Found existing git configuration:${NC}"
-  echo "   Name: $existing_name"
-  echo "   Email: $existing_email"
-  read -p "Use this configuration? (Y/n): " use_existing
+  if [[ -n "$existing_name" && -n "$existing_email" ]]; then
+    echo -e "${GREEN}Found existing git configuration:${NC}"
+    echo "   Name: $existing_name"
+    echo "   Email: $existing_email"
+    read -p "Use this configuration? (Y/n): " use_existing
 
-  if [[ "$use_existing" == "y" || "$use_existing" == "Y" || -z "$use_existing" ]]; then
-    user_name="$existing_name"
-    user_email="$existing_email"
-    echo -e "${GREEN}✓${NC} Using existing configuration"
+    if [[ "$use_existing" == "y" || "$use_existing" == "Y" || -z "$use_existing" ]]; then
+      user_name="$existing_name"
+      user_email="$existing_email"
+      echo -e "${GREEN}✓${NC} Using existing configuration"
+    else
+      read -p "Your name (for Git/SSH): " user_name
+      read -p "Your email (for Git/SSH): " user_email
+    fi
   else
     read -p "Your name (for Git/SSH): " user_name
     read -p "Your email (for Git/SSH): " user_email
   fi
-else
-  read -p "Your name (for Git/SSH): " user_name
-  read -p "Your email (for Git/SSH): " user_email
-fi
 
-if [[ -z "$user_name" || -z "$user_email" ]]; then
-  echo -e "${RED}✗ Name and email are required${NC}"
-  script_exit 1
+  if [[ -z "$user_name" || -z "$user_email" ]]; then
+    echo -e "${RED}✗ Name and email are required${NC}"
+    script_exit 1
+  fi
 fi
 
 # Step 2: Setup PATH directories
@@ -1380,81 +1398,105 @@ setup_xdg_runtime_dir
 echo -e "\n${YELLOW}Step 2c: Setting up convenience environment settings${NC}"
 setup_convenience_settings
 
-# Step 3: Setup SSH key
-echo -e "\n${YELLOW}Step 3: Setting up SSH key${NC}"
-if ! setup_ssh_key "$user_email"; then
-  echo -e "${RED}✗ SSH key setup failed. Please resolve the issue and run this script again.${NC}"
-  script_exit 1
-fi
+# In light mode, setup Vim and Git default branch, skip credential setup
+if [[ "$LIGHT_MODE" == true ]]; then
+  # Step 3: Setup Vim
+  echo -e "\n${YELLOW}Step 3: Configuring Vim${NC}"
+  setup_vim_config
 
-# Step 4: Setup GPG key for Git commit signing
-echo -e "\n${YELLOW}Step 4: Setting up GPG key for Git commit signing${NC}"
-gpg_key_id=""
-
-# Check if GPG is installed
-if ! command -v gpg &> /dev/null; then
-  echo -e "${YELLOW}GPG not installed. Skipping GPG key setup.${NC}"
-  echo -e "${YELLOW}To install: sudo apt install gnupg (or brew install gnupg on macOS)${NC}"
-else
-  # Check if user already has a GPG key for this email
-  if gpg --list-secret-keys --keyid-format=long "$user_email" &>/dev/null; then
-    echo -e "${GREEN}✓${NC} GPG key already exists for $user_email"
-    gpg_key_id=$(gpg --list-secret-keys --keyid-format=long "$user_email" | grep sec | awk '{print $2}' | cut -d'/' -f2 | head -1)
-    echo -e "${GREEN}   Key ID: $gpg_key_id${NC}"
-  else
-    # Generate GPG key without passphrase (only used for commit signing)
-    gpg_key_id=$(setup_gpg_key "$user_name" "$user_email")
-    if [[ $? -eq 0 && -n "$gpg_key_id" ]]; then
-      echo -e "${GREEN}✓${NC} GPG key setup complete"
+  # Step 4: Set Git default branch
+  echo -e "\n${YELLOW}Step 4: Setting Git default branch${NC}"
+  if command -v git &> /dev/null; then
+    current_branch=$(git config --global init.defaultBranch 2>/dev/null)
+    if [[ "$current_branch" != "main" ]]; then
+      log_change "GIT_CONFIG" "init.defaultBranch=${current_branch:-UNSET}"
+      git config --global init.defaultBranch main
+      echo -e "${GREEN}✓${NC} Set default branch to 'main'"
     else
-      echo -e "${YELLOW}Skipping GPG key setup${NC}"
-      gpg_key_id=""
+      echo -e "${GREEN}✓${NC} Default branch already set to 'main'"
     fi
-  fi
-fi
-
-# Step 5: Install keychain
-echo -e "\n${YELLOW}Step 5: Installing keychain${NC}"
-install_keychain
-
-# Step 6: Setup keychain in login profile
-echo -e "\n${YELLOW}Step 6: Configuring keychain in login profile${NC}"
-setup_keychain_profile
-
-# Step 7: Setup Vim
-echo -e "\n${YELLOW}Step 7: Configuring Vim${NC}"
-setup_vim_config
-
-# Step 8: Setup Git
-echo -e "\n${YELLOW}Step 8: Configuring Git${NC}"
-setup_git_config "$user_name" "$user_email"
-
-# Configure GPG signing if we have a GPG key
-previous_signing_key=""
-if [[ -n "$gpg_key_id" ]] && command -v git &> /dev/null; then
-  # Check if Git signing is already configured with a different key
-  current_signing_key=$(git config --global user.signingkey 2>/dev/null || echo "")
-  current_gpgsign=$(git config --global commit.gpgsign 2>/dev/null || echo "false")
-
-  if [[ "$current_signing_key" != "$gpg_key_id" ]] || [[ "$current_gpgsign" != "true" ]]; then
-    # Save the previous key if it was different
-    if [[ -n "$current_signing_key" ]] && [[ "$current_signing_key" != "$gpg_key_id" ]]; then
-      previous_signing_key="$current_signing_key"
-    fi
-
-    log_change "GIT_CONFIG" "user.signingkey=${current_signing_key:-UNSET}"
-    log_change "GIT_CONFIG" "commit.gpgsign=${current_gpgsign}"
-    git config --global user.signingkey "$gpg_key_id"
-    git config --global commit.gpgsign true
-    echo -e "${GREEN}✓${NC} Configured Git to sign commits with GPG key $gpg_key_id"
   else
-    echo -e "${GREEN}✓${NC} Git commit signing already configured with key $gpg_key_id"
+    echo -e "${YELLOW}Git not installed. Skipping Git configuration.${NC}"
   fi
-fi
+else
+  # Full setup mode - run all configuration steps
 
-# Step 9: Setup SSH config
-echo -e "\n${YELLOW}Step 9: Setting up SSH configuration${NC}"
-setup_ssh_config
+  # Step 3: Setup SSH key
+  echo -e "\n${YELLOW}Step 3: Setting up SSH key${NC}"
+  if ! setup_ssh_key "$user_email"; then
+    echo -e "${RED}✗ SSH key setup failed. Please resolve the issue and run this script again.${NC}"
+    script_exit 1
+  fi
+
+  # Step 4: Setup GPG key for Git commit signing
+  echo -e "\n${YELLOW}Step 4: Setting up GPG key for Git commit signing${NC}"
+  gpg_key_id=""
+
+  # Check if GPG is installed
+  if ! command -v gpg &> /dev/null; then
+    echo -e "${YELLOW}GPG not installed. Skipping GPG key setup.${NC}"
+    echo -e "${YELLOW}To install: sudo apt install gnupg (or brew install gnupg on macOS)${NC}"
+  else
+    # Check if user already has a GPG key for this email
+    if gpg --list-secret-keys --keyid-format=long "$user_email" &>/dev/null; then
+      echo -e "${GREEN}✓${NC} GPG key already exists for $user_email"
+      gpg_key_id=$(gpg --list-secret-keys --keyid-format=long "$user_email" | grep sec | awk '{print $2}' | cut -d'/' -f2 | head -1)
+      echo -e "${GREEN}   Key ID: $gpg_key_id${NC}"
+    else
+      # Generate GPG key without passphrase (only used for commit signing)
+      gpg_key_id=$(setup_gpg_key "$user_name" "$user_email")
+      if [[ $? -eq 0 && -n "$gpg_key_id" ]]; then
+        echo -e "${GREEN}✓${NC} GPG key setup complete"
+      else
+        echo -e "${YELLOW}Skipping GPG key setup${NC}"
+        gpg_key_id=""
+      fi
+    fi
+  fi
+
+  # Step 5: Install keychain
+  echo -e "\n${YELLOW}Step 5: Installing keychain${NC}"
+  install_keychain
+
+  # Step 6: Setup keychain in login profile
+  echo -e "\n${YELLOW}Step 6: Configuring keychain in login profile${NC}"
+  setup_keychain_profile
+
+  # Step 7: Setup Vim
+  echo -e "\n${YELLOW}Step 7: Configuring Vim${NC}"
+  setup_vim_config
+
+  # Step 8: Setup Git
+  echo -e "\n${YELLOW}Step 8: Configuring Git${NC}"
+  setup_git_config "$user_name" "$user_email"
+
+  # Configure GPG signing if we have a GPG key
+  previous_signing_key=""
+  if [[ -n "$gpg_key_id" ]] && command -v git &> /dev/null; then
+    # Check if Git signing is already configured with a different key
+    current_signing_key=$(git config --global user.signingkey 2>/dev/null || echo "")
+    current_gpgsign=$(git config --global commit.gpgsign 2>/dev/null || echo "false")
+
+    if [[ "$current_signing_key" != "$gpg_key_id" ]] || [[ "$current_gpgsign" != "true" ]]; then
+      # Save the previous key if it was different
+      if [[ -n "$current_signing_key" ]] && [[ "$current_signing_key" != "$gpg_key_id" ]]; then
+        previous_signing_key="$current_signing_key"
+      fi
+
+      log_change "GIT_CONFIG" "user.signingkey=${current_signing_key:-UNSET}"
+      log_change "GIT_CONFIG" "commit.gpgsign=${current_gpgsign}"
+      git config --global user.signingkey "$gpg_key_id"
+      git config --global commit.gpgsign true
+      echo -e "${GREEN}✓${NC} Configured Git to sign commits with GPG key $gpg_key_id"
+    else
+      echo -e "${GREEN}✓${NC} Git commit signing already configured with key $gpg_key_id"
+    fi
+  fi
+
+  # Step 9: Setup SSH config
+  echo -e "\n${YELLOW}Step 9: Setting up SSH configuration${NC}"
+  setup_ssh_config
+fi
 
 # Inform user about revert option
 echo ""
@@ -1465,70 +1507,92 @@ echo ""
 # Display completion summary
 echo -e "${GREEN}=== Setup Complete! ===${NC}\n"
 
-echo -e "${YELLOW}Next steps:${NC}\n"
-
-echo "1. Reload your shell configuration:"
-CURRENT_SHELL="${SHELL##*/}"
-if [[ "$CURRENT_SHELL" == "zsh" ]]; then
-  echo "   . ~/.zprofile"
-else
-  if [[ -f "$HOME/.bash_profile" ]]; then
-    echo "   . ~/.bash_profile"
+if [[ "$LIGHT_MODE" == true ]]; then
+  echo -e "${YELLOW}Light mode setup completed:${NC}\n"
+  echo "✓ PATH directories configured"
+  echo "✓ XDG_RUNTIME_DIR configured (Linux only)"
+  echo "✓ Convenience settings applied"
+  echo "✓ Vim configured with desert theme and edr command"
+  echo "✓ Git default branch set to 'main' (if Git is installed)"
+  echo ""
+  echo -e "${YELLOW}Next steps:${NC}\n"
+  echo "1. Reload your shell configuration:"
+  CURRENT_SHELL="${SHELL##*/}"
+  if [[ "$CURRENT_SHELL" == "zsh" ]]; then
+    echo "   . ~/.zshrc"
   else
-    echo "   . ~/.profile"
+    echo "   . ~/.bashrc"
   fi
-fi
-echo ""
+  echo ""
+  echo "2. For full setup with SSH, GPG, and Git config:"
+  echo "   ./shell-setup.sh"
+  echo ""
+else
+  echo -e "${YELLOW}Next steps:${NC}\n"
 
-echo "2. Add your SSH public key to GitHub:"
-echo "   cat ~/.ssh/id_ed25519.pub"
-echo "   Visit: https://github.com/settings/ssh/new"
-echo ""
-
-echo "3. Test your SSH connection:"
-echo "   ssh -T git@github.com"
-echo ""
-
-if [[ -n "$gpg_key_id" ]]; then
-  step=4
-
-  # Only show note if there was a different signing key
-  if [[ -n "$previous_signing_key" ]]; then
-    echo "4. Note: You had a different GPG signing key ($previous_signing_key)"
-    echo "   Git is now configured to use: $gpg_key_id"
-    echo "   To revert to the old key, run:"
-    echo "   git config --global user.signingkey $previous_signing_key"
-    echo ""
-    step=5
+  echo "1. Reload your shell configuration:"
+  CURRENT_SHELL="${SHELL##*/}"
+  if [[ "$CURRENT_SHELL" == "zsh" ]]; then
+    echo "   . ~/.zprofile"
+  else
+    if [[ -f "$HOME/.bash_profile" ]]; then
+      echo "   . ~/.bash_profile"
+    else
+      echo "   . ~/.profile"
+    fi
   fi
-
-  echo "$step. Export your GPG public key to add to GitHub:"
-  echo "   gpg --armor --export $gpg_key_id"
-  echo "   Visit: https://github.com/settings/gpg/new"
   echo ""
 
-  step=$((step + 1))
-  echo "$step. Your SSH key passphrase will be loaded on next login via keychain"
-  echo "   (GPG key has no passphrase - only used for commit signing)"
+  echo "2. Add your SSH public key to GitHub:"
+  echo "   cat ~/.ssh/id_ed25519.pub"
+  echo "   Visit: https://github.com/settings/ssh/new"
+  echo ""
 
-  # Check if HPC was configured in SSH config
-  if grep -q "^Host hpc" "$HOME/.ssh/config" 2>/dev/null; then
+  echo "3. Test your SSH connection:"
+  echo "   ssh -T git@github.com"
+  echo ""
+
+  if [[ -n "$gpg_key_id" ]]; then
+    step=4
+
+    # Only show note if there was a different signing key
+    if [[ -n "$previous_signing_key" ]]; then
+      echo "4. Note: You had a different GPG signing key ($previous_signing_key)"
+      echo "   Git is now configured to use: $gpg_key_id"
+      echo "   To revert to the old key, run:"
+      echo "   git config --global user.signingkey $previous_signing_key"
+      echo ""
+      step=5
+    fi
+
+    echo "$step. Export your GPG public key to add to GitHub:"
+    echo "   gpg --armor --export $gpg_key_id"
+    echo "   Visit: https://github.com/settings/gpg/new"
+    echo ""
+
     step=$((step + 1))
-    echo ""
-    echo "$step. Connect to your HPC system:"
-    echo "   ssh hpc"
-    echo "   (This uses the jump host configuration you set up)"
-  fi
-else
-  echo "4. Your SSH key passphrase will be loaded on next login via keychain"
-  echo "   (no need to run keychain manually)"
+    echo "$step. Your SSH key passphrase will be loaded on next login via keychain"
+    echo "   (GPG key has no passphrase - only used for commit signing)"
 
-  # Check if HPC was configured in SSH config
-  if grep -q "^Host hpc" "$HOME/.ssh/config" 2>/dev/null; then
-    echo ""
-    echo "5. Connect to your HPC system:"
-    echo "   ssh hpc"
-    echo "   (This uses the jump host configuration you set up)"
+    # Check if HPC was configured in SSH config
+    if grep -q "^Host hpc" "$HOME/.ssh/config" 2>/dev/null; then
+      step=$((step + 1))
+      echo ""
+      echo "$step. Connect to your HPC system:"
+      echo "   ssh hpc"
+      echo "   (This uses the jump host configuration you set up)"
+    fi
+  else
+    echo "4. Your SSH key passphrase will be loaded on next login via keychain"
+    echo "   (no need to run keychain manually)"
+
+    # Check if HPC was configured in SSH config
+    if grep -q "^Host hpc" "$HOME/.ssh/config" 2>/dev/null; then
+      echo ""
+      echo "5. Connect to your HPC system:"
+      echo "   ssh hpc"
+      echo "   (This uses the jump host configuration you set up)"
+    fi
   fi
 fi
 echo ""

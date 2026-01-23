@@ -27,7 +27,7 @@ The repository follows a standard MkDocs structure with organized topic sections
   - `vim-wrapper.sh` - Simple vim editor wrapper with easy-edit mode (double-escape to save/quit)
 - `.github/workflows/` - GitHub Actions automation
   - `deploy.yml` - Builds and deploys documentation to GitHub Pages
-  - `auto-fix-issue.yml` - Triggered on new issues, runs Claude Code to analyze and fix problems
+  - `issue-auto-fix.yml` - Triggered on new issues, runs Claude Code to analyze and fix problems
 - `mkdocs.yml` - Site configuration with navigation structure
 
 ### Key Scripts
@@ -36,7 +36,7 @@ The scripts directory contains production-ready automation tools documented in t
 
 1. **claude-wrapper.sh**: Wraps Claude Code CLI with AWS Bedrock integration, providing easy model switching (opus/sonnet/haiku) and permission management. Self-installs to `~/bin/claude`.
 
-2. **shell-setup.sh**: Idempotent setup script that configures a complete development environment including PATH, SSH keys with passphrases, GPG keys for Git signing, keychain for SSH key management, Vim configuration, and vim-wrapper installation. Supports `--force` mode with backups and `--revert` to undo all changes.
+2. **shell-setup.sh**: Idempotent setup script that configures a complete development environment including PATH, SSH keys with passphrases, GPG keys for Git signing, keychain for SSH key management, Vim configuration, and vim-wrapper installation. Supports `--light` mode for minimal automated setup (PATH, convenience settings, Vim with edr command, Git default branch only), `--force` mode with backups, and `--revert` to undo all changes.
 
 3. **vim-wrapper.sh**: Simple vim wrapper that starts in insert mode and provides a double-escape (within 500ms) interface to save/quit without needing `:wq` or colon commands. Only prompts to save if changes were made. Installed as `~/bin/vim-wrapper` with symlink `~/bin/edr` for easy access.
 
@@ -70,6 +70,9 @@ Note: Either approach works. The `.venv` directory is gitignored if you choose t
 
 # Run shell setup (interactive mode)
 ./scripts/shell-setup.sh
+
+# Light mode - minimal automated setup (no credentials)
+./scripts/shell-setup.sh --light
 
 # Force reconfiguration with backups
 ./scripts/shell-setup.sh --force
