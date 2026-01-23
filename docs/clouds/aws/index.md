@@ -12,11 +12,16 @@ AWS CLI v2 is the recommended command-line interface for AWS services.
 
 ### Linux/WSL Installation
 
-One-liner to download, extract, install, and verify:
+One-liner to download, extract, install to user directory, and verify:
 
 ```bash
-curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install && aws --version && rm -rf aws awscliv2.zip
+curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install -i ~/.local/aws-cli -b ~/.local/bin && aws --version && rm -rf aws awscliv2.zip
 ```
+
+This installs AWS CLI to `~/.local/aws-cli` with the `aws` command in `~/.local/bin` (no sudo required).
+
+**Requirements:**
+- Ensure `~/.local/bin` is in your PATH (see [Shell Setup](../../shell/index.md))
 
 ### macOS Installation
 
@@ -26,13 +31,15 @@ curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscli
 brew install awscli && aws --version
 ```
 
-**Or manually:**
+**Or manually (user directory installation):**
 
-One-liner to download, extract, install, and verify:
+One-liner to download, extract, install to user directory, and verify:
 
 ```bash
-curl -fsSL "https://awscli.amazonaws.com/awscli-exe-macos.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install && aws --version && rm -rf aws awscliv2.zip
+curl -fsSL "https://awscli.amazonaws.com/awscli-exe-macos.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install -i ~/.local/aws-cli -b ~/.local/bin && aws --version && rm -rf aws awscliv2.zip
 ```
+
+This installs AWS CLI to `~/.local/aws-cli` with the `aws` command in `~/.local/bin` (no sudo required).
 
 ## AWS Credential Setup
 
