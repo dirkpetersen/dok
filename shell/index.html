@@ -3338,7 +3338,107 @@
 <span class="normal">1597</span>
 <span class="normal">1598</span>
 <span class="normal">1599</span>
-<span class="normal">1600</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1600</span>
+<span class="normal">1601</span>
+<span class="normal">1602</span>
+<span class="normal">1603</span>
+<span class="normal">1604</span>
+<span class="normal">1605</span>
+<span class="normal">1606</span>
+<span class="normal">1607</span>
+<span class="normal">1608</span>
+<span class="normal">1609</span>
+<span class="normal">1610</span>
+<span class="normal">1611</span>
+<span class="normal">1612</span>
+<span class="normal">1613</span>
+<span class="normal">1614</span>
+<span class="normal">1615</span>
+<span class="normal">1616</span>
+<span class="normal">1617</span>
+<span class="normal">1618</span>
+<span class="normal">1619</span>
+<span class="normal">1620</span>
+<span class="normal">1621</span>
+<span class="normal">1622</span>
+<span class="normal">1623</span>
+<span class="normal">1624</span>
+<span class="normal">1625</span>
+<span class="normal">1626</span>
+<span class="normal">1627</span>
+<span class="normal">1628</span>
+<span class="normal">1629</span>
+<span class="normal">1630</span>
+<span class="normal">1631</span>
+<span class="normal">1632</span>
+<span class="normal">1633</span>
+<span class="normal">1634</span>
+<span class="normal">1635</span>
+<span class="normal">1636</span>
+<span class="normal">1637</span>
+<span class="normal">1638</span>
+<span class="normal">1639</span>
+<span class="normal">1640</span>
+<span class="normal">1641</span>
+<span class="normal">1642</span>
+<span class="normal">1643</span>
+<span class="normal">1644</span>
+<span class="normal">1645</span>
+<span class="normal">1646</span>
+<span class="normal">1647</span>
+<span class="normal">1648</span>
+<span class="normal">1649</span>
+<span class="normal">1650</span>
+<span class="normal">1651</span>
+<span class="normal">1652</span>
+<span class="normal">1653</span>
+<span class="normal">1654</span>
+<span class="normal">1655</span>
+<span class="normal">1656</span>
+<span class="normal">1657</span>
+<span class="normal">1658</span>
+<span class="normal">1659</span>
+<span class="normal">1660</span>
+<span class="normal">1661</span>
+<span class="normal">1662</span>
+<span class="normal">1663</span>
+<span class="normal">1664</span>
+<span class="normal">1665</span>
+<span class="normal">1666</span>
+<span class="normal">1667</span>
+<span class="normal">1668</span>
+<span class="normal">1669</span>
+<span class="normal">1670</span>
+<span class="normal">1671</span>
+<span class="normal">1672</span>
+<span class="normal">1673</span>
+<span class="normal">1674</span>
+<span class="normal">1675</span>
+<span class="normal">1676</span>
+<span class="normal">1677</span>
+<span class="normal">1678</span>
+<span class="normal">1679</span>
+<span class="normal">1680</span>
+<span class="normal">1681</span>
+<span class="normal">1682</span>
+<span class="normal">1683</span>
+<span class="normal">1684</span>
+<span class="normal">1685</span>
+<span class="normal">1686</span>
+<span class="normal">1687</span>
+<span class="normal">1688</span>
+<span class="normal">1689</span>
+<span class="normal">1690</span>
+<span class="normal">1691</span>
+<span class="normal">1692</span>
+<span class="normal">1693</span>
+<span class="normal">1694</span>
+<span class="normal">1695</span>
+<span class="normal">1696</span>
+<span class="normal">1697</span>
+<span class="normal">1698</span>
+<span class="normal">1699</span>
+<span class="normal">1700</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -4630,6 +4730,64 @@ setup_vim_config<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Created symlink ~/bin/edr -&gt; ~/.local/bin/vim-wrapper&quot;</span>
 <span class="o">}</span>
 
+<span class="c1"># Function to fetch GitHub user info from API</span>
+get_github_user_info<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">github_username</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+<span class="w">  </span><span class="c1"># Temporarily disable set -e for this function</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">old_opts</span><span class="o">=</span><span class="nv">$-</span>
+<span class="w">  </span><span class="nb">set</span><span class="w"> </span>+e
+
+<span class="w">  </span><span class="c1"># Query GitHub API with timeout</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">github_response</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>-m<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">&quot;https://api.github.com/users/</span><span class="nv">$github_username</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="k">)</span>
+
+<span class="w">  </span><span class="c1"># Check if response is valid (contains &quot;login&quot; field and not an error)</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_response</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;&quot;login&quot;&#39;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span><span class="w">  </span><span class="c1"># User not found or API error</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Extract name from response using jq if available, otherwise use grep</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>jq<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">name</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_response</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.name // empty&#39;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="k">)</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="c1"># Fallback to grep - extract name field, handle both quoted and null values</span>
+<span class="w">    </span><span class="nv">name</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_response</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-o<span class="w"> </span><span class="s1">&#39;&quot;name&quot;:&quot;[^&quot;]*&quot;&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;&quot;&#39;</span><span class="w"> </span>-f4<span class="k">)</span>
+<span class="w">    </span><span class="c1"># Also check for null value: &quot;name&quot;: null</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_response</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;&quot;name&quot;: *null&#39;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nv">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Use username as fallback if name is empty</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">name</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$github_username</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Extract email from response</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">email</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>jq<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">email</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_response</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.email // empty&#39;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="k">)</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="c1"># Fallback to grep - extract email field if it&#39;s not null</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_response</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;&quot;email&quot;: *null&#39;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nv">email</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_response</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-o<span class="w"> </span><span class="s1">&#39;&quot;email&quot;:&quot;[^&quot;]*&quot;&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;&quot;&#39;</span><span class="w"> </span>-f4<span class="k">)</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Use noreply GitHub email as fallback if email is empty</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$email</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">email</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">github_username</span><span class="si">}</span><span class="s2">@users.noreply.github.com&quot;</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Restore set -e if it was enabled</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
+
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">|</span><span class="nv">$email</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="o">}</span>
+
 <span class="c1"># Function to setup git configuration</span>
 setup_git_config<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">git_name</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
@@ -4712,12 +4870,54 @@ setup_git_config<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="w">      </span><span class="nv">user_email</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$existing_email</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Using existing configuration&quot;</span>
 <span class="w">    </span><span class="k">else</span>
-<span class="w">      </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Your name (for Git/SSH): &quot;</span><span class="w"> </span>user_name
-<span class="w">      </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Your email (for Git/SSH): &quot;</span><span class="w"> </span>user_email
+<span class="w">      </span><span class="c1"># Prompt for GitHub username and fetch info</span>
+<span class="w">      </span><span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">        </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Your GitHub username: &quot;</span><span class="w"> </span>github_username
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_username</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">          </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ GitHub username cannot be empty</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">          </span><span class="k">continue</span>
+<span class="w">        </span><span class="k">fi</span>
+
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Fetching GitHub profile information...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nv">user_info</span><span class="o">=</span><span class="k">$(</span>get_github_user_info<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_username</span><span class="s2">&quot;</span><span class="k">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">          </span><span class="nv">user_name</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$user_info</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;|&#39;</span><span class="w"> </span>-f1<span class="k">)</span>
+<span class="w">          </span><span class="nv">user_email</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$user_info</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;|&#39;</span><span class="w"> </span>-f2<span class="k">)</span>
+<span class="w">          </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> GitHub profile found&quot;</span>
+<span class="w">          </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   Name: </span><span class="nv">$user_name</span><span class="s2">&quot;</span>
+<span class="w">          </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   Email: </span><span class="nv">$user_email</span><span class="s2">&quot;</span>
+<span class="w">          </span><span class="k">break</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">          </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ GitHub user &#39;</span><span class="nv">$github_username</span><span class="s2">&#39; not found</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="k">fi</span>
+<span class="w">      </span><span class="k">done</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">else</span>
-<span class="w">    </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Your name (for Git/SSH): &quot;</span><span class="w"> </span>user_name
-<span class="w">    </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Your email (for Git/SSH): &quot;</span><span class="w"> </span>user_email
+<span class="w">    </span><span class="c1"># Prompt for GitHub username and fetch info</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">      </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Your GitHub username: &quot;</span><span class="w"> </span>github_username
+
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_username</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ GitHub username cannot be empty</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="k">continue</span>
+<span class="w">      </span><span class="k">fi</span>
+
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Fetching GitHub profile information...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nv">user_info</span><span class="o">=</span><span class="k">$(</span>get_github_user_info<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$github_username</span><span class="s2">&quot;</span><span class="k">)</span>
+
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nv">user_name</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$user_info</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;|&#39;</span><span class="w"> </span>-f1<span class="k">)</span>
+<span class="w">        </span><span class="nv">user_email</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$user_info</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;|&#39;</span><span class="w"> </span>-f2<span class="k">)</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> GitHub profile found&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   Name: </span><span class="nv">$user_name</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   Email: </span><span class="nv">$user_email</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="k">break</span>
+<span class="w">      </span><span class="k">else</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ GitHub user &#39;</span><span class="nv">$github_username</span><span class="s2">&#39; not found</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="k">fi</span>
+<span class="w">    </span><span class="k">done</span>
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$user_name</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$user_email</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
