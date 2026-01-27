@@ -1290,6 +1290,64 @@ EOF
   echo -e "${GREEN}✓${NC} Created symlink ~/bin/edr -> ~/.local/bin/vim-wrapper"
 }
 
+# Function to fetch GitHub user info from API
+get_github_user_info() {
+  local github_username="$1"
+
+  # Temporarily disable set -e for this function
+  local old_opts=$-
+  set +e
+
+  # Query GitHub API with timeout
+  local github_response=$(curl -s -m 5 "https://api.github.com/users/$github_username" 2>/dev/null)
+
+  # Check if response is valid (contains "login" field and not an error)
+  if ! echo "$github_response" | grep -q '"login"'; then
+    [[ $old_opts == *e* ]] && set -e
+    return 1  # User not found or API error
+  fi
+
+  # Extract name from response using jq if available, otherwise use grep
+  local name=""
+  if command -v jq &> /dev/null; then
+    name=$(echo "$github_response" | jq -r '.name // empty' 2>/dev/null)
+  else
+    # Fallback to grep - extract name field, handle both quoted and null values
+    name=$(echo "$github_response" | grep -o '"name":"[^"]*"' | cut -d'"' -f4)
+    # Also check for null value: "name": null
+    if echo "$github_response" | grep -q '"name": *null'; then
+      name=""
+    fi
+  fi
+
+  # Use username as fallback if name is empty
+  if [[ -z "$name" ]]; then
+    name="$github_username"
+  fi
+
+  # Extract email from response
+  local email=""
+  if command -v jq &> /dev/null; then
+    email=$(echo "$github_response" | jq -r '.email // empty' 2>/dev/null)
+  else
+    # Fallback to grep - extract email field if it's not null
+    if ! echo "$github_response" | grep -q '"email": *null'; then
+      email=$(echo "$github_response" | grep -o '"email":"[^"]*"' | cut -d'"' -f4)
+    fi
+  fi
+
+  # Use noreply GitHub email as fallback if email is empty
+  if [[ -z "$email" ]]; then
+    email="${github_username}@users.noreply.github.com"
+  fi
+
+  # Restore set -e if it was enabled
+  [[ $old_opts == *e* ]] && set -e
+
+  echo "$name|$email"
+  return 0
+}
+
 # Function to setup git configuration
 setup_git_config() {
   local git_name="$1"
@@ -1372,12 +1430,54 @@ if [[ "$LIGHT_MODE" != true ]]; then
       user_email="$existing_email"
       echo -e "${GREEN}✓${NC} Using existing configuration"
     else
-      read -p "Your name (for Git/SSH): " user_name
-      read -p "Your email (for Git/SSH): " user_email
+      # Prompt for GitHub username and fetch info
+      while true; do
+        read -p "Your GitHub username: " github_username
+
+        if [[ -z "$github_username" ]]; then
+          echo -e "${RED}✗ GitHub username cannot be empty${NC}"
+          continue
+        fi
+
+        echo -e "${YELLOW}Fetching GitHub profile information...${NC}"
+        user_info=$(get_github_user_info "$github_username")
+
+        if [[ $? -eq 0 ]]; then
+          user_name=$(echo "$user_info" | cut -d'|' -f1)
+          user_email=$(echo "$user_info" | cut -d'|' -f2)
+          echo -e "${GREEN}✓${NC} GitHub profile found"
+          echo "   Name: $user_name"
+          echo "   Email: $user_email"
+          break
+        else
+          echo -e "${RED}✗ GitHub user '$github_username' not found${NC}"
+        fi
+      done
     fi
   else
-    read -p "Your name (for Git/SSH): " user_name
-    read -p "Your email (for Git/SSH): " user_email
+    # Prompt for GitHub username and fetch info
+    while true; do
+      read -p "Your GitHub username: " github_username
+
+      if [[ -z "$github_username" ]]; then
+        echo -e "${RED}✗ GitHub username cannot be empty${NC}"
+        continue
+      fi
+
+      echo -e "${YELLOW}Fetching GitHub profile information...${NC}"
+      user_info=$(get_github_user_info "$github_username")
+
+      if [[ $? -eq 0 ]]; then
+        user_name=$(echo "$user_info" | cut -d'|' -f1)
+        user_email=$(echo "$user_info" | cut -d'|' -f2)
+        echo -e "${GREEN}✓${NC} GitHub profile found"
+        echo "   Name: $user_name"
+        echo "   Email: $user_email"
+        break
+      else
+        echo -e "${RED}✗ GitHub user '$github_username' not found${NC}"
+      fi
+    done
   fi
 
   if [[ -z "$user_name" || -z "$user_email" ]]; then
