@@ -613,18 +613,24 @@ ensure_profile_sources_bashrc() {
   # Create backup
   cp "$profile_file" "${profile_file}.bak.$(date +%Y%m%d_%H%M%S)"
 
-  # Add sourcing block (standard Ubuntu pattern)
-  cat >> "$profile_file" << 'EOF'
+  # Extract first line (usually a comment like #!/bin/bash or # ~/.profile)
+  local first_line=$(head -1 "$profile_file")
+  local rest_of_file=$(tail -n +2 "$profile_file")
 
-# Source .bashrc for interactive login shells (shell-setup.sh)
-if [ -n "$BASH_VERSION" ]; then
-    if [ -f "$HOME/.bashrc" ]; then
-        . "$HOME/.bashrc"
-    fi
-fi
-EOF
+  # Create temp file with: first line + blank line + sourcing line + rest of file
+  {
+    echo "$first_line"
+    echo ""
+    echo "# Source .bashrc for interactive login shells (shell-setup.sh)"
+    echo '[ -n "$BASH_VERSION" ] && [ -f "$HOME/.bashrc" ] && . "$HOME/.bashrc"'
+    echo ""
+    echo "$rest_of_file"
+  } > "${profile_file}.tmp"
+
+  mv "${profile_file}.tmp" "$profile_file"
 
   log_change "ADDED_TO_FILE" "$profile_file|# Source .bashrc for interactive login shells (shell-setup.sh)"
+  log_change "ADDED_TO_FILE" "$profile_file|[ -n \"\$BASH_VERSION\" ] && [ -f \"\$HOME/.bashrc\" ] && . \"\$HOME/.bashrc\""
   echo -e "${GREEN}✓${NC} Added .bashrc sourcing to $profile_file"
 
   [[ $old_opts == *e* ]] && set -e
