@@ -3438,7 +3438,13 @@
 <span class="normal">1697</span>
 <span class="normal">1698</span>
 <span class="normal">1699</span>
-<span class="normal">1700</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1700</span>
+<span class="normal">1701</span>
+<span class="normal">1702</span>
+<span class="normal">1703</span>
+<span class="normal">1704</span>
+<span class="normal">1705</span>
+<span class="normal">1706</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -4053,18 +4059,24 @@ ensure_profile_sources_bashrc<span class="o">()</span><span class="w"> </span><s
 <span class="w">  </span><span class="c1"># Create backup</span>
 <span class="w">  </span>cp<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.bak.</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span><span class="s2">&quot;</span>
 
-<span class="w">  </span><span class="c1"># Add sourcing block (standard Ubuntu pattern)</span>
-<span class="w">  </span>cat<span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
+<span class="w">  </span><span class="c1"># Extract first line (usually a comment like #!/bin/bash or # ~/.profile)</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">first_line</span><span class="o">=</span><span class="k">$(</span>head<span class="w"> </span>-1<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">rest_of_file</span><span class="o">=</span><span class="k">$(</span>tail<span class="w"> </span>-n<span class="w"> </span>+2<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span><span class="k">)</span>
 
-<span class="s"># Source .bashrc for interactive login shells (shell-setup.sh)</span>
-<span class="s">if [ -n &quot;$BASH_VERSION&quot; ]; then</span>
-<span class="s">    if [ -f &quot;$HOME/.bashrc&quot; ]; then</span>
-<span class="s">        . &quot;$HOME/.bashrc&quot;</span>
-<span class="s">    fi</span>
-<span class="s">fi</span>
-<span class="s">EOF</span>
+<span class="w">  </span><span class="c1"># Create temp file with: first line + blank line + sourcing line + rest of file</span>
+<span class="w">  </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$first_line</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;# Source .bashrc for interactive login shells (shell-setup.sh)&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;[ -n &quot;$BASH_VERSION&quot; ] &amp;&amp; [ -f &quot;$HOME/.bashrc&quot; ] &amp;&amp; . &quot;$HOME/.bashrc&quot;&#39;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$rest_of_file</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="o">}</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span>
+
+<span class="w">  </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">profile_file</span><span class="si">}</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
 
 <span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">|# Source .bashrc for interactive login shells (shell-setup.sh)&quot;</span>
+<span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile_file</span><span class="s2">|[ -n \&quot;\$BASH_VERSION\&quot; ] &amp;&amp; [ -f \&quot;\$HOME/.bashrc\&quot; ] &amp;&amp; . \&quot;\$HOME/.bashrc\&quot;&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Added .bashrc sourcing to </span><span class="nv">$profile_file</span><span class="s2">&quot;</span>
 
 <span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
