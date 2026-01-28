@@ -20,6 +20,7 @@ The repository follows a standard MkDocs structure with organized topic sections
   - `software/` - Software reference dictionary
   - `tutorials/` - Step-by-step guides
 - `scripts/` - Utility scripts referenced in documentation
+  - `dev-station-install.sh` - One-stop installer for development workstation (shell-setup, claude-wrapper, nodejs, AWS CLI)
   - `claude-wrapper.sh` - AWS Bedrock wrapper for Claude Code with model switching
   - `shell-setup.sh` - Comprehensive shell and SSH setup automation
   - `nodejs-install-check.sh` - Node.js installation verification
@@ -34,11 +35,13 @@ The repository follows a standard MkDocs structure with organized topic sections
 
 The scripts directory contains production-ready automation tools documented in the site:
 
-1. **claude-wrapper.sh**: Wraps Claude Code CLI with AWS Bedrock integration, providing easy model switching (opus/sonnet/haiku) and permission management. Self-installs to `~/bin/claude`.
+1. **dev-station-install.sh**: One-stop installer that sets up a complete development workstation. Installs shell-setup.sh (light mode by default), claude-wrapper.sh, Node.js, and AWS CLI. Detects OS/architecture (x86_64/aarch64) for AWS CLI installation. Uses Python's zipfile as fallback when unzip is unavailable (no root required). Supports `--full` flag for interactive shell-setup.
 
-2. **shell-setup.sh**: Idempotent setup script that configures a complete development environment including PATH, SSH keys with passphrases, GPG keys for Git signing, keychain for SSH key management, Vim configuration, and vim-wrapper installation. Supports `--light` mode for minimal automated setup (PATH, convenience settings, Vim with edr command, Git default branch only), `--force` mode with backups, and `--revert` to undo all changes.
+2. **claude-wrapper.sh**: Wraps Claude Code CLI with AWS Bedrock integration, providing easy model switching (opus/sonnet/haiku) and permission management. Self-installs to `~/bin/claude`.
 
-3. **vim-wrapper.sh**: Simple vim wrapper that starts in insert mode and provides a double-escape (within 500ms) interface to save/quit without needing `:wq` or colon commands. Only prompts to save if changes were made. Installed as `~/bin/vim-wrapper` with symlink `~/bin/edr` for easy access.
+3. **shell-setup.sh**: Idempotent setup script that configures a complete development environment including PATH, SSH keys with passphrases, GPG keys for Git signing, keychain for SSH key management, Vim configuration, and vim-wrapper installation. Supports `--light` mode for minimal automated setup (PATH, convenience settings, Vim with edr command, Git default branch only), `--force` mode with backups, and `--revert` to undo all changes.
+
+4. **vim-wrapper.sh**: Simple vim wrapper that starts in insert mode and provides a double-escape (within 500ms) interface to save/quit without needing `:wq` or colon commands. Only prompts to save if changes were made. Installed as `~/bin/vim-wrapper` with symlink `~/bin/edr` for easy access.
 
 ## Common Commands
 
