@@ -2,6 +2,22 @@
 
 Modern software development through articulate requirements and AI-assisted tooling.
 
+## Quick Start
+
+Set up a complete development workstation with one command:
+
+```bash
+curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/dev-station-install.sh" | bash
+```
+
+This installs shell configuration, AWS CLI, Node.js, and the Claude Code wrapper - everything needed to start AI-assisted development. No sudo required.
+
+!!! tip "Full interactive setup"
+    For complete setup with SSH keys, GPG signing, and Git configuration:
+    ```bash
+    curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/dev-station-install.sh" | bash -s -- --full
+    ```
+
 ## Philosophy
 
 In 2025, effective software development is fundamentally about **clear communication of requirements**. The traditional approach of typing code directly is being augmented (and often replaced) by a more refined process:
