@@ -2472,7 +2472,21 @@
 <span class="normal">385</span>
 <span class="normal">386</span>
 <span class="normal">387</span>
-<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
@@ -2494,12 +2508,22 @@ verify_path_configuration<span class="o">()</span><span class="w"> </span><span 
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">home_local_bin</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin&quot;</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">current_shell</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="p">##*/</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">rc_file</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">path_cmd</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">source_cmd</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
 
-<span class="w">  </span><span class="c1"># Determine which rc file to use</span>
+<span class="w">  </span><span class="c1"># Determine which rc file and syntax to use based on shell</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$current_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;zsh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nv">rc_file</span><span class="o">=</span><span class="s2">&quot;~/.zshrc&quot;</span>
+<span class="w">    </span><span class="nv">path_cmd</span><span class="o">=</span><span class="s2">&quot;export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH&quot;</span>
+<span class="w">    </span><span class="nv">source_cmd</span><span class="o">=</span><span class="s2">&quot;. </span><span class="nv">$rc_file</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$current_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;tcsh&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$current_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;csh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">rc_file</span><span class="o">=</span><span class="s2">&quot;~/.tcshrc&quot;</span>
+<span class="w">    </span><span class="nv">path_cmd</span><span class="o">=</span><span class="s2">&quot;setenv PATH \$HOME/bin:\$HOME/.local/bin:\$PATH&quot;</span>
+<span class="w">    </span><span class="nv">source_cmd</span><span class="o">=</span><span class="s2">&quot;source </span><span class="nv">$rc_file</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="nv">rc_file</span><span class="o">=</span><span class="s2">&quot;~/.bashrc&quot;</span>
+<span class="w">    </span><span class="nv">path_cmd</span><span class="o">=</span><span class="s2">&quot;export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH&quot;</span>
+<span class="w">    </span><span class="nv">source_cmd</span><span class="o">=</span><span class="s2">&quot;. </span><span class="nv">$rc_file</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="c1"># Check if ~/bin is in PATH</span>
@@ -2508,10 +2532,10 @@ verify_path_configuration<span class="o">()</span><span class="w"> </span><span 
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;To fix this, add the following to </span><span class="nv">$rc_file</span><span class="s2">:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  </span><span class="nv">$path_cmd</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Then reload your shell:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  . </span><span class="nv">$rc_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  </span><span class="nv">$source_cmd</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="w">  </span><span class="k">fi</span>
@@ -2522,10 +2546,10 @@ verify_path_configuration<span class="o">()</span><span class="w"> </span><span 
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;To fix this, add the following to </span><span class="nv">$rc_file</span><span class="s2">:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  </span><span class="nv">$path_cmd</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Then reload your shell:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  . </span><span class="nv">$rc_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  </span><span class="nv">$source_cmd</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="w">  </span><span class="k">fi</span>
@@ -2548,10 +2572,10 @@ verify_path_configuration<span class="o">()</span><span class="w"> </span><span 
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;To fix this, ensure </span><span class="nv">$rc_file</span><span class="s2"> has:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  </span><span class="nv">$path_cmd</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Then reload your shell:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  . </span><span class="nv">$rc_file</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  </span><span class="nv">$source_cmd</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="w">  </span><span class="k">fi</span>
@@ -2612,6 +2636,8 @@ find_claude_binary<span class="o">()</span><span class="w"> </span><span class="
 <span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">current_shell</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="p">##*/</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$current_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;zsh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  . ~/.zshrc&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$current_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;tcsh&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$current_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;csh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  source ~/.tcshrc&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="k">else</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  . ~/.bashrc&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="k">fi</span>
@@ -2639,6 +2665,8 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">current_shell</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="p">##*/</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$current_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;zsh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  . ~/.zshrc&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$current_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;tcsh&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$current_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;csh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  source ~/.tcshrc&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="k">else</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  . ~/.bashrc&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="k">fi</span>

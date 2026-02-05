@@ -3444,7 +3444,82 @@
 <span class="normal">1703</span>
 <span class="normal">1704</span>
 <span class="normal">1705</span>
-<span class="normal">1706</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1706</span>
+<span class="normal">1707</span>
+<span class="normal">1708</span>
+<span class="normal">1709</span>
+<span class="normal">1710</span>
+<span class="normal">1711</span>
+<span class="normal">1712</span>
+<span class="normal">1713</span>
+<span class="normal">1714</span>
+<span class="normal">1715</span>
+<span class="normal">1716</span>
+<span class="normal">1717</span>
+<span class="normal">1718</span>
+<span class="normal">1719</span>
+<span class="normal">1720</span>
+<span class="normal">1721</span>
+<span class="normal">1722</span>
+<span class="normal">1723</span>
+<span class="normal">1724</span>
+<span class="normal">1725</span>
+<span class="normal">1726</span>
+<span class="normal">1727</span>
+<span class="normal">1728</span>
+<span class="normal">1729</span>
+<span class="normal">1730</span>
+<span class="normal">1731</span>
+<span class="normal">1732</span>
+<span class="normal">1733</span>
+<span class="normal">1734</span>
+<span class="normal">1735</span>
+<span class="normal">1736</span>
+<span class="normal">1737</span>
+<span class="normal">1738</span>
+<span class="normal">1739</span>
+<span class="normal">1740</span>
+<span class="normal">1741</span>
+<span class="normal">1742</span>
+<span class="normal">1743</span>
+<span class="normal">1744</span>
+<span class="normal">1745</span>
+<span class="normal">1746</span>
+<span class="normal">1747</span>
+<span class="normal">1748</span>
+<span class="normal">1749</span>
+<span class="normal">1750</span>
+<span class="normal">1751</span>
+<span class="normal">1752</span>
+<span class="normal">1753</span>
+<span class="normal">1754</span>
+<span class="normal">1755</span>
+<span class="normal">1756</span>
+<span class="normal">1757</span>
+<span class="normal">1758</span>
+<span class="normal">1759</span>
+<span class="normal">1760</span>
+<span class="normal">1761</span>
+<span class="normal">1762</span>
+<span class="normal">1763</span>
+<span class="normal">1764</span>
+<span class="normal">1765</span>
+<span class="normal">1766</span>
+<span class="normal">1767</span>
+<span class="normal">1768</span>
+<span class="normal">1769</span>
+<span class="normal">1770</span>
+<span class="normal">1771</span>
+<span class="normal">1772</span>
+<span class="normal">1773</span>
+<span class="normal">1774</span>
+<span class="normal">1775</span>
+<span class="normal">1776</span>
+<span class="normal">1777</span>
+<span class="normal">1778</span>
+<span class="normal">1779</span>
+<span class="normal">1780</span>
+<span class="normal">1781</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -3793,11 +3868,16 @@ show_help<span class="o">()</span><span class="w"> </span><span class="o">{</spa
 
 <span class="s">  --help      Show this help message</span>
 
+<span class="s">SUPPORTED SHELLS:</span>
+<span class="s">  - bash (default) - writes to ~/.bashrc, ~/.profile</span>
+<span class="s">  - zsh            - writes to ~/.zshrc, ~/.zprofile</span>
+<span class="s">  - tcsh/csh       - writes to ~/.tcshrc, ~/.login</span>
+
 <span class="s">WHAT IT SETS UP:</span>
 <span class="s">  1. PATH directories (~/.local/bin and ~/bin)</span>
 <span class="s">     - Ensures ~/bin comes BEFORE ~/.local/bin in PATH</span>
-<span class="s">     - Removes PATH blocks from .profile (belong in .bashrc for batch mode support)</span>
-<span class="s">     - Adds correct PATH configuration to .bashrc</span>
+<span class="s">     - Uses shell-appropriate syntax (export for bash/zsh, setenv for tcsh)</span>
+<span class="s">     - Adds correct PATH configuration to shell rc file</span>
 <span class="s">  2. XDG_RUNTIME_DIR for container support (Linux only)</span>
 <span class="s">  3. Convenience settings (LS_COLORS cyan directories, history size)</span>
 <span class="s">  4. SSH key (ed25519 with mandatory passphrase)</span>
@@ -3864,10 +3944,19 @@ get_login_shell_rc<span class="o">()</span><span class="w"> </span><span class="
 <span class="w">    </span>bash<span class="o">)</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bashrc&quot;</span>
 <span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>tcsh<span class="p">|</span>csh<span class="o">)</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.tcshrc&quot;</span>
+<span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>*<span class="o">)</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bashrc&quot;</span>
 <span class="w">      </span><span class="p">;;</span>
 <span class="w">  </span><span class="k">esac</span>
+<span class="o">}</span>
+
+<span class="c1"># Function to check if user&#39;s login shell is tcsh/csh</span>
+is_tcsh_shell<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">login_shell</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="p">##*/</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$login_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;tcsh&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$login_shell</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;csh&quot;</span><span class="w"> </span><span class="o">]]</span>
 <span class="o">}</span>
 
 <span class="c1"># Function to detect login shell profile for keychain</span>
@@ -3883,6 +3972,9 @@ get_login_profile<span class="o">()</span><span class="w"> </span><span class="o
 <span class="w">      </span><span class="k">else</span>
 <span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.profile&quot;</span>
 <span class="w">      </span><span class="k">fi</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>tcsh<span class="p">|</span>csh<span class="o">)</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.login&quot;</span>
 <span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>*<span class="o">)</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.profile&quot;</span>
@@ -4119,25 +4211,28 @@ add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class
 <span class="w">  </span>check_path_order
 <span class="w">  </span><span class="nv">order_status</span><span class="o">=</span><span class="nv">$?</span>
 
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">rc_basename</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">shell_rc</span><span class="p">##*/</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$order_status</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> PATH order is correct: \$HOME/bin comes before \$HOME/.local/bin&quot;</span>
 <span class="w">  </span><span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$order_status</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">  PATH order issue: \$HOME/.local/bin comes before \$HOME/bin&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">   This will be fixed by the PATH configuration in .bashrc</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">   This will be fixed by the PATH configuration in </span><span class="nv">$rc_basename</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">  One or both directories not in PATH yet&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
 
-<span class="w">  </span><span class="c1"># Remove PATH blocks from .profile if present (they belong in .bashrc)</span>
-<span class="w">  </span><span class="k">for</span><span class="w"> </span>pfile<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.profile&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pfile</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span>remove_path_from_profile<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pfile</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="k">fi</span>
-<span class="w">  </span><span class="k">done</span>
+<span class="w">  </span><span class="c1"># Remove PATH blocks from .profile if present (they belong in shell rc) - skip for tcsh</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span>is_tcsh_shell<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span>pfile<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.profile&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pfile</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span>remove_path_from_profile<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pfile</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="k">fi</span>
+<span class="w">    </span><span class="k">done</span>
 
-<span class="w">  </span><span class="c1"># Remove RHEL9 default PATH block from .bashrc if present</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span>remove_rhel_path_from_bashrc<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="c1"># Remove RHEL9 default PATH block from .bashrc if present</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span>remove_rhel_path_from_bashrc<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="c1"># Check if PATH entries already exist in RC file using unique marker</span>
@@ -4145,27 +4240,41 @@ add_to_begin_of_path<span class="o">()</span><span class="w"> </span><span class
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-Fq<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_MODE</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> PATH directories already configured in </span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">      </span><span class="c1"># Still verify login profile sources .bashrc</span>
-<span class="w">      </span>ensure_profile_sources_bashrc<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="c1"># Still verify login profile sources shell rc (for bash only)</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span>is_tcsh_shell<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span>ensure_profile_sources_bashrc<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="k">fi</span>
 <span class="w">      </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">else</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Force mode: Removing existing PATH configuration</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span>grep<span class="w"> </span>-Fv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">      </span>grep<span class="w"> </span>-Fv<span class="w"> </span><span class="s1">&#39;export PATH=$HOME/bin:$HOME/.local/bin:$PATH&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span>is_tcsh_shell<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span>grep<span class="w"> </span>-Fv<span class="w"> </span><span class="s1">&#39;setenv PATH $HOME/bin:$HOME/.local/bin:$PATH&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="k">else</span>
+<span class="w">        </span>grep<span class="w"> </span>-Fv<span class="w"> </span><span class="s1">&#39;export PATH=$HOME/bin:$HOME/.local/bin:$PATH&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="k">fi</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">fi</span>
 
-<span class="w">  </span><span class="c1"># Add to beginning of PATH (in correct order)</span>
+<span class="w">  </span><span class="c1"># Add to beginning of PATH (in correct order) - use shell-appropriate syntax</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;export PATH=$HOME/bin:$HOME/.local/bin:$PATH&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|</span><span class="nv">$marker</span><span class="s2">&quot;</span>
-<span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="s1">&#39;|export PATH=$HOME/bin:$HOME/.local/bin:$PATH&#39;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>is_tcsh_shell<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;setenv PATH $HOME/bin:$HOME/.local/bin:$PATH&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|</span><span class="nv">$marker</span><span class="s2">&quot;</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="s1">&#39;|setenv PATH $HOME/bin:$HOME/.local/bin:$PATH&#39;</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;export PATH=$HOME/bin:$HOME/.local/bin:$PATH&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|</span><span class="nv">$marker</span><span class="s2">&quot;</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="s1">&#39;|export PATH=$HOME/bin:$HOME/.local/bin:$PATH&#39;</span>
+<span class="w">  </span><span class="k">fi</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Added PATH configuration to </span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
 
-<span class="w">  </span><span class="c1"># Ensure login profile sources .bashrc (for interactive login shells)</span>
-<span class="w">  </span>ensure_profile_sources_bashrc<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="c1"># Ensure login profile sources shell rc (for bash interactive login shells only)</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span>is_tcsh_shell<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>ensure_profile_sources_bashrc<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="c1"># Restore set -e if it was enabled</span>
 <span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
@@ -4186,7 +4295,12 @@ setup_xdg_runtime_dir<span class="o">()</span><span class="w"> </span><span clas
 
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">shell_rc</span><span class="o">=</span><span class="k">$(</span>get_login_shell_rc<span class="k">)</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">marker</span><span class="o">=</span><span class="s2">&quot;# Container support (shell-setup.sh)&quot;</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">xdg_line</span><span class="o">=</span><span class="s1">&#39;export XDG_RUNTIME_DIR=&quot;/run/user/$(id -u)&quot;&#39;</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span>xdg_line
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>is_tcsh_shell<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">xdg_line</span><span class="o">=</span><span class="s1">&#39;setenv XDG_RUNTIME_DIR /run/user/`id -u`&#39;</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="nv">xdg_line</span><span class="o">=</span><span class="s1">&#39;export XDG_RUNTIME_DIR=&quot;/run/user/$(id -u)&quot;&#39;</span>
+<span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="c1"># Check for our marker to ensure idempotency</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-Fq<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -4198,7 +4312,7 @@ setup_xdg_runtime_dir<span class="o">()</span><span class="w"> </span><span clas
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Force mode: Removing existing XDG_RUNTIME_DIR configuration</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="c1"># Remove our block (marker + xdg line)</span>
 <span class="w">      </span>grep<span class="w"> </span>-Fv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">      </span>grep<span class="w"> </span>-Fv<span class="w"> </span><span class="s1">&#39;XDG_RUNTIME_DIR=&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span>grep<span class="w"> </span>-Fv<span class="w"> </span><span class="s1">&#39;XDG_RUNTIME_DIR&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">.tmp&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">fi</span>
 
@@ -4207,7 +4321,7 @@ setup_xdg_runtime_dir<span class="o">()</span><span class="w"> </span><span clas
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$xdg_line</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
 <span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|</span><span class="nv">$marker</span><span class="s2">&quot;</span>
-<span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="s1">&#39;|export XDG_RUNTIME_DIR=&quot;/run/user/$(id -u)&quot;&#39;</span>
+<span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|</span><span class="nv">$xdg_line</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Added XDG_RUNTIME_DIR configuration to </span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
 
 <span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
@@ -4222,6 +4336,8 @@ setup_convenience_settings<span class="o">()</span><span class="w"> </span><span
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">shell_rc</span><span class="o">=</span><span class="k">$(</span>get_login_shell_rc<span class="k">)</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">marker</span><span class="o">=</span><span class="s2">&quot;# Convenience environment settings (shell-setup.sh)&quot;</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">needs_update</span><span class="o">=</span><span class="nb">false</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">is_tcsh</span><span class="o">=</span><span class="nb">false</span>
+<span class="w">  </span>is_tcsh_shell<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">is_tcsh</span><span class="o">=</span><span class="nb">true</span>
 
 <span class="w">  </span><span class="c1"># Check if our convenience settings marker exists</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-Fq<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -4246,8 +4362,12 @@ setup_convenience_settings<span class="o">()</span><span class="w"> </span><span
 
 <span class="w">  </span><span class="c1"># Get current LS_COLORS if it exists, otherwise use default</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">current_ls_colors</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^export LS_COLORS=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nv">current_ls_colors</span><span class="o">=</span><span class="k">$(</span>grep<span class="w"> </span><span class="s2">&quot;^export LS_COLORS=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/^export LS_COLORS=&quot;//&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/&quot;$//&#39;</span><span class="k">)</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^export LS_COLORS=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^setenv LS_COLORS &quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$is_tcsh</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nv">current_ls_colors</span><span class="o">=</span><span class="k">$(</span>grep<span class="w"> </span><span class="s2">&quot;^setenv LS_COLORS &quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/^setenv LS_COLORS //&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;&quot;&#39;</span><span class="k">)</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">      </span><span class="nv">current_ls_colors</span><span class="o">=</span><span class="k">$(</span>grep<span class="w"> </span><span class="s2">&quot;^export LS_COLORS=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/^export LS_COLORS=&quot;//&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/&quot;$//&#39;</span><span class="k">)</span>
+<span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="c1"># Use system default or a basic one</span>
 <span class="w">    </span><span class="nv">current_ls_colors</span><span class="o">=</span><span class="s2">&quot;rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32&quot;</span>
@@ -4258,70 +4378,90 @@ setup_convenience_settings<span class="o">()</span><span class="w"> </span><span
 <span class="w">  </span><span class="c1"># Also handle di=34 without the bold</span>
 <span class="w">  </span><span class="nv">new_ls_colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">new_ls_colors</span><span class="p">//di=34/di=01;36</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<span class="w">  </span><span class="c1"># Check if HISTCONTROL is already set in the file</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">add_histcontrol</span><span class="o">=</span><span class="nb">false</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^export HISTCONTROL=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>!<span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^HISTCONTROL=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nv">add_histcontrol</span><span class="o">=</span><span class="nb">true</span>
-<span class="w">  </span><span class="k">fi</span>
-
-<span class="w">  </span><span class="c1"># Check if HISTSIZE/HISTFILESIZE are already set - if so, edit in place</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">add_histsize</span><span class="o">=</span><span class="nb">true</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">add_histfilesize</span><span class="o">=</span><span class="nb">true</span>
-
-<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^HISTSIZE=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^export HISTSIZE=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="c1"># Edit existing HISTSIZE in place</span>
-<span class="w">    </span>sed<span class="w"> </span>-i.bak<span class="w"> </span><span class="s1">&#39;s/^HISTSIZE=.*/HISTSIZE=10000/&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">    </span>sed<span class="w"> </span>-i.bak<span class="w"> </span><span class="s1">&#39;s/^export HISTSIZE=.*/export HISTSIZE=10000/&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="nv">add_histsize</span><span class="o">=</span><span class="nb">false</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Updated existing HISTSIZE to 10000&quot;</span>
-<span class="w">  </span><span class="k">fi</span>
-
-<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^HISTFILESIZE=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^export HISTFILESIZE=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="c1"># Edit existing HISTFILESIZE in place</span>
-<span class="w">    </span>sed<span class="w"> </span>-i.bak<span class="w"> </span><span class="s1">&#39;s/^HISTFILESIZE=.*/HISTFILESIZE=20000/&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">    </span>sed<span class="w"> </span>-i.bak<span class="w"> </span><span class="s1">&#39;s/^export HISTFILESIZE=.*/export HISTFILESIZE=20000/&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="nv">add_histfilesize</span><span class="o">=</span><span class="nb">false</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Updated existing HISTFILESIZE to 20000&quot;</span>
-<span class="w">  </span><span class="k">fi</span>
-
-<span class="w">  </span><span class="c1"># Add convenience settings block</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;# Change directory color from dark blue to cyan for better visibility&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export LS_COLORS=\&quot;</span><span class="si">${</span><span class="nv">new_ls_colors</span><span class="si">}</span><span class="s2">\&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-
-<span class="w">  </span><span class="c1"># Only add history settings if they weren&#39;t edited in place</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histsize</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histfilesize</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="c1"># For tcsh, history is handled differently - use &#39;set history&#39; and &#39;set savehist&#39;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$is_tcsh</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="c1"># Add convenience settings block for tcsh</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;# Change directory color from dark blue to cyan for better visibility&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;setenv LS_COLORS \&quot;</span><span class="si">${</span><span class="nv">new_ls_colors</span><span class="si">}</span><span class="s2">\&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;# Increase history size&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;set history = 10000&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;set savehist = (10000 merge)&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|</span><span class="nv">$marker</span><span class="s2">&quot;</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|setenv LS_COLORS \&quot;</span><span class="si">${</span><span class="nv">new_ls_colors</span><span class="si">}</span><span class="s2">\&quot;&quot;</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|set history = 10000&quot;</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|set savehist = (10000 merge)&quot;</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="c1"># Bash/zsh settings</span>
+<span class="w">    </span><span class="c1"># Check if HISTCONTROL is already set in the file</span>
+<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">add_histcontrol</span><span class="o">=</span><span class="nb">false</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^export HISTCONTROL=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span>!<span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^HISTCONTROL=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nv">add_histcontrol</span><span class="o">=</span><span class="nb">true</span>
+<span class="w">    </span><span class="k">fi</span>
+
+<span class="w">    </span><span class="c1"># Check if HISTSIZE/HISTFILESIZE are already set - if so, edit in place</span>
+<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">add_histsize</span><span class="o">=</span><span class="nb">true</span>
+<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">add_histfilesize</span><span class="o">=</span><span class="nb">true</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^HISTSIZE=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^export HISTSIZE=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="c1"># Edit existing HISTSIZE in place</span>
+<span class="w">      </span>sed<span class="w"> </span>-i.bak<span class="w"> </span><span class="s1">&#39;s/^HISTSIZE=.*/HISTSIZE=10000/&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span>sed<span class="w"> </span>-i.bak<span class="w"> </span><span class="s1">&#39;s/^export HISTSIZE=.*/export HISTSIZE=10000/&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nv">add_histsize</span><span class="o">=</span><span class="nb">false</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Updated existing HISTSIZE to 10000&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^HISTFILESIZE=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^export HISTFILESIZE=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="c1"># Edit existing HISTFILESIZE in place</span>
+<span class="w">      </span>sed<span class="w"> </span>-i.bak<span class="w"> </span><span class="s1">&#39;s/^HISTFILESIZE=.*/HISTFILESIZE=20000/&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span>sed<span class="w"> </span>-i.bak<span class="w"> </span><span class="s1">&#39;s/^export HISTFILESIZE=.*/export HISTFILESIZE=20000/&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nv">add_histfilesize</span><span class="o">=</span><span class="nb">false</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Updated existing HISTFILESIZE to 20000&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+
+<span class="w">    </span><span class="c1"># Add convenience settings block</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$marker</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;# Change directory color from dark blue to cyan for better visibility&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export LS_COLORS=\&quot;</span><span class="si">${</span><span class="nv">new_ls_colors</span><span class="si">}</span><span class="s2">\&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+
+<span class="w">    </span><span class="c1"># Only add history settings if they weren&#39;t edited in place</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histsize</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histfilesize</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;# Increase history size&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histsize</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export HISTSIZE=10000&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="k">fi</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histfilesize</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export HISTFILESIZE=20000&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="k">fi</span>
+<span class="w">    </span><span class="k">fi</span>
+
+<span class="w">    </span><span class="c1"># Only add HISTCONTROL if it wasn&#39;t already set</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histcontrol</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export HISTCONTROL=ignoreboth&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+
+<span class="w">    </span><span class="c1"># Log changes for bash/zsh</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|</span><span class="nv">$marker</span><span class="s2">&quot;</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|# Change directory color from dark blue to cyan for better visibility&quot;</span>
+<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|export LS_COLORS=\&quot;</span><span class="si">${</span><span class="nv">new_ls_colors</span><span class="si">}</span><span class="s2">\&quot;&quot;</span>
+
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histsize</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export HISTSIZE=10000&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|export HISTSIZE=10000&quot;</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histfilesize</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export HISTFILESIZE=20000&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
+<span class="w">      </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|export HISTFILESIZE=20000&quot;</span>
 <span class="w">    </span><span class="k">fi</span>
-<span class="w">  </span><span class="k">fi</span>
-
-<span class="w">  </span><span class="c1"># Only add HISTCONTROL if it wasn&#39;t already set</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histcontrol</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export HISTCONTROL=ignoreboth&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="k">fi</span>
-
-<span class="w">  </span><span class="c1"># Log changes</span>
-<span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|</span><span class="nv">$marker</span><span class="s2">&quot;</span>
-<span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|# Change directory color from dark blue to cyan for better visibility&quot;</span>
-<span class="w">  </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|export LS_COLORS=\&quot;</span><span class="si">${</span><span class="nv">new_ls_colors</span><span class="si">}</span><span class="s2">\&quot;&quot;</span>
-
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histsize</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|export HISTSIZE=10000&quot;</span>
-<span class="w">  </span><span class="k">fi</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histfilesize</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|export HISTFILESIZE=20000&quot;</span>
-<span class="w">  </span><span class="k">fi</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histcontrol</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|export HISTCONTROL=ignoreboth&quot;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$add_histcontrol</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span>log_change<span class="w"> </span><span class="s2">&quot;ADDED_TO_FILE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$shell_rc</span><span class="s2">|export HISTCONTROL=ignoreboth&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Added convenience settings to </span><span class="nv">$shell_rc</span><span class="s2">&quot;</span>
@@ -4533,7 +4673,13 @@ setup_keychain_profile<span class="o">()</span><span class="w"> </span><span cla
 
 <span class="w">  </span><span class="c1"># Build keychain command for SSH key management</span>
 <span class="w">  </span><span class="c1"># Use --nogui to avoid pinentry requirement (uses console prompts instead)</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">keychain_line</span><span class="o">=</span><span class="s1">&#39;[ -z $SLURM_PTY_PORT ] &amp;&amp; eval $(keychain --nogui --quiet --eval ~/.ssh/id_ed25519)&#39;</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span>keychain_line
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>is_tcsh_shell<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="c1"># tcsh syntax: use backticks for command substitution and different test syntax</span>
+<span class="w">    </span><span class="nv">keychain_line</span><span class="o">=</span><span class="s1">&#39;if ( ! $?SLURM_PTY_PORT ) eval `keychain --nogui --quiet --eval ~/.ssh/id_ed25519`&#39;</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="nv">keychain_line</span><span class="o">=</span><span class="s1">&#39;[ -z $SLURM_PTY_PORT ] &amp;&amp; eval $(keychain --nogui --quiet --eval ~/.ssh/id_ed25519)&#39;</span>
+<span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;keychain&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$profile</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="c1"># Check if the desired SSH configuration already exists</span>
@@ -5072,6 +5218,8 @@ setup_convenience_settings
 <span class="w">  </span><span class="nv">CURRENT_SHELL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="p">##*/</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CURRENT_SHELL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;zsh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   . ~/.zshrc&quot;</span>
+<span class="w">  </span><span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CURRENT_SHELL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;tcsh&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CURRENT_SHELL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;csh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   source ~/.tcshrc&quot;</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   . ~/.bashrc&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
@@ -5086,6 +5234,8 @@ setup_convenience_settings
 <span class="w">  </span><span class="nv">CURRENT_SHELL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="p">##*/</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CURRENT_SHELL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;zsh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   . ~/.zprofile&quot;</span>
+<span class="w">  </span><span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CURRENT_SHELL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;tcsh&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CURRENT_SHELL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;csh&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   source ~/.login&quot;</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bash_profile&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   . ~/.bash_profile&quot;</span>
