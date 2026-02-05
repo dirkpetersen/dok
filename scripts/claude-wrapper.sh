@@ -20,12 +20,22 @@ verify_path_configuration() {
   local home_local_bin="$HOME/.local/bin"
   local current_shell="${SHELL##*/}"
   local rc_file=""
+  local path_cmd=""
+  local source_cmd=""
 
-  # Determine which rc file to use
+  # Determine which rc file and syntax to use based on shell
   if [[ "$current_shell" == "zsh" ]]; then
     rc_file="~/.zshrc"
+    path_cmd="export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH"
+    source_cmd=". $rc_file"
+  elif [[ "$current_shell" == "tcsh" || "$current_shell" == "csh" ]]; then
+    rc_file="~/.tcshrc"
+    path_cmd="setenv PATH \$HOME/bin:\$HOME/.local/bin:\$PATH"
+    source_cmd="source $rc_file"
   else
     rc_file="~/.bashrc"
+    path_cmd="export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH"
+    source_cmd=". $rc_file"
   fi
 
   # Check if ~/bin is in PATH
@@ -34,10 +44,10 @@ verify_path_configuration() {
     echo "" >&2
     echo "To fix this, add the following to $rc_file:" >&2
     echo "" >&2
-    echo "  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH" >&2
+    echo "  $path_cmd" >&2
     echo "" >&2
     echo "Then reload your shell:" >&2
-    echo "  . $rc_file" >&2
+    echo "  $source_cmd" >&2
     echo "" >&2
     return 1
   fi
@@ -48,10 +58,10 @@ verify_path_configuration() {
     echo "" >&2
     echo "To fix this, add the following to $rc_file:" >&2
     echo "" >&2
-    echo "  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH" >&2
+    echo "  $path_cmd" >&2
     echo "" >&2
     echo "Then reload your shell:" >&2
-    echo "  . $rc_file" >&2
+    echo "  $source_cmd" >&2
     echo "" >&2
     return 1
   fi
@@ -74,10 +84,10 @@ verify_path_configuration() {
     echo "" >&2
     echo "To fix this, ensure $rc_file has:" >&2
     echo "" >&2
-    echo "  export PATH=\$HOME/bin:\$HOME/.local/bin:\$PATH" >&2
+    echo "  $path_cmd" >&2
     echo "" >&2
     echo "Then reload your shell:" >&2
-    echo "  . $rc_file" >&2
+    echo "  $source_cmd" >&2
     echo "" >&2
     return 1
   fi
@@ -138,6 +148,8 @@ find_claude_binary() {
     local current_shell="${SHELL##*/}"
     if [[ "$current_shell" == "zsh" ]]; then
       echo "  . ~/.zshrc" >&2
+    elif [[ "$current_shell" == "tcsh" || "$current_shell" == "csh" ]]; then
+      echo "  source ~/.tcshrc" >&2
     else
       echo "  . ~/.bashrc" >&2
     fi
@@ -165,6 +177,8 @@ install_wrapper() {
     local current_shell="${SHELL##*/}"
     if [[ "$current_shell" == "zsh" ]]; then
       echo "  . ~/.zshrc" >&2
+    elif [[ "$current_shell" == "tcsh" || "$current_shell" == "csh" ]]; then
+      echo "  source ~/.tcshrc" >&2
     else
       echo "  . ~/.bashrc" >&2
     fi

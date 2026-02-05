@@ -347,11 +347,16 @@ OPTIONS:
 
   --help      Show this help message
 
+SUPPORTED SHELLS:
+  - bash (default) - writes to ~/.bashrc, ~/.profile
+  - zsh            - writes to ~/.zshrc, ~/.zprofile
+  - tcsh/csh       - writes to ~/.tcshrc, ~/.login
+
 WHAT IT SETS UP:
   1. PATH directories (~/.local/bin and ~/bin)
      - Ensures ~/bin comes BEFORE ~/.local/bin in PATH
-     - Removes PATH blocks from .profile (belong in .bashrc for batch mode support)
-     - Adds correct PATH configuration to .bashrc
+     - Uses shell-appropriate syntax (export for bash/zsh, setenv for tcsh)
+     - Adds correct PATH configuration to shell rc file
   2. XDG_RUNTIME_DIR for container support (Linux only)
   3. Convenience settings (LS_COLORS cyan directories, history size)
   4. SSH key (ed25519 with mandatory passphrase)
@@ -418,10 +423,19 @@ get_login_shell_rc() {
     bash)
       echo "$HOME/.bashrc"
       ;;
+    tcsh|csh)
+      echo "$HOME/.tcshrc"
+      ;;
     *)
       echo "$HOME/.bashrc"
       ;;
   esac
+}
+
+# Function to check if user's login shell is tcsh/csh
+is_tcsh_shell() {
+  local login_shell="${SHELL##*/}"
+  [[ "$login_shell" == "tcsh" || "$login_shell" == "csh" ]]
 }
 
 # Function to detect login shell profile for keychain
@@ -437,6 +451,9 @@ get_login_profile() {
       else
         echo "$HOME/.profile"
       fi
+      ;;
+    tcsh|csh)
+      echo "$HOME/.login"
       ;;
     *)
       echo "$HOME/.profile"
@@ -673,25 +690,28 @@ add_to_begin_of_path() {
   check_path_order
   order_status=$?
 
+  local rc_basename="${shell_rc##*/}"
   if [[ $order_status -eq 0 ]]; then
     echo -e "${GREEN}✓${NC} PATH order is correct: \$HOME/bin comes before \$HOME/.local/bin"
   elif [[ $order_status -eq 1 ]]; then
     echo -e "${YELLOW}⚠${NC}  PATH order issue: \$HOME/.local/bin comes before \$HOME/bin"
-    echo -e "${YELLOW}   This will be fixed by the PATH configuration in .bashrc${NC}"
+    echo -e "${YELLOW}   This will be fixed by the PATH configuration in $rc_basename${NC}"
   else
     echo -e "${YELLOW}⚠${NC}  One or both directories not in PATH yet"
   fi
 
-  # Remove PATH blocks from .profile if present (they belong in .bashrc)
-  for pfile in "$profile" "$HOME/.profile"; do
-    if [[ -f "$pfile" ]]; then
-      remove_path_from_profile "$pfile"
-    fi
-  done
+  # Remove PATH blocks from .profile if present (they belong in shell rc) - skip for tcsh
+  if ! is_tcsh_shell; then
+    for pfile in "$profile" "$HOME/.profile"; do
+      if [[ -f "$pfile" ]]; then
+        remove_path_from_profile "$pfile"
+      fi
+    done
 
-  # Remove RHEL9 default PATH block from .bashrc if present
-  if [[ -f "$shell_rc" ]]; then
-    remove_rhel_path_from_bashrc "$shell_rc"
+    # Remove RHEL9 default PATH block from .bashrc if present
+    if [[ -f "$shell_rc" ]]; then
+      remove_rhel_path_from_bashrc "$shell_rc"
+    fi
   fi
 
   # Check if PATH entries already exist in RC file using unique marker
@@ -699,27 +719,41 @@ add_to_begin_of_path() {
   if grep -Fq "$marker" "$shell_rc" 2>/dev/null; then
     if [[ "$FORCE_MODE" != true ]]; then
       echo -e "${GREEN}✓${NC} PATH directories already configured in $shell_rc"
-      # Still verify login profile sources .bashrc
-      ensure_profile_sources_bashrc "$profile" "$shell_rc"
+      # Still verify login profile sources shell rc (for bash only)
+      if ! is_tcsh_shell; then
+        ensure_profile_sources_bashrc "$profile" "$shell_rc"
+      fi
       [[ $old_opts == *e* ]] && set -e
       return 0
     else
       echo -e "${YELLOW}Force mode: Removing existing PATH configuration${NC}"
       grep -Fv "$marker" "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
-      grep -Fv 'export PATH=$HOME/bin:$HOME/.local/bin:$PATH' "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
+      if is_tcsh_shell; then
+        grep -Fv 'setenv PATH $HOME/bin:$HOME/.local/bin:$PATH' "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
+      else
+        grep -Fv 'export PATH=$HOME/bin:$HOME/.local/bin:$PATH' "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
+      fi
     fi
   fi
 
-  # Add to beginning of PATH (in correct order)
+  # Add to beginning of PATH (in correct order) - use shell-appropriate syntax
   echo "" >> "$shell_rc"
   echo "$marker" >> "$shell_rc"
-  echo 'export PATH=$HOME/bin:$HOME/.local/bin:$PATH' >> "$shell_rc"
-  log_change "ADDED_TO_FILE" "$shell_rc|$marker"
-  log_change "ADDED_TO_FILE" "$shell_rc"'|export PATH=$HOME/bin:$HOME/.local/bin:$PATH'
+  if is_tcsh_shell; then
+    echo 'setenv PATH $HOME/bin:$HOME/.local/bin:$PATH' >> "$shell_rc"
+    log_change "ADDED_TO_FILE" "$shell_rc|$marker"
+    log_change "ADDED_TO_FILE" "$shell_rc"'|setenv PATH $HOME/bin:$HOME/.local/bin:$PATH'
+  else
+    echo 'export PATH=$HOME/bin:$HOME/.local/bin:$PATH' >> "$shell_rc"
+    log_change "ADDED_TO_FILE" "$shell_rc|$marker"
+    log_change "ADDED_TO_FILE" "$shell_rc"'|export PATH=$HOME/bin:$HOME/.local/bin:$PATH'
+  fi
   echo -e "${GREEN}✓${NC} Added PATH configuration to $shell_rc"
 
-  # Ensure login profile sources .bashrc (for interactive login shells)
-  ensure_profile_sources_bashrc "$profile" "$shell_rc"
+  # Ensure login profile sources shell rc (for bash interactive login shells only)
+  if ! is_tcsh_shell; then
+    ensure_profile_sources_bashrc "$profile" "$shell_rc"
+  fi
 
   # Restore set -e if it was enabled
   [[ $old_opts == *e* ]] && set -e
@@ -740,7 +774,12 @@ setup_xdg_runtime_dir() {
 
   local shell_rc=$(get_login_shell_rc)
   local marker="# Container support (shell-setup.sh)"
-  local xdg_line='export XDG_RUNTIME_DIR="/run/user/$(id -u)"'
+  local xdg_line
+  if is_tcsh_shell; then
+    xdg_line='setenv XDG_RUNTIME_DIR /run/user/`id -u`'
+  else
+    xdg_line='export XDG_RUNTIME_DIR="/run/user/$(id -u)"'
+  fi
 
   # Check for our marker to ensure idempotency
   if grep -Fq "$marker" "$shell_rc" 2>/dev/null; then
@@ -752,7 +791,7 @@ setup_xdg_runtime_dir() {
       echo -e "${YELLOW}Force mode: Removing existing XDG_RUNTIME_DIR configuration${NC}"
       # Remove our block (marker + xdg line)
       grep -Fv "$marker" "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
-      grep -Fv 'XDG_RUNTIME_DIR=' "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
+      grep -Fv 'XDG_RUNTIME_DIR' "$shell_rc" > "$shell_rc.tmp" && mv "$shell_rc.tmp" "$shell_rc"
     fi
   fi
 
@@ -761,7 +800,7 @@ setup_xdg_runtime_dir() {
   echo "$marker" >> "$shell_rc"
   echo "$xdg_line" >> "$shell_rc"
   log_change "ADDED_TO_FILE" "$shell_rc|$marker"
-  log_change "ADDED_TO_FILE" "$shell_rc"'|export XDG_RUNTIME_DIR="/run/user/$(id -u)"'
+  log_change "ADDED_TO_FILE" "$shell_rc|$xdg_line"
   echo -e "${GREEN}✓${NC} Added XDG_RUNTIME_DIR configuration to $shell_rc"
 
   [[ $old_opts == *e* ]] && set -e
@@ -776,6 +815,8 @@ setup_convenience_settings() {
   local shell_rc=$(get_login_shell_rc)
   local marker="# Convenience environment settings (shell-setup.sh)"
   local needs_update=false
+  local is_tcsh=false
+  is_tcsh_shell && is_tcsh=true
 
   # Check if our convenience settings marker exists
   if grep -Fq "$marker" "$shell_rc" 2>/dev/null; then
@@ -800,8 +841,12 @@ setup_convenience_settings() {
 
   # Get current LS_COLORS if it exists, otherwise use default
   local current_ls_colors=""
-  if grep -q "^export LS_COLORS=" "$shell_rc" 2>/dev/null; then
-    current_ls_colors=$(grep "^export LS_COLORS=" "$shell_rc" | head -1 | sed 's/^export LS_COLORS="//' | sed 's/"$//')
+  if grep -q "^export LS_COLORS=" "$shell_rc" 2>/dev/null || grep -q "^setenv LS_COLORS " "$shell_rc" 2>/dev/null; then
+    if [[ "$is_tcsh" == true ]]; then
+      current_ls_colors=$(grep "^setenv LS_COLORS " "$shell_rc" | head -1 | sed 's/^setenv LS_COLORS //' | tr -d '"')
+    else
+      current_ls_colors=$(grep "^export LS_COLORS=" "$shell_rc" | head -1 | sed 's/^export LS_COLORS="//' | sed 's/"$//')
+    fi
   else
     # Use system default or a basic one
     current_ls_colors="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32"
@@ -812,70 +857,90 @@ setup_convenience_settings() {
   # Also handle di=34 without the bold
   new_ls_colors="${new_ls_colors//di=34/di=01;36}"
 
-  # Check if HISTCONTROL is already set in the file
-  local add_histcontrol=false
-  if ! grep -q "^export HISTCONTROL=" "$shell_rc" 2>/dev/null && \
-     ! grep -q "^HISTCONTROL=" "$shell_rc" 2>/dev/null; then
-    add_histcontrol=true
-  fi
-
-  # Check if HISTSIZE/HISTFILESIZE are already set - if so, edit in place
-  local add_histsize=true
-  local add_histfilesize=true
-
-  if grep -q "^HISTSIZE=" "$shell_rc" 2>/dev/null || grep -q "^export HISTSIZE=" "$shell_rc" 2>/dev/null; then
-    # Edit existing HISTSIZE in place
-    sed -i.bak 's/^HISTSIZE=.*/HISTSIZE=10000/' "$shell_rc"
-    sed -i.bak 's/^export HISTSIZE=.*/export HISTSIZE=10000/' "$shell_rc"
-    add_histsize=false
-    echo -e "${GREEN}✓${NC} Updated existing HISTSIZE to 10000"
-  fi
-
-  if grep -q "^HISTFILESIZE=" "$shell_rc" 2>/dev/null || grep -q "^export HISTFILESIZE=" "$shell_rc" 2>/dev/null; then
-    # Edit existing HISTFILESIZE in place
-    sed -i.bak 's/^HISTFILESIZE=.*/HISTFILESIZE=20000/' "$shell_rc"
-    sed -i.bak 's/^export HISTFILESIZE=.*/export HISTFILESIZE=20000/' "$shell_rc"
-    add_histfilesize=false
-    echo -e "${GREEN}✓${NC} Updated existing HISTFILESIZE to 20000"
-  fi
-
-  # Add convenience settings block
-  echo "" >> "$shell_rc"
-  echo "$marker" >> "$shell_rc"
-  echo "" >> "$shell_rc"
-  echo "# Change directory color from dark blue to cyan for better visibility" >> "$shell_rc"
-  echo "export LS_COLORS=\"${new_ls_colors}\"" >> "$shell_rc"
-
-  # Only add history settings if they weren't edited in place
-  if [[ "$add_histsize" == true ]] || [[ "$add_histfilesize" == true ]]; then
+  # For tcsh, history is handled differently - use 'set history' and 'set savehist'
+  if [[ "$is_tcsh" == true ]]; then
+    # Add convenience settings block for tcsh
+    echo "" >> "$shell_rc"
+    echo "$marker" >> "$shell_rc"
+    echo "" >> "$shell_rc"
+    echo "# Change directory color from dark blue to cyan for better visibility" >> "$shell_rc"
+    echo "setenv LS_COLORS \"${new_ls_colors}\"" >> "$shell_rc"
     echo "" >> "$shell_rc"
     echo "# Increase history size" >> "$shell_rc"
+    echo "set history = 10000" >> "$shell_rc"
+    echo "set savehist = (10000 merge)" >> "$shell_rc"
+
+    log_change "ADDED_TO_FILE" "$shell_rc|$marker"
+    log_change "ADDED_TO_FILE" "$shell_rc|setenv LS_COLORS \"${new_ls_colors}\""
+    log_change "ADDED_TO_FILE" "$shell_rc|set history = 10000"
+    log_change "ADDED_TO_FILE" "$shell_rc|set savehist = (10000 merge)"
+  else
+    # Bash/zsh settings
+    # Check if HISTCONTROL is already set in the file
+    local add_histcontrol=false
+    if ! grep -q "^export HISTCONTROL=" "$shell_rc" 2>/dev/null && \
+       ! grep -q "^HISTCONTROL=" "$shell_rc" 2>/dev/null; then
+      add_histcontrol=true
+    fi
+
+    # Check if HISTSIZE/HISTFILESIZE are already set - if so, edit in place
+    local add_histsize=true
+    local add_histfilesize=true
+
+    if grep -q "^HISTSIZE=" "$shell_rc" 2>/dev/null || grep -q "^export HISTSIZE=" "$shell_rc" 2>/dev/null; then
+      # Edit existing HISTSIZE in place
+      sed -i.bak 's/^HISTSIZE=.*/HISTSIZE=10000/' "$shell_rc"
+      sed -i.bak 's/^export HISTSIZE=.*/export HISTSIZE=10000/' "$shell_rc"
+      add_histsize=false
+      echo -e "${GREEN}✓${NC} Updated existing HISTSIZE to 10000"
+    fi
+
+    if grep -q "^HISTFILESIZE=" "$shell_rc" 2>/dev/null || grep -q "^export HISTFILESIZE=" "$shell_rc" 2>/dev/null; then
+      # Edit existing HISTFILESIZE in place
+      sed -i.bak 's/^HISTFILESIZE=.*/HISTFILESIZE=20000/' "$shell_rc"
+      sed -i.bak 's/^export HISTFILESIZE=.*/export HISTFILESIZE=20000/' "$shell_rc"
+      add_histfilesize=false
+      echo -e "${GREEN}✓${NC} Updated existing HISTFILESIZE to 20000"
+    fi
+
+    # Add convenience settings block
+    echo "" >> "$shell_rc"
+    echo "$marker" >> "$shell_rc"
+    echo "" >> "$shell_rc"
+    echo "# Change directory color from dark blue to cyan for better visibility" >> "$shell_rc"
+    echo "export LS_COLORS=\"${new_ls_colors}\"" >> "$shell_rc"
+
+    # Only add history settings if they weren't edited in place
+    if [[ "$add_histsize" == true ]] || [[ "$add_histfilesize" == true ]]; then
+      echo "" >> "$shell_rc"
+      echo "# Increase history size" >> "$shell_rc"
+      if [[ "$add_histsize" == true ]]; then
+        echo "export HISTSIZE=10000" >> "$shell_rc"
+      fi
+      if [[ "$add_histfilesize" == true ]]; then
+        echo "export HISTFILESIZE=20000" >> "$shell_rc"
+      fi
+    fi
+
+    # Only add HISTCONTROL if it wasn't already set
+    if [[ "$add_histcontrol" == true ]]; then
+      echo "export HISTCONTROL=ignoreboth" >> "$shell_rc"
+    fi
+
+    # Log changes for bash/zsh
+    log_change "ADDED_TO_FILE" "$shell_rc|$marker"
+    log_change "ADDED_TO_FILE" "$shell_rc|# Change directory color from dark blue to cyan for better visibility"
+    log_change "ADDED_TO_FILE" "$shell_rc|export LS_COLORS=\"${new_ls_colors}\""
+
     if [[ "$add_histsize" == true ]]; then
-      echo "export HISTSIZE=10000" >> "$shell_rc"
+      log_change "ADDED_TO_FILE" "$shell_rc|export HISTSIZE=10000"
     fi
     if [[ "$add_histfilesize" == true ]]; then
-      echo "export HISTFILESIZE=20000" >> "$shell_rc"
+      log_change "ADDED_TO_FILE" "$shell_rc|export HISTFILESIZE=20000"
     fi
-  fi
-
-  # Only add HISTCONTROL if it wasn't already set
-  if [[ "$add_histcontrol" == true ]]; then
-    echo "export HISTCONTROL=ignoreboth" >> "$shell_rc"
-  fi
-
-  # Log changes
-  log_change "ADDED_TO_FILE" "$shell_rc|$marker"
-  log_change "ADDED_TO_FILE" "$shell_rc|# Change directory color from dark blue to cyan for better visibility"
-  log_change "ADDED_TO_FILE" "$shell_rc|export LS_COLORS=\"${new_ls_colors}\""
-
-  if [[ "$add_histsize" == true ]]; then
-    log_change "ADDED_TO_FILE" "$shell_rc|export HISTSIZE=10000"
-  fi
-  if [[ "$add_histfilesize" == true ]]; then
-    log_change "ADDED_TO_FILE" "$shell_rc|export HISTFILESIZE=20000"
-  fi
-  if [[ "$add_histcontrol" == true ]]; then
-    log_change "ADDED_TO_FILE" "$shell_rc|export HISTCONTROL=ignoreboth"
+    if [[ "$add_histcontrol" == true ]]; then
+      log_change "ADDED_TO_FILE" "$shell_rc|export HISTCONTROL=ignoreboth"
+    fi
   fi
 
   echo -e "${GREEN}✓${NC} Added convenience settings to $shell_rc"
@@ -1087,7 +1152,13 @@ setup_keychain_profile() {
 
   # Build keychain command for SSH key management
   # Use --nogui to avoid pinentry requirement (uses console prompts instead)
-  local keychain_line='[ -z $SLURM_PTY_PORT ] && eval $(keychain --nogui --quiet --eval ~/.ssh/id_ed25519)'
+  local keychain_line
+  if is_tcsh_shell; then
+    # tcsh syntax: use backticks for command substitution and different test syntax
+    keychain_line='if ( ! $?SLURM_PTY_PORT ) eval `keychain --nogui --quiet --eval ~/.ssh/id_ed25519`'
+  else
+    keychain_line='[ -z $SLURM_PTY_PORT ] && eval $(keychain --nogui --quiet --eval ~/.ssh/id_ed25519)'
+  fi
 
   if grep -q "keychain" "$profile" 2>/dev/null; then
     # Check if the desired SSH configuration already exists
@@ -1626,6 +1697,8 @@ if [[ "$LIGHT_MODE" == true ]]; then
   CURRENT_SHELL="${SHELL##*/}"
   if [[ "$CURRENT_SHELL" == "zsh" ]]; then
     echo "   . ~/.zshrc"
+  elif [[ "$CURRENT_SHELL" == "tcsh" || "$CURRENT_SHELL" == "csh" ]]; then
+    echo "   source ~/.tcshrc"
   else
     echo "   . ~/.bashrc"
   fi
@@ -1640,6 +1713,8 @@ else
   CURRENT_SHELL="${SHELL##*/}"
   if [[ "$CURRENT_SHELL" == "zsh" ]]; then
     echo "   . ~/.zprofile"
+  elif [[ "$CURRENT_SHELL" == "tcsh" || "$CURRENT_SHELL" == "csh" ]]; then
+    echo "   source ~/.login"
   else
     if [[ -f "$HOME/.bash_profile" ]]; then
       echo "   . ~/.bash_profile"
