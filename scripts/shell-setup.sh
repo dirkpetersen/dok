@@ -1352,7 +1352,7 @@ EOF
   mkdir -p "$HOME/.local/bin"
 
   # Download vim-wrapper.sh from GitHub
-  if curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/vim-wrapper.sh" -o "$vim_wrapper" 2>/dev/null; then
+  if curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/vim-wrapper.sh?`date +%s`" -o "$vim_wrapper" 2>/dev/null; then
     chmod +x "$vim_wrapper"
     log_change "CREATED_FILE" "$vim_wrapper"
     echo -e "${GREEN}✓${NC} Installed vim wrapper to ~/.local/bin/vim-wrapper"

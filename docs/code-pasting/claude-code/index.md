@@ -47,7 +47,7 @@ curl -fsSL https://claude.ai/install.sh | bash -s latest
 Install the wrapper script that provides easy model switching and proper permission handling:
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?$(date +%s)" | bash
+curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`" | bash
 ```
 
 This wrapper script will:
@@ -310,7 +310,7 @@ Before installing Claude Code via npm, verify that npm is available and properly
 **Copy and paste this command into your terminal:**
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/nodejs-install-check.sh?$(date +%s)" | bash
+curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/nodejs-install-check.sh?`date +%s`" | bash
 ```
 
 ??? info "View script contents"

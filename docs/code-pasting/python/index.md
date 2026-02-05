@@ -17,7 +17,7 @@ For a clean, optimized Python environment, use Python Build Standalone - a high-
 Use the automated installer script that automatically detects your OS and architecture:
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/python-build-standalone-install.sh?$(date +%s)" | bash
+curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/python-build-standalone-install.sh?`date +%s`" | bash
 ```
 
 This script will:
@@ -30,7 +30,7 @@ This script will:
 !!! tip "Custom Installation Directory"
     To install to a different directory, pass it as an argument:
     ```bash
-    curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/python-build-standalone-install.sh?$(date +%s)" | bash -s /opt/python
+    curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/python-build-standalone-install.sh?`date +%s`" | bash -s /opt/python
     ```
 
 ### Manual Installation (All Platforms)

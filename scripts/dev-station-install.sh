@@ -126,7 +126,7 @@ install_shell_setup() {
   echo -e "\n${GREEN}=== Installing shell-setup.sh ===${NC}\n"
 
   mkdir -p ~/temp
-  curl -fsSL -o ~/temp/shell-setup.sh "${GITHUB_RAW}/shell-setup.sh?$(date +%s)"
+  curl -fsSL -o ~/temp/shell-setup.sh "${GITHUB_RAW}/shell-setup.sh?`date +%s`"
   chmod +x ~/temp/shell-setup.sh
 
   if [[ "$mode" == "full" ]]; then
@@ -143,7 +143,7 @@ install_claude_wrapper() {
   echo -e "\n${GREEN}=== Installing claude-wrapper.sh ===${NC}\n"
 
   mkdir -p ~/temp
-  curl -fsSL -o ~/temp/claude-wrapper.sh "${GITHUB_RAW}/claude-wrapper.sh?$(date +%s)"
+  curl -fsSL -o ~/temp/claude-wrapper.sh "${GITHUB_RAW}/claude-wrapper.sh?`date +%s`"
   chmod +x ~/temp/claude-wrapper.sh
 
   # Run installation
@@ -155,7 +155,7 @@ install_nodejs() {
   echo -e "\n${GREEN}=== Checking/Installing Node.js ===${NC}\n"
 
   mkdir -p ~/temp
-  curl -fsSL -o ~/temp/nodejs-install-check.sh "${GITHUB_RAW}/nodejs-install-check.sh?$(date +%s)"
+  curl -fsSL -o ~/temp/nodejs-install-check.sh "${GITHUB_RAW}/nodejs-install-check.sh?`date +%s`"
   chmod +x ~/temp/nodejs-install-check.sh
 
   # Run installation check
