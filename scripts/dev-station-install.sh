@@ -319,6 +319,8 @@ main() {
   local current_shell="${SHELL##*/}"
   if [[ "$current_shell" == "zsh" ]]; then
     echo "   source ~/.zshrc"
+  elif [[ "$current_shell" == "tcsh" || "$current_shell" == "csh" ]]; then
+    echo "   source ~/.tcshrc"
   else
     echo "   source ~/.bashrc"
   fi

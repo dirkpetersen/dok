@@ -16,6 +16,7 @@ add_nvm_to_shell() {
   local shell_rc=""
   local shell_name=""
   local login_shell=""
+  local is_tcsh=false
 
   # Get the user's login shell from the SHELL environment variable
   login_shell="${SHELL##*/}"  # Extract shell name from path (e.g., /bin/zsh -> zsh)
@@ -28,6 +29,11 @@ add_nvm_to_shell() {
     bash)
       shell_rc="$HOME/.bashrc"
       shell_name="Bash"
+      ;;
+    tcsh|csh)
+      shell_rc="$HOME/.tcshrc"
+      shell_name="Tcsh"
+      is_tcsh=true
       ;;
     *)
       echo -e "${YELLOW}Warning: Detected shell '$login_shell'. Please manually add NVM initialization.${NC}"
@@ -42,28 +48,48 @@ add_nvm_to_shell() {
   fi
 
   # Check if NVM initialization already exists (uncommented)
-  if grep -q '^[^#]*NVM_DIR.*nvm.sh' "$shell_rc" 2>/dev/null; then
+  if grep -q 'NVM_DIR' "$shell_rc" 2>/dev/null; then
     echo -e "${GREEN}✓${NC} NVM already configured in $shell_name configuration"
     return 0
   fi
 
-  # Remove commented-out NVM lines if they exist
-  if grep -q '#.*NVM_DIR.*nvm.sh' "$shell_rc" 2>/dev/null; then
-    echo -e "${YELLOW}Removing commented NVM configuration...${NC}"
-    sed -i.bak '/^#.*NVM_DIR/d; /^#.*nvm.sh/d; /^#.*bash_completion/d' "$shell_rc"
-    rm -f "${shell_rc}.bak"
+  # For tcsh, use tcsh-compatible syntax
+  if [[ "$is_tcsh" == true ]]; then
+    # Add NVM initialization to tcsh RC file
+    echo "" >> "$shell_rc"
+    echo "# ========== NVM (Node Version Manager) initialization ==========" >> "$shell_rc"
+    echo "setenv NVM_DIR \"\$HOME/.nvm\"" >> "$shell_rc"
+    echo "# NVM is primarily designed for bash/zsh. For tcsh, we add NVM bin to PATH." >> "$shell_rc"
+    echo "# After running 'nvm use <version>' in bash, the node/npm binaries will be available." >> "$shell_rc"
+    echo "if ( -d \"\$NVM_DIR/versions/node\" ) then" >> "$shell_rc"
+    echo "  set nvm_node_dir = \`ls -1 \$NVM_DIR/versions/node | tail -1\`" >> "$shell_rc"
+    echo "  if ( \"\$nvm_node_dir\" != \"\" ) then" >> "$shell_rc"
+    echo "    setenv PATH \"\$NVM_DIR/versions/node/\$nvm_node_dir/bin:\$PATH\"" >> "$shell_rc"
+    echo "  endif" >> "$shell_rc"
+    echo "endif" >> "$shell_rc"
+    echo "# ================================================================" >> "$shell_rc"
+
+    echo -e "${GREEN}✓${NC} Added NVM initialization to $shell_name configuration"
+    echo -e "${YELLOW}Note: NVM functions (nvm use, nvm install) require bash. Node/npm will be in PATH.${NC}"
+  else
+    # Remove commented-out NVM lines if they exist (bash/zsh only)
+    if grep -q '#.*NVM_DIR.*nvm.sh' "$shell_rc" 2>/dev/null; then
+      echo -e "${YELLOW}Removing commented NVM configuration...${NC}"
+      sed -i.bak '/^#.*NVM_DIR/d; /^#.*nvm.sh/d; /^#.*bash_completion/d' "$shell_rc"
+      rm -f "${shell_rc}.bak"
+    fi
+
+    # Add NVM initialization to shell RC file
+    # Use a separator comment to mark our additions
+    echo "" >> "$shell_rc"
+    echo "# ========== NVM (Node Version Manager) initialization ==========" >> "$shell_rc"
+    echo "export NVM_DIR=\"\$HOME/.nvm\"" >> "$shell_rc"
+    echo "[ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\"" >> "$shell_rc"
+    echo "[ -s \"\$NVM_DIR/bash_completion\" ] && \\. \"\$NVM_DIR/bash_completion\"" >> "$shell_rc"
+    echo "# ================================================================" >> "$shell_rc"
+
+    echo -e "${GREEN}✓${NC} Added NVM initialization to $shell_name configuration"
   fi
-
-  # Add NVM initialization to shell RC file
-  # Use a separator comment to mark our additions
-  echo "" >> "$shell_rc"
-  echo "# ========== NVM (Node Version Manager) initialization ==========" >> "$shell_rc"
-  echo "export NVM_DIR=\"\$HOME/.nvm\"" >> "$shell_rc"
-  echo "[ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\"" >> "$shell_rc"
-  echo "[ -s \"\$NVM_DIR/bash_completion\" ] && \\. \"\$NVM_DIR/bash_completion\"" >> "$shell_rc"
-  echo "# ================================================================" >> "$shell_rc"
-
-  echo -e "${GREEN}✓${NC} Added NVM initialization to $shell_name configuration"
   return 0
 }
 
@@ -160,20 +186,17 @@ echo "========================================"
 echo ""
 echo "To apply the NVM configuration in new shell sessions:"
 echo ""
-if [[ -n "$ZSH_VERSION" ]]; then
-  echo "  source ~/.zshrc"
-elif [[ -n "$BASH_VERSION" ]]; then
-  echo "  source ~/.bashrc"
-else
-  case "$SHELL" in
-    */zsh)
-      echo "  source ~/.zshrc"
-      ;;
-    */bash)
-      echo "  source ~/.bashrc"
-      ;;
-  esac
-fi
+case "${SHELL##*/}" in
+  zsh)
+    echo "  source ~/.zshrc"
+    ;;
+  tcsh|csh)
+    echo "  source ~/.tcshrc"
+    ;;
+  *)
+    echo "  source ~/.bashrc"
+    ;;
+esac
 echo ""
 echo "Then install Claude Code:"
 echo "  npm install -g @anthropic-ai/claude-code"
