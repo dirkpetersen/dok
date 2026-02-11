@@ -229,6 +229,9 @@ install_wrapper() {
   echo "  claude                # Launch with Haiku (fast/default)"
   echo "  claude sonnet         # Launch with Sonnet (balanced)"
   echo "  claude opus           # Launch with Opus (most capable)"
+  echo "  claude opus-1m        # Launch with Opus in fast mode"
+  echo "  claude sonnet-1m      # Launch with Sonnet in fast mode"
+  echo "  claude -c opus        # Model name works anywhere in args"
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
   echo ""
 
@@ -375,20 +378,36 @@ export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 model_name="haiku"
 
-# Check first argument for model selection
-if [[ "$1" == "opus" ]]; then
-  mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}"
-  model_name="opus"
-  shift
-elif [[ "$1" == "sonnet" ]]; then
-  mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}"
-  model_name="sonnet"
-  shift
-elif [[ "$1" == "haiku" ]]; then
-  mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
-  model_name="haiku"
-  shift
-fi
+# Scan all arguments for model selection (allows e.g. "claude -c opus")
+new_args=()
+for arg in "$@"; do
+  case "$arg" in
+    opus-1m)
+      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}[1m]"
+      model_name="opus-1m"
+      ;;
+    opus)
+      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}"
+      model_name="opus"
+      ;;
+    sonnet-1m)
+      mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}[1m]"
+      model_name="sonnet-1m"
+      ;;
+    sonnet)
+      mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}"
+      model_name="sonnet"
+      ;;
+    haiku)
+      mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
+      model_name="haiku"
+      ;;
+    *)
+      new_args+=("$arg")
+      ;;
+  esac
+done
+set -- "${new_args[@]}"
 
 export ANTHROPIC_MODEL="$mymodel"
 
