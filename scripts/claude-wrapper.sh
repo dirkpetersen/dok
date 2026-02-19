@@ -326,6 +326,17 @@ if [[ "$1" == "--models" ]]; then
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}[1m]"
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-6-v1}[1m]"
   echo ""
+
+  # Show local models if configured
+  if [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]] || [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] || [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]]; then
+    echo "Local Models (when using --local flag):"
+    echo ""
+    [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]] && echo "  Haiku:  $LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
+    [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && echo "  Sonnet: $LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
+    [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]] && echo "  Opus:   $LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
+    echo ""
+  fi
+
   exit 0
 fi
 
@@ -356,9 +367,9 @@ if [[ "$1" == "--local" ]]; then
     echo "  export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.run.university.edu/cc/v1\"" >&2
     echo "" >&2
     echo "Optionally, also set local model names:" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"hc/glm-4.7\"" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"hc/glm-4.7\"" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"hc/glm-4.7\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"hc/glm-5\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"hc/glm-5\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"hc/glm-5\"" >&2
     exit 1
   fi
 
