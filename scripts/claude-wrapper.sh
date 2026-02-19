@@ -232,6 +232,7 @@ install_wrapper() {
   echo "  claude opus-1m        # Launch with Opus in fast mode"
   echo "  claude sonnet-1m      # Launch with Sonnet in fast mode"
   echo "  claude -c opus        # Model name works anywhere in args"
+  echo "  claude --models       # Show default Anthropic models"
   echo "  claude update         # Update wrapper and Claude Code"
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
   echo ""
@@ -310,6 +311,22 @@ fi
 REAL_CLAUDE=$(find_claude_binary)
 if [[ $? -ne 0 ]]; then
   exit 1
+fi
+
+# Check if --models flag is used
+if [[ "$1" == "--models" ]]; then
+  echo ""
+  echo "Default Anthropic Models:"
+  echo ""
+  echo "  Haiku:  ${ANTHROPIC_DEFAULT_HAIKU_MODEL:-us.anthropic.claude-haiku-4-5-20251001-v1:0}"
+  echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}"
+  echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-6-v1}"
+  echo ""
+  echo "Fast mode models (append [1m] to base model):"
+  echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}[1m]"
+  echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-6-v1}[1m]"
+  echo ""
+  exit 0
 fi
 
 # Check if update/upgrade is requested
