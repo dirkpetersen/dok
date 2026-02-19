@@ -237,6 +237,14 @@ install_wrapper() {
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
   echo ""
 
+  # Show yolo-mode hint on macOS
+  if [[ "$(uname)" == "Darwin" ]]; then
+    echo "To skip all permission prompts on macOS, run:"
+    echo ""
+    echo "  touch ~/.claude/yolo-mode"
+    echo ""
+  fi
+
   exit 0
 }
 
@@ -483,8 +491,8 @@ if [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
 fi
 
-# Execute Claude Code (skip permissions on Linux only)
-if [[ "$(uname)" == "Darwin" ]]; then
+# Execute Claude Code (skip permissions on Linux; on macOS only if yolo-mode enabled)
+if [[ "$(uname)" == "Darwin" ]] && [[ ! -f "$HOME/.claude/yolo-mode" ]]; then
   exec "$REAL_CLAUDE" --model "$mymodel" "$@"
 else
   exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
