@@ -232,6 +232,7 @@ install_wrapper() {
   echo "  claude opus-1m        # Launch with Opus in fast mode"
   echo "  claude sonnet-1m      # Launch with Sonnet in fast mode"
   echo "  claude -c opus        # Model name works anywhere in args"
+  echo "  claude update         # Update wrapper and Claude Code"
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
   echo ""
 
@@ -309,6 +310,21 @@ fi
 REAL_CLAUDE=$(find_claude_binary)
 if [[ $? -ne 0 ]]; then
   exit 1
+fi
+
+# Check if update/upgrade is requested
+if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
+  echo -e "${YELLOW}Updating claude-wrapper...${NC}" >&2
+  if curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`" | bash; then
+    echo -e "${GREEN}✓${NC} Wrapper updated successfully" >&2
+    echo "" >&2
+  else
+    echo -e "${RED}✗ Failed to update wrapper${NC}" >&2
+  fi
+
+  # Now update Claude Code itself
+  echo -e "${YELLOW}Updating Claude Code...${NC}" >&2
+  exec "$REAL_CLAUDE" update
 fi
 
 # Check if --local flag is used
