@@ -483,5 +483,9 @@ if [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
 fi
 
-# Execute Claude Code
-exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
+# Execute Claude Code (skip permissions on Linux only)
+if [[ "$(uname)" == "Darwin" ]]; then
+  exec "$REAL_CLAUDE" --model "$mymodel" "$@"
+else
+  exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
+fi
