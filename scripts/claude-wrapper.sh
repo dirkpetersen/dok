@@ -343,11 +343,21 @@ fi
 # Check if update/upgrade is requested
 if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
   echo -e "${YELLOW}Updating claude-wrapper...${NC}" >&2
-  if curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`" | bash; then
-    echo -e "${GREEN}✓${NC} Wrapper updated successfully" >&2
-    echo "" >&2
+
+  # Download new wrapper to temp file
+  TEMP_WRAPPER=$(mktemp)
+  if curl -fsSL -o "$TEMP_WRAPPER" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`"; then
+    # Replace the installed wrapper
+    if mv "$TEMP_WRAPPER" "$WRAPPER_PATH" && chmod +x "$WRAPPER_PATH"; then
+      echo -e "${GREEN}✓${NC} Wrapper updated successfully" >&2
+      echo "" >&2
+    else
+      echo -e "${RED}✗ Failed to replace wrapper${NC}" >&2
+      rm -f "$TEMP_WRAPPER"
+    fi
   else
-    echo -e "${RED}✗ Failed to update wrapper${NC}" >&2
+    echo -e "${RED}✗ Failed to download wrapper${NC}" >&2
+    rm -f "$TEMP_WRAPPER"
   fi
 
   # Now update Claude Code itself
