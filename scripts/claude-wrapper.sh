@@ -327,7 +327,7 @@ if [[ "$1" == "--models" ]]; then
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-6-v1}[1m]"
   echo ""
 
-  # Show local/custom configuration if set
+  # Always show local LLM configuration section
   if [[ -n "$LOCAL_ANTHROPIC_BASE_URL" ]]; then
     echo "Local LLM Configuration (use 'claude --local'):"
     echo ""
@@ -336,13 +336,16 @@ if [[ "$1" == "--models" ]]; then
     echo "  Sonnet:   ${LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL:-hc/glm-5}"
     echo "  Opus:     ${LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL:-hc/glm-5}"
     echo ""
-  elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
-    echo "Custom LLM Configuration (currently active):"
+  else
+    echo "Local LLM Configuration (not configured):"
     echo ""
-    echo "  Base URL: $ANTHROPIC_BASE_URL"
-    [[ -n "$ANTHROPIC_DEFAULT_HAIKU_MODEL" ]] && echo "  Haiku:    $ANTHROPIC_DEFAULT_HAIKU_MODEL"
-    [[ -n "$ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && echo "  Sonnet:   $ANTHROPIC_DEFAULT_SONNET_MODEL"
-    [[ -n "$ANTHROPIC_DEFAULT_OPUS_MODEL" ]] && echo "  Opus:     $ANTHROPIC_DEFAULT_OPUS_MODEL"
+    echo "  Set LOCAL_ANTHROPIC_BASE_URL to activate local models"
+    echo "  Example: export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.example.com/v1\""
+    echo ""
+    echo "  Default models (hc/glm-5) can be overridden with:"
+    echo "    LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
+    echo "    LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
+    echo "    LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
     echo ""
   fi
 
