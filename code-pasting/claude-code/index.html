@@ -2583,7 +2583,38 @@
 <span class="normal">496</span>
 <span class="normal">497</span>
 <span class="normal">498</span>
-<span class="normal">499</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span>
+<span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
@@ -3038,6 +3069,7 @@ verify_path_configuration
 <span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;haiku&quot;</span>
 
 <span class="c1"># Scan all arguments for model selection (allows e.g. &quot;claude -c opus&quot;)</span>
+<span class="nv">wdebug</span><span class="o">=</span><span class="m">0</span>
 <span class="nv">new_args</span><span class="o">=()</span>
 <span class="k">for</span><span class="w"> </span>arg<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$arg</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
@@ -3061,6 +3093,9 @@ verify_path_configuration
 <span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;haiku&quot;</span>
 <span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>--wdebug<span class="o">)</span>
+<span class="w">      </span><span class="nv">wdebug</span><span class="o">=</span><span class="m">1</span>
+<span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>*<span class="o">)</span>
 <span class="w">      </span><span class="nv">new_args</span><span class="o">+=(</span><span class="s2">&quot;</span><span class="nv">$arg</span><span class="s2">&quot;</span><span class="o">)</span>
 <span class="w">      </span><span class="p">;;</span>
@@ -3074,6 +3109,33 @@ verify_path_configuration
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">Using local </span><span class="nv">$model_name</span><span class="s2"> model: </span><span class="nv">$mymodel</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">  Base URL: </span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="k">fi</span>
+
+<span class="c1"># Show debug info if --wdebug was requested</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$wdebug</span><span class="s2">&quot;</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">=== claude-wrapper debug ===</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Environment variables set by wrapper:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span>var<span class="w"> </span><span class="k">in</span><span class="w"> </span>ANTHROPIC_MODEL<span class="w"> </span>ANTHROPIC_BASE_URL<span class="w"> </span>ANTHROPIC_API_KEY<span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>ANTHROPIC_DEFAULT_HAIKU_MODEL<span class="w"> </span>ANTHROPIC_DEFAULT_SONNET_MODEL<span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>ANTHROPIC_DEFAULT_OPUS_MODEL<span class="w"> </span>ANTHROPIC_SMALL_FAST_MODEL<span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>CLAUDE_CODE_USE_BEDROCK<span class="w"> </span>AWS_DEFAULT_REGION<span class="w"> </span>AWS_PROFILE<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="p">!var+x</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="c1"># Mask API key value</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$var</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;ANTHROPIC_API_KEY&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  </span><span class="nv">$var</span><span class="s2">=</span><span class="si">${</span><span class="p">!var:</span><span class="nv">0</span><span class="p">:</span><span class="nv">10</span><span class="si">}</span><span class="s2">...&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="k">else</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  </span><span class="nv">$var</span><span class="s2">=</span><span class="si">${</span><span class="p">!var</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="k">fi</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">done</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>uname<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;Darwin&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/yolo-mode&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Command: </span><span class="nv">$REAL_CLAUDE</span><span class="s2"> --model </span><span class="nv">$mymodel</span><span class="s2"> </span><span class="nv">$*</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Command: </span><span class="nv">$REAL_CLAUDE</span><span class="s2"> --model </span><span class="nv">$mymodel</span><span class="s2"> --dangerously-skip-permissions </span><span class="nv">$*</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="k">fi</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="k">fi</span>
 
 <span class="c1"># Execute Claude Code (skip permissions on Linux; on macOS only if yolo-mode enabled)</span>
