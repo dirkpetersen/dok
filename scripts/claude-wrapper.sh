@@ -453,6 +453,7 @@ mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 model_name="haiku"
 
 # Scan all arguments for model selection (allows e.g. "claude -c opus")
+wdebug=0
 new_args=()
 for arg in "$@"; do
   case "$arg" in
@@ -476,6 +477,9 @@ for arg in "$@"; do
       mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
       model_name="haiku"
       ;;
+    --wdebug)
+      wdebug=1
+      ;;
     *)
       new_args+=("$arg")
       ;;
@@ -489,6 +493,33 @@ export ANTHROPIC_MODEL="$mymodel"
 if [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   echo -e "${GREEN}Using local $model_name model: $mymodel${NC}" >&2
   echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
+fi
+
+# Show debug info if --wdebug was requested
+if [[ "$wdebug" -eq 1 ]]; then
+  echo -e "${YELLOW}=== claude-wrapper debug ===${NC}" >&2
+  echo "" >&2
+  echo "Environment variables set by wrapper:" >&2
+  for var in ANTHROPIC_MODEL ANTHROPIC_BASE_URL ANTHROPIC_API_KEY \
+             ANTHROPIC_DEFAULT_HAIKU_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL \
+             ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_SMALL_FAST_MODEL \
+             CLAUDE_CODE_USE_BEDROCK AWS_DEFAULT_REGION AWS_PROFILE; do
+    if [[ -n "${!var+x}" ]]; then
+      # Mask API key value
+      if [[ "$var" == "ANTHROPIC_API_KEY" ]]; then
+        echo "  $var=${!var:0:10}..." >&2
+      else
+        echo "  $var=${!var}" >&2
+      fi
+    fi
+  done
+  echo "" >&2
+  if [[ "$(uname)" == "Darwin" ]] && [[ ! -f "$HOME/.claude/yolo-mode" ]]; then
+    echo "Command: $REAL_CLAUDE --model $mymodel $*" >&2
+  else
+    echo "Command: $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
+  fi
+  echo "" >&2
 fi
 
 # Execute Claude Code (skip permissions on Linux; on macOS only if yolo-mode enabled)
