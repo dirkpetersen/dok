@@ -1021,6 +1021,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#debugging-wrapper-configuration-wdebug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging Wrapper Configuration (--wdebug)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1874,6 +1885,17 @@
     <span class="md-ellipsis">
       
         Opus (Most Capable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-wrapper-configuration-wdebug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging Wrapper Configuration (--wdebug)
       
     </span>
   </a>
@@ -3324,12 +3346,53 @@ git<span class="w"> </span>init
 - Complex problem-solving
 - Full-project analysis
 - Maximum capability required</p>
+<h3 id="debugging-wrapper-configuration-wdebug">Debugging Wrapper Configuration (--wdebug)<a class="headerlink" href="#debugging-wrapper-configuration-wdebug" title="Permanent link">&para;</a></h3>
+<p>Use <code>--wdebug</code> to inspect all environment variables set by the wrapper and the exact command that will be passed to Claude Code, before committing to running it:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>claude<span class="w"> </span>--wdebug
+claude<span class="w"> </span>--wdebug<span class="w"> </span>sonnet
+claude<span class="w"> </span>--wdebug<span class="w"> </span>opus<span class="w"> </span>--resume
+</code></pre></div></td></tr></table></div>
+<p>The flag can appear anywhere in the argument list. It prints a summary to stderr, then prompts:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code>=== claude-wrapper debug ===
+
+Environment variables set by wrapper:
+  ANTHROPIC_MODEL=global.anthropic.claude-sonnet-4-6
+  ANTHROPIC_DEFAULT_HAIKU_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
+  ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-4-6
+  ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-4-6-v1
+  ANTHROPIC_SMALL_FAST_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
+  CLAUDE_CODE_USE_BEDROCK=1
+  AWS_DEFAULT_REGION=us-west-2
+  AWS_PROFILE=bedrock
+
+Command: /home/user/.local/bin/claude --model global.anthropic.claude-sonnet-4-6 --dangerously-skip-permissions
+
+Execute Claude Code now? (y/n):
+</code></pre></div></td></tr></table></div>
+<p>Answering <code>y</code> launches Claude Code; anything else exits without running it. This is especially useful when troubleshooting model selection, local LLM routing, or Bedrock credential issues.</p>
 <h2 id="configuration-notes">Configuration Notes<a class="headerlink" href="#configuration-notes" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Bedrock Integration</strong>: Uses AWS Bedrock for model inference</li>
 <li><strong>Context Window</strong>: Defaults to 1M context window for Sonnet</li>
 <li><strong>No Confirmation</strong>: Configured to skip permission prompts for streamlined workflow</li>
 <li><strong>Model Selection</strong>: Easy switching between Haiku (fast), Sonnet (balanced), and Opus (capable)</li>
+<li><strong>Debug Mode</strong>: Use <code>--wdebug</code> to inspect environment variables and the final command before execution</li>
 </ul>
 <h2 id="secure-setup-sandboxed-claude-code-with-bubblewrap">Secure Setup: Sandboxed Claude Code with Bubblewrap<a class="headerlink" href="#secure-setup-sandboxed-claude-code-with-bubblewrap" title="Permanent link">&para;</a></h2>
 <p>For maximum security when working with sensitive projects, you can run Claude Code in an isolated sandbox using bubblewrap (bwrap). This approach protects your AWS credentials and SSH keys by:</p>
@@ -3409,6 +3472,7 @@ sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> <
 <li>Use <strong>Opus</strong> for challenging problems requiring maximum capability</li>
 <li>Ensure AWS credentials are properly configured before use</li>
 <li>The wrapper script automatically handles model selection and AWS environment setup</li>
+<li>Use <code>--wdebug</code> to troubleshoot configuration issues — it shows every env var set by the wrapper and the exact command before running</li>
 </ul>
 <h2 id="alternative-npm-based-installation-legacy">Alternative: npm-based Installation (Legacy)<a class="headerlink" href="#alternative-npm-based-installation-legacy" title="Permanent link">&para;</a></h2>
 <p>If the binary installer doesn't work or you prefer npm, follow these steps:</p>
