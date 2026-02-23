@@ -216,12 +216,45 @@ claude opus /path/to/project
 - Full-project analysis
 - Maximum capability required
 
+### Debugging Wrapper Configuration (--wdebug)
+
+Use `--wdebug` to inspect all environment variables set by the wrapper and the exact command that will be passed to Claude Code, before committing to running it:
+
+```bash
+claude --wdebug
+claude --wdebug sonnet
+claude --wdebug opus --resume
+```
+
+The flag can appear anywhere in the argument list. It prints a summary to stderr, then prompts:
+
+```
+=== claude-wrapper debug ===
+
+Environment variables set by wrapper:
+  ANTHROPIC_MODEL=global.anthropic.claude-sonnet-4-6
+  ANTHROPIC_DEFAULT_HAIKU_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
+  ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-4-6
+  ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-4-6-v1
+  ANTHROPIC_SMALL_FAST_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
+  CLAUDE_CODE_USE_BEDROCK=1
+  AWS_DEFAULT_REGION=us-west-2
+  AWS_PROFILE=bedrock
+
+Command: /home/user/.local/bin/claude --model global.anthropic.claude-sonnet-4-6 --dangerously-skip-permissions
+
+Execute Claude Code now? (y/n):
+```
+
+Answering `y` launches Claude Code; anything else exits without running it. This is especially useful when troubleshooting model selection, local LLM routing, or Bedrock credential issues.
+
 ## Configuration Notes
 
 - **Bedrock Integration**: Uses AWS Bedrock for model inference
 - **Context Window**: Defaults to 1M context window for Sonnet
 - **No Confirmation**: Configured to skip permission prompts for streamlined workflow
 - **Model Selection**: Easy switching between Haiku (fast), Sonnet (balanced), and Opus (capable)
+- **Debug Mode**: Use `--wdebug` to inspect environment variables and the final command before execution
 
 ## Secure Setup: Sandboxed Claude Code with Bubblewrap
 
@@ -298,6 +331,7 @@ bwrap \
 - Use **Opus** for challenging problems requiring maximum capability
 - Ensure AWS credentials are properly configured before use
 - The wrapper script automatically handles model selection and AWS environment setup
+- Use `--wdebug` to troubleshoot configuration issues — it shows every env var set by the wrapper and the exact command before running
 
 ## Alternative: npm-based Installation (Legacy)
 
