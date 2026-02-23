@@ -520,6 +520,12 @@ if [[ "$wdebug" -eq 1 ]]; then
     echo "Command: $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
   fi
   echo "" >&2
+  read -p "Execute Claude Code now? (y/n): " run_confirm
+  if [[ "$run_confirm" != "y" && "$run_confirm" != "Y" ]]; then
+    echo "Aborted." >&2
+    exit 0
+  fi
+  echo "" >&2
 fi
 
 # Execute Claude Code (skip permissions on Linux; on macOS only if yolo-mode enabled)
