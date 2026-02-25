@@ -247,3 +247,64 @@ If this prints a long string starting with `ya29...`, you are back in business.
 
 - ✅ **PREFER**: Service accounts with narrowly scoped IAM roles over API keys for server-to-server calls
 - ✅ **PREFER**: Workload Identity Federation for CI/CD pipelines instead of long-lived keys
+
+## LibreChat Configuration
+
+### The "Two Geminis" Problem — 403 Generative Language API Disabled
+
+If LibreChat throws an error like:
+
+```
+[GoogleGenerativeAI Error]: Error fetching from
+https://generativelanguage.googleapis.com/v1beta/models/...:streamGenerateContent
+[403 Forbidden] Generative Language API has not been used in project ... before or it is disabled.
+```
+
+The giveaway is the domain `generativelanguage.googleapis.com`. Google exposes Gemini through **two completely separate API endpoints**:
+
+| Door | API | Used for |
+|------|-----|----------|
+| **AI Studio** | `generativelanguage.googleapis.com` | Rapid prototyping, third-party apps (LibreChat with `GOOGLE_KEY`) |
+| **Vertex AI** | `aiplatform.googleapis.com` | Enterprise features, service accounts |
+
+When LibreChat is configured with `GOOGLE_KEY`, it uses the AI Studio door — even if you are running inside a Google Cloud project. That endpoint must be explicitly enabled.
+
+#### Fix: Enable the Generative Language API
+
+```bash
+gcloud services enable generativelanguage.googleapis.com --project=YOUR_PROJECT_ID
+```
+
+Wait 2–3 minutes for the change to propagate across Google's global infrastructure, then retry in LibreChat.
+
+#### Fix: Update your API key restriction
+
+If you followed Phase 4 and restricted your key to `aiplatform.googleapis.com` only, the key is now blocked for the AI Studio endpoint. Add `generativelanguage` to the allowed list:
+
+```bash
+# Replace KEY_NAME with the value from 'gcloud services api-keys list'
+gcloud services api-keys update KEY_NAME \
+  --api-target=service=aiplatform.googleapis.com \
+  --api-target=service=generativelanguage.googleapis.com
+```
+
+!!! warning
+    You must specify **both** targets in a single `--api-target` update — omitting one will remove it from the allowed list.
+
+#### 3-step checklist if it still fails
+
+1. **Wait** — API activation can take a few minutes to propagate
+2. **Check the model ID** — use the exact model string LibreChat expects (e.g. `gemini-2.0-flash`, `gemini-1.5-pro`)
+3. **Verify the key restriction** — run `gcloud services api-keys list` and confirm both APIs appear under the key's restrictions
+
+#### Test the key manually
+
+Use `curl` to confirm the key itself works before debugging LibreChat:
+
+```bash
+curl -s \
+  "https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_API_KEY" \
+  | python3 -m json.tool | head -20
+```
+
+A successful response lists available models. A `403` means the key or API is still misconfigured.
