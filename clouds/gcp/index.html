@@ -1363,6 +1363,84 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#librechat-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LibreChat Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="LibreChat Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-two-geminis-problem-403-generative-language-api-disabled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The "Two Geminis" Problem — 403 Generative Language API Disabled
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The &#34;Two Geminis&#34; Problem — 403 Generative Language API Disabled">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fix-enable-the-generative-language-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix: Enable the Generative Language API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-update-your-api-key-restriction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix: Update your API key restriction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-step-checklist-if-it-still-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-step checklist if it still fails
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-the-key-manually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test the key manually
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1974,6 +2052,84 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#librechat-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LibreChat Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="LibreChat Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-two-geminis-problem-403-generative-language-api-disabled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The "Two Geminis" Problem — 403 Generative Language API Disabled
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The &#34;Two Geminis&#34; Problem — 403 Generative Language API Disabled">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fix-enable-the-generative-language-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix: Enable the Generative Language API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-update-your-api-key-restriction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix: Update your API key restriction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-step-checklist-if-it-still-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-step checklist if it still fails
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-the-key-manually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test the key manually
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2225,6 +2381,71 @@ gcloud<span class="w"> </span>auth<span class="w"> </span>application-default<sp
 <li>✅ <strong>PREFER</strong>: Service accounts with narrowly scoped IAM roles over API keys for server-to-server calls</li>
 <li>✅ <strong>PREFER</strong>: Workload Identity Federation for CI/CD pipelines instead of long-lived keys</li>
 </ul>
+<h2 id="librechat-configuration">LibreChat Configuration<a class="headerlink" href="#librechat-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="the-two-geminis-problem-403-generative-language-api-disabled">The "Two Geminis" Problem — 403 Generative Language API Disabled<a class="headerlink" href="#the-two-geminis-problem-403-generative-language-api-disabled" title="Permanent link">&para;</a></h3>
+<p>If LibreChat throws an error like:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>[GoogleGenerativeAI Error]: Error fetching from
+https://generativelanguage.googleapis.com/v1beta/models/...:streamGenerateContent
+[403 Forbidden] Generative Language API has not been used in project ... before or it is disabled.
+</code></pre></div></td></tr></table></div>
+<p>The giveaway is the domain <code>generativelanguage.googleapis.com</code>. Google exposes Gemini through <strong>two completely separate API endpoints</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Door</th>
+<th>API</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AI Studio</strong></td>
+<td><code>generativelanguage.googleapis.com</code></td>
+<td>Rapid prototyping, third-party apps (LibreChat with <code>GOOGLE_KEY</code>)</td>
+</tr>
+<tr>
+<td><strong>Vertex AI</strong></td>
+<td><code>aiplatform.googleapis.com</code></td>
+<td>Enterprise features, service accounts</td>
+</tr>
+</tbody>
+</table>
+<p>When LibreChat is configured with <code>GOOGLE_KEY</code>, it uses the AI Studio door — even if you are running inside a Google Cloud project. That endpoint must be explicitly enabled.</p>
+<h4 id="fix-enable-the-generative-language-api">Fix: Enable the Generative Language API<a class="headerlink" href="#fix-enable-the-generative-language-api" title="Permanent link">&para;</a></h4>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>gcloud<span class="w"> </span>services<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>generativelanguage.googleapis.com<span class="w"> </span>--project<span class="o">=</span>YOUR_PROJECT_ID
+</code></pre></div></td></tr></table></div>
+<p>Wait 2–3 minutes for the change to propagate across Google's global infrastructure, then retry in LibreChat.</p>
+<h4 id="fix-update-your-api-key-restriction">Fix: Update your API key restriction<a class="headerlink" href="#fix-update-your-api-key-restriction" title="Permanent link">&para;</a></h4>
+<p>If you followed Phase 4 and restricted your key to <code>aiplatform.googleapis.com</code> only, the key is now blocked for the AI Studio endpoint. Add <code>generativelanguage</code> to the allowed list:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Replace KEY_NAME with the value from &#39;gcloud services api-keys list&#39;</span>
+gcloud<span class="w"> </span>services<span class="w"> </span>api-keys<span class="w"> </span>update<span class="w"> </span>KEY_NAME<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--api-target<span class="o">=</span><span class="nv">service</span><span class="o">=</span>aiplatform.googleapis.com<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--api-target<span class="o">=</span><span class="nv">service</span><span class="o">=</span>generativelanguage.googleapis.com
+</code></pre></div></td></tr></table></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You must specify <strong>both</strong> targets in a single <code>--api-target</code> update — omitting one will remove it from the allowed list.</p>
+</div>
+<h4 id="3-step-checklist-if-it-still-fails">3-step checklist if it still fails<a class="headerlink" href="#3-step-checklist-if-it-still-fails" title="Permanent link">&para;</a></h4>
+<ol>
+<li><strong>Wait</strong> — API activation can take a few minutes to propagate</li>
+<li><strong>Check the model ID</strong> — use the exact model string LibreChat expects (e.g. <code>gemini-2.0-flash</code>, <code>gemini-1.5-pro</code>)</li>
+<li><strong>Verify the key restriction</strong> — run <code>gcloud services api-keys list</code> and confirm both APIs appear under the key's restrictions</li>
+</ol>
+<h4 id="test-the-key-manually">Test the key manually<a class="headerlink" href="#test-the-key-manually" title="Permanent link">&para;</a></h4>
+<p>Use <code>curl</code> to confirm the key itself works before debugging LibreChat:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-s<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_API_KEY&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-m<span class="w"> </span>json.tool<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-20
+</code></pre></div></td></tr></table></div>
+<p>A successful response lists available models. A <code>403</code> means the key or API is still misconfigured.</p>
 
 
 
