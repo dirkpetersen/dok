@@ -1098,10 +1098,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#create-a-project" class="md-nav__link">
+  <a href="#use-an-existing-project" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Create a project
+        Use an existing project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-new-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a new project
       
     </span>
   </a>
@@ -1232,6 +1243,73 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invalid_grant-stale-or-expired-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        invalid_grant — Stale or Expired Tokens
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="invalid_grant — Stale or Expired Tokens">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fix-refresh-both-login-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix: Refresh both login types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-re-set-the-quota-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix: Re-set the quota project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-everything-is-working" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify everything is working
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1631,10 +1709,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#create-a-project" class="md-nav__link">
+  <a href="#use-an-existing-project" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Create a project
+        Use an existing project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-new-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a new project
       
     </span>
   </a>
@@ -1769,6 +1858,73 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invalid_grant-stale-or-expired-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        invalid_grant — Stale or Expired Tokens
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="invalid_grant — Stale or Expired Tokens">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fix-refresh-both-login-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix: Refresh both login types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-re-set-the-quota-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix: Re-set the quota project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-everything-is-working" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify everything is working
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#best-practices" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1875,7 +2031,36 @@ sudo<span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>gcloud<span class="w"> </span>auth<span class="w"> </span>login
 </code></pre></div></td></tr></table></div>
 <p>This opens a browser window for authentication. In headless environments (e.g. WSL without a browser), append <code>--no-launch-browser</code> and follow the printed URL manually.</p>
-<h3 id="create-a-project">Create a project<a class="headerlink" href="#create-a-project" title="Permanent link">&para;</a></h3>
+<h3 id="use-an-existing-project">Use an existing project<a class="headerlink" href="#use-an-existing-project" title="Permanent link">&para;</a></h3>
+<p>If you already have a GCP project, list your projects and activate the one you want:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># List all projects you have access to</span>
+gcloud<span class="w"> </span>projects<span class="w"> </span>list
+
+<span class="c1"># Output example:</span>
+<span class="c1"># PROJECT_ID              NAME          PROJECT_NUMBER</span>
+<span class="c1"># ai-hub-488500           AI Hub        123456789012</span>
+<span class="c1"># my-other-project        Other         987654321098</span>
+
+<span class="c1"># Set the active project</span>
+gcloud<span class="w"> </span>config<span class="w"> </span><span class="nb">set</span><span class="w"> </span>project<span class="w"> </span>ai-hub-488500
+
+<span class="c1"># Confirm it&#39;s set</span>
+gcloud<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>project
+</code></pre></div></td></tr></table></div>
+<p>Then skip ahead to <a href="#link-a-billing-account">link billing</a> if not already linked, or go straight to <a href="#phase-3-enable-the-vertex-ai-api-and-create-an-api-key">Phase 3</a>.</p>
+<h3 id="create-a-new-project">Create a new project<a class="headerlink" href="#create-a-new-project" title="Permanent link">&para;</a></h3>
 <p>Choose a globally unique project ID (lowercase letters, digits, hyphens):</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>gcloud<span class="w"> </span>projects<span class="w"> </span>create<span class="w"> </span>librechat-vertex-101<span class="w"> </span>--name<span class="o">=</span><span class="s2">&quot;LibreChat AI&quot;</span>
@@ -1977,6 +2162,50 @@ gcloud<span class="w"> </span>billing<span class="w"> </span>budgets<span class=
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Budget alerts require the <code>billing.budgets.create</code> IAM permission on the billing account. If you get a permission error, create the alert in the GCP Console under <strong>Billing → Budgets &amp; alerts</strong> instead.</p>
+</div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="invalid_grant-stale-or-expired-tokens"><code>invalid_grant</code> — Stale or Expired Tokens<a class="headerlink" href="#invalid_grant-stale-or-expired-tokens" title="Permanent link">&para;</a></h3>
+<p>The <code>invalid_grant</code> error means your local security tokens are stale or corrupted. Common causes:</p>
+<ul>
+<li>You haven't logged in for a while and the tokens expired</li>
+<li>Your Google account password changed, immediately invalidating all local tokens</li>
+<li>Your project is in <strong>"Testing"</strong> mode on the OAuth Consent Screen — user tokens expire every <strong>7 days</strong> in this mode</li>
+<li>You manually revoked the "Google Cloud SDK" app from your Google Account security settings</li>
+</ul>
+<h4 id="fix-refresh-both-login-types">Fix: Refresh both login types<a class="headerlink" href="#fix-refresh-both-login-types" title="Permanent link">&para;</a></h4>
+<p>Run these two commands in order. Each opens a browser window — use the <strong>same Google account</strong> for both:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># 1. Refresh the main CLI login</span>
+gcloud<span class="w"> </span>auth<span class="w"> </span>login
+
+<span class="c1"># 2. Refresh the Application Default Credentials (used by SDKs and LibreChat)</span>
+gcloud<span class="w"> </span>auth<span class="w"> </span>application-default<span class="w"> </span>login
+</code></pre></div></td></tr></table></div>
+<h4 id="fix-re-set-the-quota-project">Fix: Re-set the quota project<a class="headerlink" href="#fix-re-set-the-quota-project" title="Permanent link">&para;</a></h4>
+<p>After refreshing tokens, re-link your project for billing attribution:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>gcloud<span class="w"> </span>auth<span class="w"> </span>application-default<span class="w"> </span>set-quota-project<span class="w"> </span>YOUR_PROJECT_ID
+</code></pre></div></td></tr></table></div>
+<p>To keep the CLI config and ADC in sync at all times, also set:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>gcloud<span class="w"> </span>config<span class="w"> </span><span class="nb">set</span><span class="w"> </span>billing/quota_project<span class="w"> </span>YOUR_PROJECT_ID
+</code></pre></div></td></tr></table></div>
+<h4 id="verify-everything-is-working">Verify everything is working<a class="headerlink" href="#verify-everything-is-working" title="Permanent link">&para;</a></h4>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>gcloud<span class="w"> </span>auth<span class="w"> </span>application-default<span class="w"> </span>print-access-token
+</code></pre></div></td></tr></table></div>
+<p>If this prints a long string starting with <code>ya29...</code>, you are back in business.</p>
+<div class="admonition tip">
+<p class="admonition-title">Understanding the two login commands</p>
+<ul>
+<li><code>gcloud auth login</code> — authenticates <strong>you</strong> as a user for running <code>gcloud</code> CLI commands</li>
+<li><code>gcloud auth application-default login</code> — creates credentials that <strong>applications and SDKs</strong> (like LibreChat) use at runtime</li>
+</ul>
+<p>These are stored separately and both can expire independently, which is why you need to refresh both.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Stop tokens expiring every 7 days</p>
+<p>If your project's OAuth Consent Screen is set to <strong>"Testing"</strong>, tokens expire weekly. To fix this permanently, go to <strong>APIs &amp; Services → OAuth Consent Screen</strong> in the GCP Console and publish the app to <strong>"Production"</strong> (no formal review needed for internal/personal projects).</p>
 </div>
 <h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
 <h3 id="key-hygiene">Key hygiene<a class="headerlink" href="#key-hygiene" title="Permanent link">&para;</a></h3>
