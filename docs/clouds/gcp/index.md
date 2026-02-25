@@ -42,7 +42,29 @@ gcloud auth login
 
 This opens a browser window for authentication. In headless environments (e.g. WSL without a browser), append `--no-launch-browser` and follow the printed URL manually.
 
-### Create a project
+### Use an existing project
+
+If you already have a GCP project, list your projects and activate the one you want:
+
+```bash
+# List all projects you have access to
+gcloud projects list
+
+# Output example:
+# PROJECT_ID              NAME          PROJECT_NUMBER
+# ai-hub-488500           AI Hub        123456789012
+# my-other-project        Other         987654321098
+
+# Set the active project
+gcloud config set project ai-hub-488500
+
+# Confirm it's set
+gcloud config get project
+```
+
+Then skip ahead to [link billing](#link-a-billing-account) if not already linked, or go straight to [Phase 3](#phase-3-enable-the-vertex-ai-api-and-create-an-api-key).
+
+### Create a new project
 
 Choose a globally unique project ID (lowercase letters, digits, hyphens):
 
@@ -152,6 +174,60 @@ gcloud billing budgets create \
 
 !!! note
     Budget alerts require the `billing.budgets.create` IAM permission on the billing account. If you get a permission error, create the alert in the GCP Console under **Billing → Budgets & alerts** instead.
+
+## Troubleshooting
+
+### `invalid_grant` — Stale or Expired Tokens
+
+The `invalid_grant` error means your local security tokens are stale or corrupted. Common causes:
+
+- You haven't logged in for a while and the tokens expired
+- Your Google account password changed, immediately invalidating all local tokens
+- Your project is in **"Testing"** mode on the OAuth Consent Screen — user tokens expire every **7 days** in this mode
+- You manually revoked the "Google Cloud SDK" app from your Google Account security settings
+
+#### Fix: Refresh both login types
+
+Run these two commands in order. Each opens a browser window — use the **same Google account** for both:
+
+```bash
+# 1. Refresh the main CLI login
+gcloud auth login
+
+# 2. Refresh the Application Default Credentials (used by SDKs and LibreChat)
+gcloud auth application-default login
+```
+
+#### Fix: Re-set the quota project
+
+After refreshing tokens, re-link your project for billing attribution:
+
+```bash
+gcloud auth application-default set-quota-project YOUR_PROJECT_ID
+```
+
+To keep the CLI config and ADC in sync at all times, also set:
+
+```bash
+gcloud config set billing/quota_project YOUR_PROJECT_ID
+```
+
+#### Verify everything is working
+
+```bash
+gcloud auth application-default print-access-token
+```
+
+If this prints a long string starting with `ya29...`, you are back in business.
+
+!!! tip "Understanding the two login commands"
+    - `gcloud auth login` — authenticates **you** as a user for running `gcloud` CLI commands
+    - `gcloud auth application-default login` — creates credentials that **applications and SDKs** (like LibreChat) use at runtime
+
+    These are stored separately and both can expire independently, which is why you need to refresh both.
+
+!!! note "Stop tokens expiring every 7 days"
+    If your project's OAuth Consent Screen is set to **"Testing"**, tokens expire weekly. To fix this permanently, go to **APIs & Services → OAuth Consent Screen** in the GCP Console and publish the app to **"Production"** (no formal review needed for internal/personal projects).
 
 ## Best Practices
 
