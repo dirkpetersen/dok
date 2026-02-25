@@ -340,9 +340,9 @@ if [[ "$1" == "--models" ]]; then
     echo "Local LLM Configuration (use 'claude --local'):"
     echo ""
     echo "  Base URL: $LOCAL_ANTHROPIC_BASE_URL"
-    echo "  Haiku:    ${LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL:-hc/glm-5}"
-    echo "  Sonnet:   ${LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL:-hc/glm-5}"
-    echo "  Opus:     ${LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL:-hc/glm-5}"
+    echo "  Haiku:    ${LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL:-hc/minimax-m2p5}"
+    echo "  Sonnet:   ${LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL:-hc/minimax-m2p5}"
+    echo "  Opus:     ${LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL:-hc/minimax-m2p5}"
     echo ""
   else
     echo "Local LLM Configuration (not configured):"
@@ -350,7 +350,7 @@ if [[ "$1" == "--models" ]]; then
     echo "  Set LOCAL_ANTHROPIC_BASE_URL to activate local models"
     echo "  Example: export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.example.com/v1\""
     echo ""
-    echo "  Default models (hc/glm-5) can be overridden with:"
+    echo "  Default models (hc/minimax-m2p5) can be overridden with:"
     echo "    LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
     echo "    LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
     echo "    LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
@@ -397,9 +397,9 @@ if [[ "$1" == "--local" ]]; then
     echo "  export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.run.university.edu/cc/v1\"" >&2
     echo "" >&2
     echo "Optionally, also set local model names:" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"hc/glm-5\"" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"hc/glm-5\"" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"hc/glm-5\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"hc/minimax-m2p5\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"hc/minimax-m2p5\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"hc/minimax-m2p5\"" >&2
     exit 1
   fi
 
@@ -526,6 +526,33 @@ if [[ "$wdebug" -eq 1 ]]; then
     exit 0
   fi
   echo "" >&2
+fi
+
+# Block running Claude Code directly in the home directory
+if [[ "$PWD" == "$HOME" ]]; then
+  echo -e "${RED}✗ Error: Do not run Claude Code directly in your home directory${NC}" >&2
+  echo "" >&2
+  echo "Please create a project folder first, for example:" >&2
+  echo "" >&2
+  echo "  mkdir ~/myproject && cd ~/myproject && git init" >&2
+  echo "" >&2
+  exit 1
+fi
+
+# Check if current directory is inside a git repository
+if ! git rev-parse --git-dir > /dev/null 2>&1; then
+  echo -e "${YELLOW}⚠ Warning: Current directory is not a git repository${NC}" >&2
+  echo "" >&2
+  echo "You can do one of these two things:" >&2
+  echo "" >&2
+  echo "  1. Clone an existing repository from GitHub:" >&2
+  echo "     git clone https://github.com/username/repo-name" >&2
+  echo "     cd repo-name" >&2
+  echo "" >&2
+  echo "  2. Initialize a new local git repository (for a quick test):" >&2
+  echo "     git init" >&2
+  echo "" >&2
+  exit 1
 fi
 
 # Execute Claude Code (skip permissions on Linux; on macOS only if yolo-mode enabled)
