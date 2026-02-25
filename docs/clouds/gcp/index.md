@@ -52,11 +52,11 @@ gcloud projects list
 
 # Output example:
 # PROJECT_ID              NAME          PROJECT_NUMBER
-# ai-hub-488500           AI Hub        123456789012
+# my-project-123          My Project    123456789012
 # my-other-project        Other         987654321098
 
 # Set the active project
-gcloud config set project ai-hub-488500
+gcloud config set project my-project-123
 
 # Confirm it's set
 gcloud config get project
