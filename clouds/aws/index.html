@@ -1008,6 +1008,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#quick-start-create-a-bedrock-user-via-cloudshell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start: Create a Bedrock User via CloudShell
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start: Create a Bedrock User via CloudShell">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-the-script-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the script does
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#installing-aws-cli-v2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1647,6 +1697,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#quick-start-create-a-bedrock-user-via-cloudshell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start: Create a Bedrock User via CloudShell
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start: Create a Bedrock User via CloudShell">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-the-script-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the script does
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#installing-aws-cli-v2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1942,6 +2042,50 @@
 <p>Cloud infrastructure and services configuration guide with security-first credential management.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>AWS provides scalable cloud computing services. This section covers secure setup, CLI configuration, and best practices for managing AWS credentials with proper scope isolation.</p>
+<h2 id="quick-start-create-a-bedrock-user-via-cloudshell">Quick Start: Create a Bedrock User via CloudShell<a class="headerlink" href="#quick-start-create-a-bedrock-user-via-cloudshell" title="Permanent link">&para;</a></h2>
+<p>If you have access to the AWS Console, the fastest way to create a Bedrock IAM user and generate credentials is to run <code>aws-bedrock-user.sh</code> directly in <strong>AWS CloudShell</strong> — no local AWS CLI setup required, since CloudShell is already authenticated as your console account.</p>
+<h3 id="steps">Steps<a class="headerlink" href="#steps" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Open the <a href="https://console.aws.amazon.com">AWS Console</a> and sign in</li>
+<li>Click the <strong>CloudShell</strong> icon in the top navigation bar (or search for "CloudShell")</li>
+<li>Paste and run this one-liner:</li>
+</ol>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/aws-bedrock-user.sh<span class="k">)</span><span class="s2">&quot;</span>
+</code></pre></div></td></tr></table></div>
+<p>Or if you have cloned this repo, run it directly:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>bash<span class="w"> </span>scripts/aws-bedrock-user.sh
+</code></pre></div></td></tr></table></div>
+<ol>
+<li>Enter your username when prompted — the script will prefix it with <code>bedrock-</code></li>
+<li>Copy the credentials block from the output into <code>~/.aws/credentials</code> on your <strong>local machine</strong></li>
+</ol>
+<h3 id="what-the-script-does">What the script does<a class="headerlink" href="#what-the-script-does" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Creates an IAM user named <code>bedrock-&lt;yourname&gt;</code></li>
+<li>Attaches the <code>AmazonBedrockFullAccess</code> managed policy</li>
+<li>Generates a permanent access key pair</li>
+<li>Prints a ready-to-paste <code>[bedrock]</code> credentials block</li>
+</ul>
+<h3 id="output-example">Output example<a class="headerlink" href="#output-example" title="Permanent link">&para;</a></h3>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code>╭──────────────────────────────────────────────────────────────────╮
+│ [bedrock]                                                        │
+│ aws_access_key_id = AKIAIOSFODNN7EXAMPLE                         │
+│ aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY│
+╰──────────────────────────────────────────────────────────────────╯
+</code></pre></div></td></tr></table></div>
+<p>Paste this block into <code>~/.aws/credentials</code>, then follow the <a href="#setting-up-service-specific-profiles">profile configuration</a> steps below to add the matching region entry to <code>~/.aws/config</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Credential security</p>
+<p>The secret access key is shown <strong>once</strong> — it cannot be retrieved again. Save it immediately. If you lose it, delete the key in IAM and generate a new one.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">AmazonBedrockFullAccess scope</p>
+<p>This managed policy grants access to all Bedrock models and features. For production environments, consider creating a custom policy restricted to the specific model ARNs and actions your application needs.</p>
+</div>
 <h2 id="installing-aws-cli-v2">Installing AWS CLI v2<a class="headerlink" href="#installing-aws-cli-v2" title="Permanent link">&para;</a></h2>
 <p>AWS CLI v2 is the recommended command-line interface for AWS services.</p>
 <h3 id="linuxwsl-installation">Linux/WSL Installation<a class="headerlink" href="#linuxwsl-installation" title="Permanent link">&para;</a></h3>
