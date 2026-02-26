@@ -6,6 +6,54 @@ Cloud infrastructure and services configuration guide with security-first creden
 
 AWS provides scalable cloud computing services. This section covers secure setup, CLI configuration, and best practices for managing AWS credentials with proper scope isolation.
 
+## Quick Start: Create a Bedrock User via CloudShell
+
+If you have access to the AWS Console, the fastest way to create a Bedrock IAM user and generate credentials is to run `aws-bedrock-user.sh` directly in **AWS CloudShell** — no local AWS CLI setup required, since CloudShell is already authenticated as your console account.
+
+### Steps
+
+1. Open the [AWS Console](https://console.aws.amazon.com) and sign in
+2. Click the **CloudShell** icon in the top navigation bar (or search for "CloudShell")
+3. Paste and run this one-liner:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/aws-bedrock-user.sh)"
+```
+
+Or if you have cloned this repo, run it directly:
+
+```bash
+bash scripts/aws-bedrock-user.sh
+```
+
+4. Enter your username when prompted — the script will prefix it with `bedrock-`
+5. Copy the credentials block from the output into `~/.aws/credentials` on your **local machine**
+
+### What the script does
+
+- Creates an IAM user named `bedrock-<yourname>`
+- Attaches the `AmazonBedrockFullAccess` managed policy
+- Generates a permanent access key pair
+- Prints a ready-to-paste `[bedrock]` credentials block
+
+### Output example
+
+```
+╭──────────────────────────────────────────────────────────────────╮
+│ [bedrock]                                                        │
+│ aws_access_key_id = AKIAIOSFODNN7EXAMPLE                         │
+│ aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY│
+╰──────────────────────────────────────────────────────────────────╯
+```
+
+Paste this block into `~/.aws/credentials`, then follow the [profile configuration](#setting-up-service-specific-profiles) steps below to add the matching region entry to `~/.aws/config`.
+
+!!! warning "Credential security"
+    The secret access key is shown **once** — it cannot be retrieved again. Save it immediately. If you lose it, delete the key in IAM and generate a new one.
+
+!!! note "AmazonBedrockFullAccess scope"
+    This managed policy grants access to all Bedrock models and features. For production environments, consider creating a custom policy restricted to the specific model ARNs and actions your application needs.
+
 ## Installing AWS CLI v2
 
 AWS CLI v2 is the recommended command-line interface for AWS services.
