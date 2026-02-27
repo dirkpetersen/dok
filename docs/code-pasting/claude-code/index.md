@@ -28,8 +28,12 @@ Add the Bedrock profile to `~/.aws/config`:
 region = us-west-2
 ```
 
-!!! tip "Use AWS CLI to configure credentials"
-    You can use the AWS CLI to set up your credentials conveniently. See the [AWS documentation](../../clouds/aws/index.md) for detailed instructions on configuring AWS CLI.
+**Where do I get these credentials?** You have two options:
+
+- **From your sysadmin** — If you are in a managed environment (university, company), ask your AWS administrator to create a Bedrock-scoped IAM user for you and send you the access key and secret.
+- **Create them yourself** — If you have access to the AWS Console, use the [Bedrock user setup script](../../clouds/aws/index.md#quick-start-create-a-bedrock-user-via-cloudshell) to create a `bedrock-<yourname>` IAM user in under a minute via AWS CloudShell. The script outputs a ready-to-paste credentials block.
+
+See the [AWS Clouds section](../../clouds/aws/index.md) for full details on credential management, profile isolation, and IAM policy best practices.
 
 ### 2. Install Claude Code
 
