@@ -60,13 +60,13 @@ AWS CLI v2 is the recommended command-line interface for AWS services.
 
 ### Linux/WSL Installation
 
-One-liner to download, extract, install to user directory, and verify:
+One-liner to download, extract (using Python's built-in `zipfile` — no `unzip` required), install to user directory, and verify:
 
 ```bash
-curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install -i ~/.local/aws-cli -b ~/.local/bin && aws --version && rm -rf aws awscliv2.zip
+curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && python3 -c "import zipfile,sys; zipfile.ZipFile(sys.argv[1]).extractall()" awscliv2.zip && ./aws/install -i ~/.local/aws-cli -b ~/.local/bin && aws --version && rm -rf aws awscliv2.zip
 ```
 
-This installs AWS CLI to `~/.local/aws-cli` with the `aws` command in `~/.local/bin` (no sudo required).
+This installs AWS CLI to `~/.local/aws-cli` with the `aws` command in `~/.local/bin` (no sudo required, no `unzip` dependency).
 
 **Requirements:**
 - Ensure `~/.local/bin` is in your PATH (see [Shell Setup](../../shell/index.md))
