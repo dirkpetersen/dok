@@ -102,7 +102,7 @@ If you have a local LLM endpoint available, you can use the `--local` flag to by
 
 ```bash
 # First, set the local endpoint
-export LOCAL_ANTHROPIC_BASE_URL="http://llm.run.university.edu/cc/v1"
+export LOCAL_ANTHROPIC_BASE_URL="http://llm.dev-ai.university.edu/cc/v1"
 
 # Optionally, set custom model names for your local LLM
 export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL="hc/glm-4.7"
@@ -115,7 +115,7 @@ claude --local
 
 **Environment Variables:**
 
-- `LOCAL_ANTHROPIC_BASE_URL` (required): The URL to your local LLM endpoint (e.g., `http://localhost:8000/v1` or `http://llm.run.university.edu/cc/v1`)
+- `LOCAL_ANTHROPIC_BASE_URL` (required): The URL to your local LLM endpoint (e.g., `http://localhost:8000/v1` or `http://llm.dev-ai.university.edu/cc/v1`)
 - `LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL` (optional): Model name for fast inference
 - `LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL` (optional): Model name for balanced inference
 - `LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL` (optional): Model name for maximum capability

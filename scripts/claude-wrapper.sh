@@ -432,7 +432,7 @@ if [[ "$1" == "--local" ]]; then
     echo -e "${RED}✗ Error: --local flag used but LOCAL_ANTHROPIC_BASE_URL is not set${NC}" >&2
     echo "" >&2
     echo "To use --local, set the LOCAL_ANTHROPIC_BASE_URL environment variable:" >&2
-    echo "  export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.run.university.edu/cc/v1\"" >&2
+    echo "  export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.dev-ai.university.edu/cc/v1\"" >&2
     echo "" >&2
     echo "Optionally, also set local model names:" >&2
     echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"hc/minimax-m2p5\"" >&2
