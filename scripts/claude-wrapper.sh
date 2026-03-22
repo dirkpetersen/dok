@@ -268,6 +268,14 @@ if [[ -f "$HOME/.azure/clauderc" ]]; then
   source "$HOME/.azure/clauderc"
 fi
 
+# Source ~/.claude/claudelocalrc if it exists (loads local LLM settings)
+LOCALRC_LOADED=0
+if [[ -f "$HOME/.claude/claudelocalrc" ]]; then
+  LOCALRC_LOADED=1
+  # shellcheck source=/dev/null
+  source "$HOME/.claude/claudelocalrc"
+fi
+
 # Verify PATH configuration first, before doing anything
 verify_path_configuration
 if [[ $? -ne 0 ]]; then
@@ -441,6 +449,25 @@ if [[ "$1" == "--local" ]]; then
   [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]] && export ANTHROPIC_DEFAULT_HAIKU_MODEL="$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
   [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && export ANTHROPIC_DEFAULT_SONNET_MODEL="$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
   [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]] && export ANTHROPIC_DEFAULT_OPUS_MODEL="$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
+  USING_LOCAL=1
+
+  # Offer to persist settings to ~/.claude/claudelocalrc if it doesn't exist yet
+  if [[ ! -f "$HOME/.claude/claudelocalrc" ]] && [[ -t 0 ]]; then
+    echo "" >&2
+    echo -e "${YELLOW}Local LLM vars are set but ~/.claude/claudelocalrc does not exist.${NC}" >&2
+    read -p "Save these settings to ~/.claude/claudelocalrc for future sessions? (Y/n): " _save_local
+    if [[ -z "$_save_local" || "$_save_local" == "y" || "$_save_local" == "Y" ]]; then
+      mkdir -p "$HOME/.claude"
+      {
+        echo "export LOCAL_ANTHROPIC_BASE_URL=\"$LOCAL_ANTHROPIC_BASE_URL\""
+        [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]]  && echo "export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL\""
+        [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && echo "export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL\""
+        [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]]   && echo "export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL\""
+      } > "$HOME/.claude/claudelocalrc"
+      echo -e "${GREEN}✓${NC} Saved to ~/.claude/claudelocalrc" >&2
+    fi
+    echo "" >&2
+  fi
 
 # Check if ANTHROPIC_BASE_URL is already set (for local LLM usage without --local flag)
 elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
@@ -563,12 +590,15 @@ export ANTHROPIC_MODEL="$mymodel"
 
 # Show status message for Foundry / local / custom base URL
 if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
-  _foundry_msg="Foundry Model: $mymodel, URL: $ANTHROPIC_BASE_URL"
-  [[ "$CLAUDERC_LOADED" == "1" ]] && _foundry_msg="Reading ~/.azure/clauderc, $_foundry_msg"
-  echo -e "${GREEN}${_foundry_msg}${NC}" >&2
+  _msg="Foundry Model: $mymodel, URL: $ANTHROPIC_BASE_URL"
+  [[ "$CLAUDERC_LOADED" == "1" ]] && _msg="Reading ~/.azure/clauderc, $_msg"
+  echo -e "${GREEN}${_msg}${NC}" >&2
+elif [[ "${USING_LOCAL:-0}" == "1" ]]; then
+  _msg="Local Model: $mymodel, URL: $ANTHROPIC_BASE_URL"
+  [[ "$LOCALRC_LOADED" == "1" ]] && _msg="Reading ~/.claude/claudelocalrc, $_msg"
+  echo -e "${GREEN}${_msg}${NC}" >&2
 elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
-  echo -e "${GREEN}Using local $model_name model: $mymodel${NC}" >&2
-  echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
+  echo -e "${GREEN}Local Model: $mymodel, URL: $ANTHROPIC_BASE_URL${NC}" >&2
 fi
 
 # Show debug info if --wdebug was requested
