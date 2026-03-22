@@ -3280,7 +3280,7 @@ verify_path_configuration
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: --local flag used but LOCAL_ANTHROPIC_BASE_URL is not set</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;To use --local, set the LOCAL_ANTHROPIC_BASE_URL environment variable:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export LOCAL_ANTHROPIC_BASE_URL=\&quot;http://llm.run.university.edu/cc/v1\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export LOCAL_ANTHROPIC_BASE_URL=\&quot;http://llm.dev-ai.university.edu/cc/v1\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Optionally, also set local model names:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\&quot;hc/minimax-m2p5\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
@@ -3605,7 +3605,7 @@ claude
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># First, set the local endpoint</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">LOCAL_ANTHROPIC_BASE_URL</span><span class="o">=</span><span class="s2">&quot;http://llm.run.university.edu/cc/v1&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LOCAL_ANTHROPIC_BASE_URL</span><span class="o">=</span><span class="s2">&quot;http://llm.dev-ai.university.edu/cc/v1&quot;</span>
 
 <span class="c1"># Optionally, set custom model names for your local LLM</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="o">=</span><span class="s2">&quot;hc/glm-4.7&quot;</span>
@@ -3617,7 +3617,7 @@ claude<span class="w"> </span>--local
 </code></pre></div></td></tr></table></div>
 <p><strong>Environment Variables:</strong></p>
 <ul>
-<li><code>LOCAL_ANTHROPIC_BASE_URL</code> (required): The URL to your local LLM endpoint (e.g., <code>http://localhost:8000/v1</code> or <code>http://llm.run.university.edu/cc/v1</code>)</li>
+<li><code>LOCAL_ANTHROPIC_BASE_URL</code> (required): The URL to your local LLM endpoint (e.g., <code>http://localhost:8000/v1</code> or <code>http://llm.dev-ai.university.edu/cc/v1</code>)</li>
 <li><code>LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</code> (optional): Model name for fast inference</li>
 <li><code>LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</code> (optional): Model name for balanced inference</li>
 <li><code>LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</code> (optional): Model name for maximum capability</li>
