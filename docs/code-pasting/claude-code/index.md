@@ -58,9 +58,9 @@ This wrapper script will:
 - Automatically find your Claude Code installation
 - Install itself to `~/bin/claude-wrapper.sh`
 - Create a symlink `~/bin/claude` pointing to the wrapper
-- Configure AWS Bedrock integration
+- Auto-detect the active backend (Bedrock, Foundry, or local LLM)
 - Enable easy model switching (haiku/sonnet/opus)
-- Set appropriate permissions for the current directory
+- Apply a safe tool allowlist by default; full permissions via `~/.claude/yolo-mode`
 
 ??? info "View script contents"
     ```bash linenums="1"
@@ -96,58 +96,82 @@ When Claude Code launches for the first time, it will:
 2. Initialize the Claude Code environment
 3. Start the interactive session in the git repository
 
-### 4. (Optional) Using Local LLM with --local Flag
+### 4. (Optional) Using a Local LLM with --local Flag
 
-If you have a local LLM endpoint available, you can use the `--local` flag to bypass AWS Bedrock and connect to your local server:
+If you have a local LLM endpoint available, you can use the `--local` flag to bypass AWS Bedrock and connect to your local server.
+
+Set the variables and run once — the wrapper will offer to save them to `~/.claude/claudelocalrc`:
 
 ```bash
-# First, set the local endpoint
 export LOCAL_ANTHROPIC_BASE_URL="http://llm.dev-ai.university.edu/cc/v1"
 
-# Optionally, set custom model names for your local LLM
+# Optionally set model names (defaults to whatever the endpoint provides)
 export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL="hc/glm-4.7"
 export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL="hc/glm-4.7"
 export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL="hc/glm-4.7"
 
-# Run Claude Code with local LLM
 claude --local
+```
+
+On first use the wrapper prompts:
+
+```
+Local LLM vars are set but ~/.claude/claudelocalrc does not exist.
+Save these settings to ~/.claude/claudelocalrc for future sessions? (Y/n):
+```
+
+After saving, every subsequent launch sources `~/.claude/claudelocalrc` automatically and shows:
+
+```
+Reading ~/.claude/claudelocalrc, Local Model: hc/glm-4.7, URL: http://llm.dev-ai.university.edu/cc/v1
 ```
 
 **Environment Variables:**
 
-- `LOCAL_ANTHROPIC_BASE_URL` (required): The URL to your local LLM endpoint (e.g., `http://localhost:8000/v1` or `http://llm.dev-ai.university.edu/cc/v1`)
+- `LOCAL_ANTHROPIC_BASE_URL` (required): URL to your local LLM endpoint
 - `LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL` (optional): Model name for fast inference
 - `LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL` (optional): Model name for balanced inference
 - `LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL` (optional): Model name for maximum capability
 
 !!! note "Using --local without setting LOCAL_ANTHROPIC_BASE_URL"
-    If you run `claude --local` without setting `LOCAL_ANTHROPIC_BASE_URL`, you'll see an error message with setup instructions reminding you to configure the required environment variable.
+    If you run `claude --local` without setting `LOCAL_ANTHROPIC_BASE_URL`, you'll see an error message with setup instructions.
 
-### 4. (Optional) Using Microsoft Azure AI Foundry Instead of AWS Bedrock
+### 5. (Optional) Using Microsoft Azure AI Foundry Instead of AWS Bedrock
 
 If you have access to Azure AI Foundry, you can use it as a drop-in replacement for AWS Bedrock — no AWS credentials required.
 
-Add the following to your `~/.profile` (or `~/.bashrc` / `~/.zshrc`):
+Set the variables and run once — the wrapper will offer to save them to `~/.azure/clauderc`:
 
 ```bash
 export CLAUDE_CODE_USE_FOUNDRY=1
 export ANTHROPIC_FOUNDRY_BASE_URL="https://<your-endpoint>.services.ai.azure.com/..."
 export ANTHROPIC_FOUNDRY_API_KEY="<your-foundry-api-key>"
+
+claude
 ```
 
-When `CLAUDE_CODE_USE_FOUNDRY=1` is set, the wrapper automatically:
+On first use the wrapper prompts:
 
-- Uses `ANTHROPIC_FOUNDRY_BASE_URL` as the API base URL
-- Authenticates with `ANTHROPIC_FOUNDRY_API_KEY`
-- Switches model defaults to plain Anthropic model names (no Bedrock prefixes):
+```
+Azure Foundry vars are set but ~/.azure/clauderc does not exist.
+Save these settings to ~/.azure/clauderc for future sessions? (Y/n):
+```
 
-| Alias  | Default model              |
-|--------|----------------------------|
-| haiku  | `claude-haiku-4-5-20251001` |
-| sonnet | `claude-sonnet-4-6`         |
-| opus   | `claude-opus-4-6`           |
+After saving, every subsequent launch sources `~/.azure/clauderc` automatically and shows:
 
-You can override any of these by setting the corresponding env var before the wrapper runs:
+```
+Reading ~/.azure/clauderc, Foundry Model: claude-haiku-4-5, URL: https://<your-endpoint>.services.ai.azure.com/...
+```
+
+When `CLAUDE_CODE_USE_FOUNDRY=1` is active, model defaults switch to plain Anthropic model names (no Bedrock prefixes):
+
+| Alias  | Default model       |
+|--------|---------------------|
+| haiku  | `claude-haiku-4-5`  |
+| sonnet | `claude-sonnet-4-6` |
+| opus   | `claude-opus-4-6`   |
+
+You can override any of these by adding them to `~/.azure/clauderc`:
 
 ```bash
 export ANTHROPIC_DEFAULT_OPUS_MODEL="claude-opus-4-6"
@@ -155,7 +179,7 @@ export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-6"
 ```
 
 !!! warning "Both Foundry variables must be set"
-    If `CLAUDE_CODE_USE_FOUNDRY=1` but either `ANTHROPIC_FOUNDRY_BASE_URL` or `ANTHROPIC_FOUNDRY_API_KEY` is missing, the wrapper exits immediately with an error listing exactly which variable needs to be added to your `~/.profile`.
+    If `CLAUDE_CODE_USE_FOUNDRY=1` but either `ANTHROPIC_FOUNDRY_BASE_URL` or `ANTHROPIC_FOUNDRY_API_KEY` is missing, the wrapper exits immediately with an error listing exactly which variable needs to be set.
 
 **Backend priority** (highest to lowest):
 
@@ -286,7 +310,7 @@ Environment variables set by wrapper:
   AWS_DEFAULT_REGION=us-west-2
   AWS_PROFILE=bedrock
 
-Command: /home/user/.local/bin/claude --model global.anthropic.claude-sonnet-4-6 --dangerously-skip-permissions
+Command: /home/user/.local/bin/claude --model global.anthropic.claude-sonnet-4-6 --allowedTools <list> --disallowedTools <list>
 
 Execute Claude Code now? (y/n):
 ```
@@ -296,8 +320,11 @@ Answering `y` launches Claude Code; anything else exits without running it. This
 ## Configuration Notes
 
 - **Inference Backend**: AWS Bedrock (default), Azure AI Foundry (`CLAUDE_CODE_USE_FOUNDRY=1`), or local LLM (`--local`)
-- **Context Window**: Defaults to 1M context window for Sonnet
-- **No Confirmation**: Configured to skip permission prompts for streamlined workflow
+- **Permissions**: By default the wrapper uses `--allowedTools` / `--disallowedTools` to allow a broad but safe set of commands. To grant full unrestricted permissions, create `~/.claude/yolo-mode`:
+  ```bash
+  touch ~/.claude/yolo-mode   # enables --dangerously-skip-permissions
+  rm ~/.claude/yolo-mode      # reverts to allowedTools mode
+  ```
 - **Model Selection**: Easy switching between Haiku (fast), Sonnet (balanced), and Opus (capable)
 - **Debug Mode**: Use `--wdebug` to inspect environment variables and the final command before execution
 
@@ -374,9 +401,10 @@ bwrap \
 - Use **Haiku** for quick fixes and simple tasks
 - Use **Sonnet** for complex development and analysis
 - Use **Opus** for challenging problems requiring maximum capability
-- Ensure AWS credentials are configured (Bedrock) or Foundry env vars are set before use
-- The wrapper script automatically handles model selection and backend environment setup
+- Ensure the correct backend is configured: AWS Bedrock (`~/.aws/config`), Foundry (`~/.azure/clauderc`), or local LLM (`~/.claude/claudelocalrc`)
+- The wrapper auto-detects the active backend and applies the right model IDs and API settings
 - Use `--wdebug` to troubleshoot configuration issues — it shows every env var set by the wrapper and the exact command before running
+- Use `touch ~/.claude/yolo-mode` to enable full permissions; remove it to return to the safe allowedTools default
 
 ## Alternative: npm-based Installation (Legacy)
 
