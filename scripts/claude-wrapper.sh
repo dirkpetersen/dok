@@ -261,8 +261,9 @@ EOF
 fi
 
 # Source ~/.azure/clauderc if it exists (loads Foundry and other Azure settings)
+CLAUDERC_LOADED=0
 if [[ -f "$HOME/.azure/clauderc" ]]; then
-  echo "reading ~/.azure/clauderc" >&2
+  CLAUDERC_LOADED=1
   # shellcheck source=/dev/null
   source "$HOME/.azure/clauderc"
 fi
@@ -554,7 +555,9 @@ export ANTHROPIC_MODEL="$mymodel"
 
 # Show status message for Foundry / local / custom base URL
 if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
-  echo -e "${GREEN}Foundry Model: $mymodel, URL: $ANTHROPIC_BASE_URL${NC}" >&2
+  _foundry_msg="Foundry Model: $mymodel, URL: $ANTHROPIC_BASE_URL"
+  [[ "$CLAUDERC_LOADED" == "1" ]] && _foundry_msg="Reading ~/.azure/clauderc, $_foundry_msg"
+  echo -e "${GREEN}${_foundry_msg}${NC}" >&2
 elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   echo -e "${GREEN}Using local $model_name model: $mymodel${NC}" >&2
   echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
