@@ -472,8 +472,8 @@ elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" ]]; then
   if [[ ! -f "$HOME/.azure/clauderc" ]] && [[ -t 0 ]]; then
     echo "" >&2
     echo -e "${YELLOW}Azure Foundry vars are set but ~/.azure/clauderc does not exist.${NC}" >&2
-    read -p "Save these settings to ~/.azure/clauderc for future sessions? (y/n): " _save_confirm
-    if [[ "$_save_confirm" == "y" || "$_save_confirm" == "Y" ]]; then
+    read -p "Save these settings to ~/.azure/clauderc for future sessions? (Y/n): " _save_confirm
+    if [[ -z "$_save_confirm" || "$_save_confirm" == "y" || "$_save_confirm" == "Y" ]]; then
       mkdir -p "$HOME/.azure"
       cat > "$HOME/.azure/clauderc" <<EOF
 export CLAUDE_CODE_USE_FOUNDRY=1
