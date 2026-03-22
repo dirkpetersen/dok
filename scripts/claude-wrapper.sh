@@ -237,13 +237,10 @@ install_wrapper() {
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
   echo ""
 
-  # Show yolo-mode hint on macOS
-  if [[ "$(uname)" == "Darwin" ]]; then
-    echo "To skip all permission prompts on macOS, run:"
-    echo ""
-    echo "  touch ~/.claude/yolo-mode"
-    echo ""
-  fi
+  echo "To skip all permission prompts, run:"
+  echo ""
+  echo "  touch ~/.claude/yolo-mode"
+  echo ""
 
   exit 0
 }
@@ -584,10 +581,10 @@ if [[ "$wdebug" -eq 1 ]]; then
     fi
   done
   echo "" >&2
-  if [[ "$(uname)" == "Darwin" ]] && [[ ! -f "$HOME/.claude/yolo-mode" ]]; then
-    echo "Command: $REAL_CLAUDE --model $mymodel $*" >&2
-  else
+  if [[ -f "$HOME/.claude/yolo-mode" ]]; then
     echo "Command: $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
+  else
+    echo "Command: $REAL_CLAUDE --model $mymodel $*" >&2
   fi
   echo "" >&2
   read -p "Execute Claude Code now? (y/n): " run_confirm
@@ -625,9 +622,9 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
   exit 1
 fi
 
-# Execute Claude Code (skip permissions on Linux; on macOS only if yolo-mode enabled)
-if [[ "$(uname)" == "Darwin" ]] && [[ ! -f "$HOME/.claude/yolo-mode" ]]; then
-  exec "$REAL_CLAUDE" --model "$mymodel" "$@"
-else
+# Execute Claude Code (skip permissions only if ~/.claude/yolo-mode exists)
+if [[ -f "$HOME/.claude/yolo-mode" ]]; then
   exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
+else
+  exec "$REAL_CLAUDE" --model "$mymodel" "$@"
 fi
