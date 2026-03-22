@@ -554,8 +554,7 @@ export ANTHROPIC_MODEL="$mymodel"
 
 # Show status message for Foundry / local / custom base URL
 if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
-  echo -e "${GREEN}Using Foundry $model_name model: $mymodel${NC}" >&2
-  echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
+  echo -e "${GREEN}Foundry Model: $mymodel, URL: $ANTHROPIC_BASE_URL${NC}" >&2
 elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   echo -e "${GREEN}Using local $model_name model: $mymodel${NC}" >&2
   echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
