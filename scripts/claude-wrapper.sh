@@ -345,7 +345,7 @@ if [[ "$1" == "--models" ]]; then
     echo "Foundry Configuration (active via CLAUDE_CODE_USE_FOUNDRY=1):"
     echo ""
     echo "  Base URL: $ANTHROPIC_FOUNDRY_BASE_URL"
-    echo "  Haiku:    ${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4-5-20251001}"
+    echo "  Haiku:    ${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4-5}"
     echo "  Sonnet:   ${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet-4-6}"
     echo "  Opus:     ${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-6}"
     echo ""
