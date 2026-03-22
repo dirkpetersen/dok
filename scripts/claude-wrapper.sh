@@ -386,12 +386,20 @@ fi
 if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
   echo -e "${YELLOW}Updating claude-wrapper...${NC}" >&2
 
+  # Checksum before download
+  MD5_BEFORE=$(md5sum "$WRAPPER_PATH" 2>/dev/null | cut -d' ' -f1)
+
   # Download new wrapper to temp file
   TEMP_WRAPPER=$(mktemp)
   if curl -fsSL -o "$TEMP_WRAPPER" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`"; then
+    MD5_AFTER=$(md5sum "$TEMP_WRAPPER" 2>/dev/null | cut -d' ' -f1)
     # Replace the installed wrapper
     if mv "$TEMP_WRAPPER" "$WRAPPER_PATH" && chmod +x "$WRAPPER_PATH"; then
-      echo -e "${GREEN}✓${NC} Wrapper updated successfully" >&2
+      if [[ "$MD5_BEFORE" != "$MD5_AFTER" ]]; then
+        echo -e "${GREEN}✓${NC} Wrapper updated successfully" >&2
+      else
+        echo -e "${GREEN}✓${NC} Wrapper already up to date" >&2
+      fi
       echo "" >&2
     else
       echo -e "${RED}✗ Failed to replace wrapper${NC}" >&2
