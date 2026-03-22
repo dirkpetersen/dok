@@ -456,24 +456,8 @@ elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" ]]; then
     exit 1
   fi
   export ANTHROPIC_BASE_URL="$ANTHROPIC_FOUNDRY_BASE_URL"
-  export ANTHROPIC_API_KEY="$ANTHROPIC_FOUNDRY_API_KEY"
+  export ANTHROPIC_API_KEY="sk-ant-dummy"
   USING_FOUNDRY=1
-
-  # Pre-approve the Foundry API key in ~/.claude.json to suppress the "custom key" prompt
-  python3 -c "
-import json, os
-path = os.path.expanduser('~/.claude.json')
-key = os.environ.get('ANTHROPIC_FOUNDRY_API_KEY', '')
-if not key or not os.path.exists(path):
-    exit(0)
-with open(path) as f:
-    data = json.load(f)
-approved = data.setdefault('customApiKeyResponses', {}).setdefault('approved', [])
-if key not in approved:
-    approved.append(key)
-    with open(path, 'w') as f:
-        json.dump(data, f, indent=2)
-" 2>/dev/null || true
 
   # Offer to persist settings to ~/.azure/clauderc if it doesn't exist yet
   if [[ ! -f "$HOME/.azure/clauderc" ]] && [[ -t 0 ]]; then
