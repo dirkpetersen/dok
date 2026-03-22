@@ -4,7 +4,7 @@ Documentation for Claude Code, an AI-powered development tool integrated into th
 
 ## Overview
 
-Claude Code provides AI-assisted development capabilities for code generation, analysis, and problem-solving. This setup uses AWS Bedrock for model inference, enabling local-first Claude Code execution.
+Claude Code provides AI-assisted development capabilities for code generation, analysis, and problem-solving. This setup supports multiple inference backends: **AWS Bedrock** (default), **Microsoft Azure AI Foundry**, or a **local LLM** endpoint.
 
 !!! warning "Prerequisites: Shell Environment Required"
     Claude Code depends on a properly configured shell environment with git and GitHub working correctly. Before installing Claude Code, ensure your shell is set up properly. If you need help with shell configuration, SSH keys, or Git setup, see our **[Shell Setup Guide](../../shell/index.md)** for automated configuration.
@@ -122,6 +122,47 @@ claude --local
 
 !!! note "Using --local without setting LOCAL_ANTHROPIC_BASE_URL"
     If you run `claude --local` without setting `LOCAL_ANTHROPIC_BASE_URL`, you'll see an error message with setup instructions reminding you to configure the required environment variable.
+
+### 4. (Optional) Using Microsoft Azure AI Foundry Instead of AWS Bedrock
+
+If you have access to Azure AI Foundry, you can use it as a drop-in replacement for AWS Bedrock — no AWS credentials required.
+
+Add the following to your `~/.profile` (or `~/.bashrc` / `~/.zshrc`):
+
+```bash
+export CLAUDE_CODE_USE_FOUNDRY=1
+export ANTHROPIC_FOUNDRY_BASE_URL="https://<your-endpoint>.services.ai.azure.com/..."
+export ANTHROPIC_FOUNDRY_API_KEY="<your-foundry-api-key>"
+```
+
+When `CLAUDE_CODE_USE_FOUNDRY=1` is set, the wrapper automatically:
+
+- Uses `ANTHROPIC_FOUNDRY_BASE_URL` as the API base URL
+- Authenticates with `ANTHROPIC_FOUNDRY_API_KEY`
+- Switches model defaults to plain Anthropic model names (no Bedrock prefixes):
+
+| Alias  | Default model              |
+|--------|----------------------------|
+| haiku  | `claude-haiku-4-5-20251001` |
+| sonnet | `claude-sonnet-4-6`         |
+| opus   | `claude-opus-4-6`           |
+
+You can override any of these by setting the corresponding env var before the wrapper runs:
+
+```bash
+export ANTHROPIC_DEFAULT_OPUS_MODEL="claude-opus-4-6"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-6"
+```
+
+!!! warning "Both Foundry variables must be set"
+    If `CLAUDE_CODE_USE_FOUNDRY=1` but either `ANTHROPIC_FOUNDRY_BASE_URL` or `ANTHROPIC_FOUNDRY_API_KEY` is missing, the wrapper exits immediately with an error listing exactly which variable needs to be added to your `~/.profile`.
+
+**Backend priority** (highest to lowest):
+
+1. `--local` flag (always wins)
+2. `ANTHROPIC_BASE_URL` already set in environment
+3. `CLAUDE_CODE_USE_FOUNDRY=1`
+4. AWS Bedrock profile in `~/.aws/config`
 
 ## Important: Git Repository Requirement
 
@@ -254,7 +295,7 @@ Answering `y` launches Claude Code; anything else exits without running it. This
 
 ## Configuration Notes
 
-- **Bedrock Integration**: Uses AWS Bedrock for model inference
+- **Inference Backend**: AWS Bedrock (default), Azure AI Foundry (`CLAUDE_CODE_USE_FOUNDRY=1`), or local LLM (`--local`)
 - **Context Window**: Defaults to 1M context window for Sonnet
 - **No Confirmation**: Configured to skip permission prompts for streamlined workflow
 - **Model Selection**: Easy switching between Haiku (fast), Sonnet (balanced), and Opus (capable)
@@ -333,8 +374,8 @@ bwrap \
 - Use **Haiku** for quick fixes and simple tasks
 - Use **Sonnet** for complex development and analysis
 - Use **Opus** for challenging problems requiring maximum capability
-- Ensure AWS credentials are properly configured before use
-- The wrapper script automatically handles model selection and AWS environment setup
+- Ensure AWS credentials are configured (Bedrock) or Foundry env vars are set before use
+- The wrapper script automatically handles model selection and backend environment setup
 - Use `--wdebug` to troubleshoot configuration issues — it shows every env var set by the wrapper and the exact command before running
 
 ## Alternative: npm-based Installation (Legacy)

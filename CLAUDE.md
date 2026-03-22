@@ -110,15 +110,14 @@ GitHub Actions automatically resolves issues by triggering Claude Code to analyz
 2. Installs Claude Code globally via npm: `npm i -g @anthropic-ai/claude-code`
 3. Configures AWS credentials from GitHub Secrets
 4. Creates feature branch based on issue ID: `fix/issue-{issue_number}`
-5. Clones repository and checks out new branch
-6. Executes Claude Code in batch mode with automated fix prompt:
-   - Reads issue description and context
-   - Analyzes the problem
-   - Makes necessary code/documentation changes
-   - Commits changes with reference to issue
-   - Creates and submits pull request
-7. Links pull request to original issue with resolution context
-8. Optionally auto-merges PR if `ISSUE_AUTO_FIX_MERGE=yes` is set
+5. Builds a prompt that includes a SECURITY NOTICE instructing Claude to treat issue content as untrusted data (prompt injection protection), then pipes it to `claude --permission-mode acceptEdits`
+6. Commits any file changes and creates a PR linked to the issue
+7. Optionally auto-merges PR if `ISSUE_AUTO_FIX_MERGE=yes` is set
+
+**Security notes**:
+- The job declares explicit `permissions` (`contents: write`, `issues: write`, `pull-requests: write`) instead of relying on defaults
+- Issue content is written to a temp file via `printf` (not inline shell interpolation) to avoid shell injection
+- Claude runs with `--permission-mode acceptEdits` (not `--dangerously-skip-permissions`) so it can only edit files, not run arbitrary commands
 
 **Configuration**:
 - AWS Bedrock credentials must be stored as GitHub repository secrets:
@@ -151,13 +150,14 @@ This documentation follows a "Code Pasting" philosophy - writing clear, comprehe
 ### Adding New Pages
 
 1. Create markdown file in appropriate `docs/` subdirectory
-2. Update navigation in `mkdocs.yml` under the `nav:` section
+2. Update navigation in `mkdocs.yml` under the `nav:` section — section index pages use an empty string key (`'': section/index.md`)
 3. Follow existing page structure with clear headers and code examples
 4. Use MkDocs markdown extensions configured in mkdocs.yml:
    - Admonitions for notes/warnings
    - Code highlighting with line numbers
    - Task lists
    - Table of contents with permalinks
+   - `pymdownx.snippets`: embed file contents inline using `--8<-- "path/to/file"` syntax (base path is repo root; `check_paths: true` means missing files cause build errors)
 
 ### Modifying Scripts
 

@@ -263,6 +263,13 @@ if [[ ! -f "$HOME/.claude.json" ]]; then
 EOF
 fi
 
+# Source ~/.azure/clauderc if it exists (loads Foundry and other Azure settings)
+if [[ -f "$HOME/.azure/clauderc" ]]; then
+  echo "reading ~/.azure/clauderc" >&2
+  # shellcheck source=/dev/null
+  source "$HOME/.azure/clauderc"
+fi
+
 # Verify PATH configuration first, before doing anything
 verify_path_configuration
 if [[ $? -ne 0 ]]; then
@@ -334,6 +341,23 @@ if [[ "$1" == "--models" ]]; then
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}[1m]"
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-6-v1}[1m]"
   echo ""
+
+  # Show Foundry configuration section
+  if [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" && -n "$ANTHROPIC_FOUNDRY_BASE_URL" && -n "$ANTHROPIC_FOUNDRY_API_KEY" ]]; then
+    echo "Foundry Configuration (active via CLAUDE_CODE_USE_FOUNDRY=1):"
+    echo ""
+    echo "  Base URL: $ANTHROPIC_FOUNDRY_BASE_URL"
+    echo "  Haiku:    ${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4-5-20251001}"
+    echo "  Sonnet:   ${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet-4-6}"
+    echo "  Opus:     ${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-6}"
+    echo ""
+  elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" ]]; then
+    echo "Foundry Configuration (CLAUDE_CODE_USE_FOUNDRY=1 set but incomplete):"
+    echo ""
+    [[ -z "$ANTHROPIC_FOUNDRY_BASE_URL" ]] && echo "  Missing: ANTHROPIC_FOUNDRY_BASE_URL"
+    [[ -z "$ANTHROPIC_FOUNDRY_API_KEY" ]]  && echo "  Missing: ANTHROPIC_FOUNDRY_API_KEY"
+    echo ""
+  fi
 
   # Always show local LLM configuration section
   if [[ -n "$LOCAL_ANTHROPIC_BASE_URL" ]]; then
@@ -419,6 +443,42 @@ elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
     export ANTHROPIC_API_KEY="sk-ant-dummy"
   fi
 
+# Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1
+elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" ]]; then
+  if [[ -z "$ANTHROPIC_FOUNDRY_BASE_URL" || -z "$ANTHROPIC_FOUNDRY_API_KEY" ]]; then
+    echo -e "${RED}✗ Error: CLAUDE_CODE_USE_FOUNDRY=1 but required variables are not set${NC}" >&2
+    echo "" >&2
+    echo "Both of these must be set in your ~/.profile (or ~/.bashrc / ~/.zshrc):" >&2
+    echo "" >&2
+    echo "  export ANTHROPIC_FOUNDRY_BASE_URL=\"https://<your-endpoint>.openai.azure.com/...\"" >&2
+    echo "  export ANTHROPIC_FOUNDRY_API_KEY=\"<your-foundry-api-key>\"" >&2
+    echo "" >&2
+    [[ -z "$ANTHROPIC_FOUNDRY_BASE_URL" ]] && echo "  Missing: ANTHROPIC_FOUNDRY_BASE_URL" >&2
+    [[ -z "$ANTHROPIC_FOUNDRY_API_KEY" ]]  && echo "  Missing: ANTHROPIC_FOUNDRY_API_KEY" >&2
+    echo "" >&2
+    exit 1
+  fi
+  export ANTHROPIC_BASE_URL="$ANTHROPIC_FOUNDRY_BASE_URL"
+  export ANTHROPIC_API_KEY="$ANTHROPIC_FOUNDRY_API_KEY"
+  USING_FOUNDRY=1
+
+  # Offer to persist settings to ~/.azure/clauderc if it doesn't exist yet
+  if [[ ! -f "$HOME/.azure/clauderc" ]] && [[ -t 0 ]]; then
+    echo "" >&2
+    echo -e "${YELLOW}Azure Foundry vars are set but ~/.azure/clauderc does not exist.${NC}" >&2
+    read -p "Save these settings to ~/.azure/clauderc for future sessions? (y/n): " _save_confirm
+    if [[ "$_save_confirm" == "y" || "$_save_confirm" == "Y" ]]; then
+      mkdir -p "$HOME/.azure"
+      cat > "$HOME/.azure/clauderc" <<EOF
+export CLAUDE_CODE_USE_FOUNDRY=1
+export ANTHROPIC_FOUNDRY_BASE_URL="$ANTHROPIC_FOUNDRY_BASE_URL"
+export ANTHROPIC_FOUNDRY_API_KEY="$ANTHROPIC_FOUNDRY_API_KEY"
+EOF
+      echo -e "${GREEN}✓${NC} Saved to ~/.azure/clauderc" >&2
+    fi
+    echo "" >&2
+  fi
+
 # Default: AWS Bedrock Configuration - only enable if bedrock is configured
 elif grep -q "bedrock" "$HOME/.aws/config" 2>/dev/null; then
   export CLAUDE_CODE_USE_BEDROCK=1
@@ -442,10 +502,16 @@ else
   exit 1
 fi
 
-# Model Configuration (Bedrock model IDs, overridden by LOCAL_* variants if set above)
-export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-us.anthropic.claude-haiku-4-5-20251001-v1:0}"
-export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}"
-export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-6-v1}"
+# Model Configuration — Foundry uses plain model names; Bedrock uses prefixed IDs
+if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
+  export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4-5-20251001}"
+  export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet-4-6}"
+  export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-6}"
+else
+  export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-us.anthropic.claude-haiku-4-5-20251001-v1:0}"
+  export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}"
+  export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-6-v1}"
+fi
 export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 
 # Default model is Haiku
@@ -489,8 +555,11 @@ set -- "${new_args[@]}"
 
 export ANTHROPIC_MODEL="$mymodel"
 
-# Show status message for local/custom base URL
-if [[ -n "$ANTHROPIC_BASE_URL" ]]; then
+# Show status message for Foundry / local / custom base URL
+if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
+  echo -e "${GREEN}Using Foundry $model_name model: $mymodel${NC}" >&2
+  echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
+elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   echo -e "${GREEN}Using local $model_name model: $mymodel${NC}" >&2
   echo -e "${GREEN}  Base URL: $ANTHROPIC_BASE_URL${NC}" >&2
 fi
@@ -503,10 +572,11 @@ if [[ "$wdebug" -eq 1 ]]; then
   for var in ANTHROPIC_MODEL ANTHROPIC_BASE_URL ANTHROPIC_API_KEY \
              ANTHROPIC_DEFAULT_HAIKU_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL \
              ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_SMALL_FAST_MODEL \
+             CLAUDE_CODE_USE_FOUNDRY ANTHROPIC_FOUNDRY_BASE_URL \
              CLAUDE_CODE_USE_BEDROCK AWS_DEFAULT_REGION AWS_PROFILE; do
     if [[ -n "${!var+x}" ]]; then
-      # Mask API key value
-      if [[ "$var" == "ANTHROPIC_API_KEY" ]]; then
+      # Mask API key values
+      if [[ "$var" == "ANTHROPIC_API_KEY" || "$var" == "ANTHROPIC_FOUNDRY_API_KEY" ]]; then
         echo "  $var=${!var:0:10}..." >&2
       else
         echo "  $var=${!var}" >&2
