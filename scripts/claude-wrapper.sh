@@ -584,7 +584,7 @@ if [[ "$wdebug" -eq 1 ]]; then
   if [[ -f "$HOME/.claude/yolo-mode" ]]; then
     echo "Command: $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
   else
-    echo "Command: $REAL_CLAUDE --model $mymodel $*" >&2
+    echo "Command: $REAL_CLAUDE --model $mymodel --allowedTools <list> --disallowedTools <list> $*" >&2
   fi
   echo "" >&2
   read -p "Execute Claude Code now? (y/n): " run_confirm
@@ -622,9 +622,55 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
   exit 1
 fi
 
+# Allowed/disallowed tools for non-yolo mode
+ALLOWED_TOOLS=(
+  "Read" "Edit" "WebFetch" "Agent"
+  "Bash(ls *)" "Bash(cat *)" "Bash(head *)" "Bash(tail *)" "Bash(less *)"
+  "Bash(find *)" "Bash(tree *)" "Bash(file *)" "Bash(stat *)" "Bash(wc *)"
+  "Bash(du *)" "Bash(df *)" "Bash(grep *)" "Bash(awk *)" "Bash(sed *)"
+  "Bash(sort *)" "Bash(uniq *)" "Bash(cut *)" "Bash(tr *)" "Bash(diff *)"
+  "Bash(jq *)" "Bash(yq *)" "Bash(xargs *)" "Bash(tee *)"
+  "Bash(cp *)" "Bash(mv *)" "Bash(mkdir *)" "Bash(touch *)" "Bash(chmod *)"
+  "Bash(chown *)" "Bash(ln *)" "Bash(tar *)" "Bash(zip *)" "Bash(unzip *)"
+  "Bash(gzip *)" "Bash(gunzip *)"
+  "Bash(curl *)" "Bash(wget *)" "Bash(ping *)" "Bash(dig *)"
+  "Bash(nslookup *)" "Bash(host *)" "Bash(ss *)" "Bash(netstat *)"
+  "Bash(ip *)" "Bash(ifconfig *)" "Bash(traceroute *)" "Bash(nmap *)"
+  "Bash(ssh *)" "Bash(scp *)" "Bash(rsync *)"
+  "Bash(ps *)" "Bash(top *)" "Bash(htop *)" "Bash(kill *)" "Bash(killall *)"
+  "Bash(uptime *)" "Bash(free *)" "Bash(uname *)" "Bash(hostname *)"
+  "Bash(whoami *)" "Bash(id *)" "Bash(w *)" "Bash(who *)" "Bash(lsof *)"
+  "Bash(strace *)" "Bash(systemctl *)" "Bash(journalctl *)" "Bash(service *)"
+  "Bash(apt *)" "Bash(apt-get *)" "Bash(yum *)" "Bash(dnf *)" "Bash(brew *)"
+  "Bash(snap *)" "Bash(pip *)" "Bash(pip3 *)" "Bash(npm *)" "Bash(npx *)"
+  "Bash(docker *)" "Bash(docker-compose *)" "Bash(kubectl *)" "Bash(helm *)"
+  "Bash(terraform *)" "Bash(ansible *)"
+  "Bash(aws *)" "Bash(az *)" "Bash(gcloud *)" "Bash(git *)" "Bash(gh *)"
+  "Bash(appmo *)"
+  "Bash(python *)" "Bash(python3 *)" "Bash(node *)"
+  "Bash(bash *)" "Bash(sh *)" "Bash(env *)" "Bash(export *)"
+  "Bash(echo *)" "Bash(printf *)" "Bash(date *)"
+  "Bash(cron *)" "Bash(crontab *)"
+  "Bash(mount *)" "Bash(umount *)" "Bash(fdisk *)" "Bash(lsblk *)" "Bash(blkid *)"
+  "Bash(openssl *)" "Bash(ssh-keygen *)" "Bash(iptables *)" "Bash(ufw *)"
+  "Bash(sudo *)"
+  "Bash(* --version)" "Bash(* --help)" "Bash(* --help *)"
+  "Bash(which *)" "Bash(type *)" "Bash(man *)"
+)
+DISALLOWED_TOOLS=(
+  "Bash(rm -rf /)"
+  "Bash(rm -rf /*)"
+  "Bash(mkfs *)"
+  "Bash(dd *)"
+  "Bash(:(){ :|:& };:)"
+)
+
 # Execute Claude Code (skip permissions only if ~/.claude/yolo-mode exists)
 if [[ -f "$HOME/.claude/yolo-mode" ]]; then
   exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
 else
-  exec "$REAL_CLAUDE" --model "$mymodel" "$@"
+  exec "$REAL_CLAUDE" --model "$mymodel" \
+    --allowedTools "${ALLOWED_TOOLS[@]}" \
+    --disallowedTools "${DISALLOWED_TOOLS[@]}" \
+    "$@"
 fi
