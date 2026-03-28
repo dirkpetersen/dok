@@ -1094,6 +1094,56 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#wsl-coding-appliance-kanna-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WSL Coding Appliance (kanna-code)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WSL Coding Appliance (kanna-code)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-it-sets-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it sets up
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2230,6 +2280,56 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#wsl-coding-appliance-kanna-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WSL Coding Appliance (kanna-code)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WSL Coding Appliance (kanna-code)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-it-sets-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it sets up
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2539,6 +2639,41 @@ code<span class="w"> </span><span class="se">\\</span>wsl$<span class="se">\U</s
 <li>❌ Don't mix Windows and WSL paths in the same project</li>
 <li>❌ Don't edit WSL files from Windows (permission issues)</li>
 </ul>
+<h2 id="wsl-coding-appliance-kanna-code">WSL Coding Appliance (kanna-code)<a class="headerlink" href="#wsl-coding-appliance-kanna-code" title="Permanent link">&para;</a></h2>
+<p>For a zero-friction AI coding appliance on Windows, use the <code>setup-wsl-claude-kanna.ps1</code> script. It turns a fresh Windows machine into a fully configured Linux dev environment running <a href="https://github.com/PuneetGopinath/kanna">kanna-code</a> in a single PowerShell command.</p>
+<h3 id="what-it-sets-up">What it sets up<a class="headerlink" href="#what-it-sets-up" title="Permanent link">&para;</a></h3>
+<p>The script runs six idempotent steps — safe to re-run at any time:</p>
+<ol>
+<li><strong>WSL 2</strong> — installs if missing, prompts for reboot if needed</li>
+<li><strong>Windows Terminal</strong> — installs via <code>winget</code> if missing</li>
+<li><strong>Ubuntu</strong> — installs as the WSL distro with a default user <code>claude</code> (passwordless sudo)</li>
+<li><strong>dev-station</strong> — runs <a href="../../scripts/dev-station-install.sh"><code>dev-station-install.sh</code></a> inside Ubuntu (shell setup, claude-wrapper, Node.js, AWS CLI)</li>
+<li><strong>Bun + kanna-code</strong> — installs the <a href="https://bun.sh">Bun</a> runtime and <code>kanna-code</code> globally</li>
+<li><strong>Launches kanna</strong> — starts the kanna interactive session</li>
+</ol>
+<h3 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h3>
+<p>Open PowerShell as Administrator and run:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">Set-ExecutionPolicy</span> <span class="n">Bypass</span> <span class="n">-Scope</span> <span class="k">Process</span> <span class="n">-Force</span>
+<span class="nb">Invoke-WebRequest</span> <span class="n">-Uri</span> <span class="s2">&quot;https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/setup-wsl-claude-kanna.ps1&quot;</span> <span class="n">-OutFile</span> <span class="n">setup-wsl-claude-kanna</span><span class="p">.</span><span class="n">ps1</span>
+<span class="p">.\</span><span class="n">setup-wsl-claude-kanna</span><span class="p">.</span><span class="n">ps1</span>
+</code></pre></div></td></tr></table></div>
+<p>Or, if you have already cloned this repo:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">Set-ExecutionPolicy</span> <span class="n">Bypass</span> <span class="n">-Scope</span> <span class="k">Process</span> <span class="n">-Force</span>
+<span class="p">.\</span><span class="n">scripts</span><span class="p">\</span><span class="n">setup-wsl-claude-kanna</span><span class="p">.</span><span class="n">ps1</span>
+</code></pre></div></td></tr></table></div>
+<div class="admonition note">
+<p class="admonition-title">First-time reboot</p>
+<p>If WSL is not yet installed, the script will install it and ask you to reboot. Simply re-run the script after rebooting — all steps are idempotent and will skip anything already done.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Default user</p>
+<p>The Ubuntu distro is configured with a <code>claude</code> user (passwordless sudo). You can add your own user and change the WSL default later via <code>/etc/wsl.conf</code>.</p>
+</div>
+<h3 id="source">Source<a class="headerlink" href="#source" title="Permanent link">&para;</a></h3>
+<p>Script: <a href="https://github.com/dirkpetersen/dok/blob/main/scripts/setup-wsl-claude-kanna.ps1"><code>scripts/setup-wsl-claude-kanna.ps1</code></a></p>
 
 
 
