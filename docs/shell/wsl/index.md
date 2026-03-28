@@ -314,3 +314,45 @@ code \\wsl$\Ubuntu\home\username\project
 - ✅ Regularly update WSL and distributions
 - ❌ Don't mix Windows and WSL paths in the same project
 - ❌ Don't edit WSL files from Windows (permission issues)
+
+## WSL Coding Appliance (kanna-code)
+
+For a zero-friction AI coding appliance on Windows, use the `setup-wsl-claude-kanna.ps1` script. It turns a fresh Windows machine into a fully configured Linux dev environment running [kanna-code](https://github.com/PuneetGopinath/kanna) in a single PowerShell command.
+
+### What it sets up
+
+The script runs six idempotent steps — safe to re-run at any time:
+
+1. **WSL 2** — installs if missing, prompts for reboot if needed
+2. **Windows Terminal** — installs via `winget` if missing
+3. **Ubuntu** — installs as the WSL distro with a default user `claude` (passwordless sudo)
+4. **dev-station** — runs [`dev-station-install.sh`](../../scripts/dev-station-install.sh) inside Ubuntu (shell setup, claude-wrapper, Node.js, AWS CLI)
+5. **Bun + kanna-code** — installs the [Bun](https://bun.sh) runtime and `kanna-code` globally
+6. **Launches kanna** — starts the kanna interactive session
+
+### Quick start
+
+Open PowerShell as Administrator and run:
+
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/setup-wsl-claude-kanna.ps1" -OutFile setup-wsl-claude-kanna.ps1
+.\setup-wsl-claude-kanna.ps1
+```
+
+Or, if you have already cloned this repo:
+
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\scripts\setup-wsl-claude-kanna.ps1
+```
+
+!!! note "First-time reboot"
+    If WSL is not yet installed, the script will install it and ask you to reboot. Simply re-run the script after rebooting — all steps are idempotent and will skip anything already done.
+
+!!! tip "Default user"
+    The Ubuntu distro is configured with a `claude` user (passwordless sudo). You can add your own user and change the WSL default later via `/etc/wsl.conf`.
+
+### Source
+
+Script: [`scripts/setup-wsl-claude-kanna.ps1`](https://github.com/dirkpetersen/dok/blob/main/scripts/setup-wsl-claude-kanna.ps1)
