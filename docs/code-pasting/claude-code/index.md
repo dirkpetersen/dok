@@ -188,6 +188,54 @@ export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-6"
 3. `CLAUDE_CODE_USE_FOUNDRY=1`
 4. AWS Bedrock profile in `~/.aws/config`
 
+### 6. (Optional) Using Claude Code Natively on Windows via PowerShell
+
+If you are running Claude Code directly on Windows (not inside WSL), you can configure the required environment variables in your PowerShell profile so they are set automatically in every session.
+
+Open your profile file in an editor:
+
+```powershell
+notepad $PROFILE.CurrentUserAllHosts
+```
+
+#### AWS Bedrock (Windows)
+
+Add these lines to your profile:
+
+```powershell
+# Claude Code — AWS Bedrock backend
+$env:DEFAULT_AWS_REGION                    = "us-west-2"
+$env:AWS_REGION                            = $env:DEFAULT_AWS_REGION
+$env:CLAUDE_CODE_USE_BEDROCK               = 1
+$env:ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION = $env:AWS_REGION
+$env:ANTHROPIC_DEFAULT_OPUS_MODEL          = "global.anthropic.claude-opus-4-6-v1"
+$env:ANTHROPIC_DEFAULT_SONNET_MODEL        = "global.anthropic.claude-sonnet-4-6"
+```
+
+AWS credentials still need to be present in `~\.aws\credentials` under a `[bedrock]` profile — the same file used in step 1. PowerShell environment variables handle the region and model selection; the credentials file handles the authentication.
+
+#### Azure AI Foundry (Windows)
+
+If you are using Azure instead of AWS, add these lines to your profile instead:
+
+```powershell
+# Claude Code — Azure AI Foundry backend
+$env:CLAUDE_CODE_USE_FOUNDRY        = 1
+$env:ANTHROPIC_FOUNDRY_BASE_URL     = "https://xxxxxxxxxxxxx.azure-api.net/anthropic"
+$env:ANTHROPIC_FOUNDRY_API_KEY      = "xxxxxxxxxxxxxxxxxx"
+```
+
+Replace the URL and key with the values from your Azure AI Foundry deployment.
+
+!!! tip "Apply changes without restarting"
+    After editing the profile, reload it in the current session:
+    ```powershell
+    . $PROFILE.CurrentUserAllHosts
+    ```
+
+!!! note "WSL users"
+    If you are running Claude Code inside WSL, use the Linux-based setup in steps 1–5 above. The PowerShell profile approach is only needed when running `claude` natively from a Windows terminal (e.g. `cmd`, PowerShell, Windows Terminal without WSL). For a one-command WSL appliance setup, see the [WSL Coding Appliance](../../shell/wsl/index.md#wsl-coding-appliance-kanna-code) guide.
+
 ## Important: Git Repository Requirement
 
 **Claude Code must always be initialized inside a git repository.** This is a requirement for the tool to function properly.
