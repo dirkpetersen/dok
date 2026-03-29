@@ -931,6 +931,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#troubleshooting-ssh-agent-on-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting: SSH Agent on Windows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting: SSH Agent on Windows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#git-keeps-asking-for-passphrase-even-after-ssh-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git keeps asking for passphrase even after ssh-add
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1960,6 +1988,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#troubleshooting-ssh-agent-on-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting: SSH Agent on Windows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting: SSH Agent on Windows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#git-keeps-asking-for-passphrase-even-after-ssh-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git keeps asking for passphrase even after ssh-add
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2473,6 +2529,42 @@ ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
 <span class="c1"># Should output: Hi USERNAME! You&#39;ve successfully authenticated...</span>
 </code></pre></div></td></tr></table></div>
 <p>Your SSH configuration from the <a href="../ssh/">SSH section</a> enables secure Git operations without storing credentials.</p>
+<h2 id="troubleshooting-ssh-agent-on-windows">Troubleshooting: SSH Agent on Windows<a class="headerlink" href="#troubleshooting-ssh-agent-on-windows" title="Permanent link">&para;</a></h2>
+<h3 id="git-keeps-asking-for-passphrase-even-after-ssh-add">Git keeps asking for passphrase even after <code>ssh-add</code><a class="headerlink" href="#git-keeps-asking-for-passphrase-even-after-ssh-add" title="Permanent link">&para;</a></h3>
+<p>On Windows you may run into this confusing situation — <code>ssh-add</code> succeeds, but <code>git pull</code> still prompts for a passphrase:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code>❯ Enter passphrase for C:\Users\peterdir\.ssh\id_ed25519:
+Identity added: C:\Users\peterdir\.ssh\id_ed25519 (dp@wsl)
+
+PS C:\Users\peterdir\gh\maude&gt; git pull
+Enter passphrase for key &#39;/c/Users/peterdir/.ssh/id_ed25519&#39;:
+</code></pre></div></td></tr></table></div>
+<p><strong>Root cause</strong>: two different SSH agents are in play.</p>
+<ul>
+<li><code>ssh-add</code> used the <strong>Windows OpenSSH agent</strong> — key path shown as <code>C:\Users\...</code></li>
+<li><code>git pull</code> used <strong>Git for Windows' bundled SSH</strong> (MinGW/MSYS2) — path shown as <code>/c/Users/...</code></li>
+</ul>
+<p>The two agents are separate processes and do not share keys.</p>
+<p><strong>Fix</strong>: point Git at the Windows OpenSSH binary so both operations use the same agent:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">git</span> <span class="n">config</span> <span class="p">-</span><span class="n">-global</span> <span class="n">core</span><span class="p">.</span><span class="n">sshCommand</span> <span class="s2">&quot;C:/Windows/System32/OpenSSH/ssh.exe&quot;</span>
+</code></pre></div></td></tr></table></div>
+<p>Verify it was saved:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">git</span> <span class="n">config</span> <span class="p">-</span><span class="n">-global</span> <span class="n">core</span><span class="p">.</span><span class="n">sshCommand</span>
+<span class="c"># C:/Windows/System32/OpenSSH/ssh.exe</span>
+</code></pre></div></td></tr></table></div>
+<p>Now <code>git pull</code> will use the Windows OpenSSH agent where the key is already loaded and will not ask for a passphrase.</p>
+<div class="admonition note">
+<p class="admonition-title">After a reboot</p>
+<p>The Windows OpenSSH <strong>agent service</strong> (<code>ssh-agent</code>) survives reboots automatically if it is set to <em>Automatic</em> startup — but the loaded keys do not persist. Run <code>ssh-add</code> once per session to re-add your key. To check or change the service startup type:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">Get-Service</span> <span class="n">ssh-agent</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">Name</span><span class="p">,</span> <span class="n">StartType</span><span class="p">,</span> <span class="n">Status</span>
+<span class="nb">Set-Service</span> <span class="n">-Name</span> <span class="n">ssh-agent</span> <span class="n">-StartupType</span> <span class="n">Automatic</span>
+</code></pre></div></td></tr></table></div>
+</div>
 
 
 
