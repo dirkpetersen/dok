@@ -385,3 +385,47 @@ ssh -T git@github.com
 ```
 
 Your SSH configuration from the [SSH section](../ssh/index.md) enables secure Git operations without storing credentials.
+
+## Troubleshooting: SSH Agent on Windows
+
+### Git keeps asking for passphrase even after `ssh-add`
+
+On Windows you may run into this confusing situation — `ssh-add` succeeds, but `git pull` still prompts for a passphrase:
+
+```
+❯ Enter passphrase for C:\Users\peterdir\.ssh\id_ed25519:
+Identity added: C:\Users\peterdir\.ssh\id_ed25519 (dp@wsl)
+
+PS C:\Users\peterdir\gh\maude> git pull
+Enter passphrase for key '/c/Users/peterdir/.ssh/id_ed25519':
+```
+
+**Root cause**: two different SSH agents are in play.
+
+- `ssh-add` used the **Windows OpenSSH agent** — key path shown as `C:\Users\...`
+- `git pull` used **Git for Windows' bundled SSH** (MinGW/MSYS2) — path shown as `/c/Users/...`
+
+The two agents are separate processes and do not share keys.
+
+**Fix**: point Git at the Windows OpenSSH binary so both operations use the same agent:
+
+```powershell
+git config --global core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe"
+```
+
+Verify it was saved:
+
+```powershell
+git config --global core.sshCommand
+# C:/Windows/System32/OpenSSH/ssh.exe
+```
+
+Now `git pull` will use the Windows OpenSSH agent where the key is already loaded and will not ask for a passphrase.
+
+!!! note "After a reboot"
+    The Windows OpenSSH **agent service** (`ssh-agent`) survives reboots automatically if it is set to *Automatic* startup — but the loaded keys do not persist. Run `ssh-add` once per session to re-add your key. To check or change the service startup type:
+
+    ```powershell
+    Get-Service ssh-agent | Select-Object Name, StartType, Status
+    Set-Service -Name ssh-agent -StartupType Automatic
+    ```
