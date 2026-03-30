@@ -2924,7 +2924,12 @@
 <span class="normal">713</span>
 <span class="normal">714</span>
 <span class="normal">715</span>
-<span class="normal">716</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">716</span>
+<span class="normal">717</span>
+<span class="normal">718</span>
+<span class="normal">719</span>
+<span class="normal">720</span>
+<span class="normal">721</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
@@ -3450,13 +3455,18 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Options to fix this:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;1. Configure AWS Bedrock by getting AWS creds and then executing:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;1. Use Azure AI Foundry — paste these exports into your shell (or add to ~/.bashrc):&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   export CLAUDE_CODE_USE_FOUNDRY=1&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   export ANTHROPIC_FOUNDRY_BASE_URL=https://xxxxxxxxxxxxx.azure-api.net/anthropic&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   export ANTHROPIC_FOUNDRY_API_KEY=xxxxxxxxxxxxxxxxxx&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;2. Configure AWS Bedrock — get AWS creds and run:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   aws configure --profile bedrock&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;2. Use --local flag with a local LLM endpoint:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;3. Use --local flag with a local LLM endpoint:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   claude --local&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;3. Bypass this wrapper and run Claude Code directly:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;4. Bypass this wrapper and run Claude Code directly:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;   ~/.local/bin/claude&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="k">fi</span>
