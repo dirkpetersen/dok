@@ -524,13 +524,18 @@ else
   echo "" >&2
   echo "Options to fix this:" >&2
   echo "" >&2
-  echo "1. Configure AWS Bedrock by getting AWS creds and then executing:" >&2
+  echo "1. Use Azure AI Foundry — paste these exports into your shell (or add to ~/.bashrc):" >&2
+  echo "   export CLAUDE_CODE_USE_FOUNDRY=1" >&2
+  echo "   export ANTHROPIC_FOUNDRY_BASE_URL=https://xxxxxxxxxxxxx.azure-api.net/anthropic" >&2
+  echo "   export ANTHROPIC_FOUNDRY_API_KEY=xxxxxxxxxxxxxxxxxx" >&2
+  echo "" >&2
+  echo "2. Configure AWS Bedrock — get AWS creds and run:" >&2
   echo "   aws configure --profile bedrock" >&2
   echo "" >&2
-  echo "2. Use --local flag with a local LLM endpoint:" >&2
+  echo "3. Use --local flag with a local LLM endpoint:" >&2
   echo "   claude --local" >&2
   echo "" >&2
-  echo "3. Bypass this wrapper and run Claude Code directly:" >&2
+  echo "4. Bypass this wrapper and run Claude Code directly:" >&2
   echo "   ~/.local/bin/claude" >&2
   exit 1
 fi
