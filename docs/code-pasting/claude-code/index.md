@@ -190,7 +190,7 @@ export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-6"
 
 ### 6. (Optional) Using Claude Code Natively on Windows via PowerShell
 
-If you are running Claude Code directly on Windows (not inside WSL), you can configure the required environment variables in your PowerShell profile so they are set automatically in every session.
+If you are running Claude Code directly on Windows (not inside WSL), configure the required environment variables in your PowerShell profile so they are set automatically in every session.
 
 Open your profile file in an editor:
 
@@ -198,43 +198,67 @@ Open your profile file in an editor:
 notepad $PROFILE.CurrentUserAllHosts
 ```
 
-#### AWS Bedrock (Windows)
+#### Managing both backends in one profile
 
-Add these lines to your profile:
-
-```powershell
-# Claude Code — AWS Bedrock backend
-$env:DEFAULT_AWS_REGION                    = "us-west-2"
-$env:AWS_REGION                            = $env:DEFAULT_AWS_REGION
-$env:CLAUDE_CODE_USE_BEDROCK               = 1
-$env:ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION = $env:AWS_REGION
-$env:ANTHROPIC_DEFAULT_OPUS_MODEL          = "global.anthropic.claude-opus-4-6-v1"
-$env:ANTHROPIC_DEFAULT_SONNET_MODEL        = "global.anthropic.claude-sonnet-4-6"
-```
-
-AWS credentials still need to be present in `~\.aws\credentials` under a `[bedrock]` profile — the same file used in step 1. PowerShell environment variables handle the region and model selection; the credentials file handles the authentication.
-
-#### Azure AI Foundry (Windows)
-
-If you are using Azure instead of AWS, add these lines to your profile instead:
+The recommended approach is to keep both backend configurations in your profile and comment out whichever one is not active. To switch backends, swap which block is commented out and reload the profile.
 
 ```powershell
-# Claude Code — Azure AI Foundry backend
+# My PowerShell-only environment variables
+# ─────────────────────────────────────────
+# Switch backends by commenting/uncommenting the relevant block,
+# then reload with: . $PROFILE.CurrentUserAllHosts
+
+# ── Option A: AWS Bedrock ──────────────────────────────────────
+# $env:CLAUDE_CODE_USE_BEDROCK               = 1
+# $env:CLAUDE_CODE_USE_FOUNDRY               = 0
+# $env:AWS_REGION                            = "us-west-2"
+# $env:AWS_PROFILE                           = "bedrock"
+# $env:ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION = $env:AWS_REGION
+# $env:ANTHROPIC_DEFAULT_OPUS_MODEL          = "global.anthropic.claude-opus-4-6-v1"
+# $env:ANTHROPIC_DEFAULT_SONNET_MODEL        = "global.anthropic.claude-sonnet-4-6"
+
+# ── Option B: Azure AI Foundry ────────────────────────────────
 $env:CLAUDE_CODE_USE_FOUNDRY        = 1
-$env:ANTHROPIC_FOUNDRY_BASE_URL     = "https://xxxxxxxxxxxxx.azure-api.net/anthropic"
-$env:ANTHROPIC_FOUNDRY_API_KEY      = "xxxxxxxxxxxxxxxxxx"
+$env:CLAUDE_CODE_USE_BEDROCK        = 0
+$env:ANTHROPIC_FOUNDRY_BASE_URL     = "https://xxxxxxxxxxxx.azure-api.net/anthropic"
+$env:ANTHROPIC_FOUNDRY_API_KEY      = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+$env:ANTHROPIC_DEFAULT_OPUS_MODEL   = "claude-opus-4-6"
+$env:ANTHROPIC_DEFAULT_SONNET_MODEL = "claude-sonnet-4-6"
 ```
 
-Replace the URL and key with the values from your Azure AI Foundry deployment.
+**AWS Bedrock notes**: credentials must also be present in `~\.aws\credentials` under a `[bedrock]` profile (see step 1). The PowerShell variables handle region and model selection; the credentials file handles authentication.
 
-!!! tip "Apply changes without restarting"
-    After editing the profile, reload it in the current session:
-    ```powershell
-    . $PROFILE.CurrentUserAllHosts
-    ```
+**Azure AI Foundry notes**: replace the URL and API key with the values from your Azure AI Foundry deployment. No `~\.aws\credentials` file is needed.
+
+#### Switching backends
+
+```powershell
+# 1. Open the profile
+notepad $PROFILE.CurrentUserAllHosts
+
+# 2. Comment out the active block, uncomment the other
+
+# 3. Reload without restarting the terminal
+. $PROFILE.CurrentUserAllHosts
+```
+
+#### Installing Claude Code on Windows
+
+Install Claude Code via npm (requires Node.js):
+
+```powershell
+npm install -g @anthropic-ai/claude-code
+```
+
+Then run it from any directory that contains a git repo:
+
+```powershell
+cd C:\Users\you\gh\myproject
+claude
+```
 
 !!! note "WSL users"
-    If you are running Claude Code inside WSL, use the Linux-based setup in steps 1–5 above. The PowerShell profile approach is only needed when running `claude` natively from a Windows terminal (e.g. `cmd`, PowerShell, Windows Terminal without WSL). For a one-command WSL appliance setup, see the [WSL Coding Appliance](../../shell/wsl/index.md#wsl-coding-appliance-kanna-code) guide.
+    If you are running Claude Code inside WSL, use the Linux-based setup in steps 1–5 above. The PowerShell profile approach is only needed when running `claude` natively from a Windows terminal. For a one-command WSL appliance setup, see the [WSL Coding Appliance](../../shell/wsl/index.md#wsl-coding-appliance-kanna-code) guide.
 
 ## Important: Git Repository Requirement
 
