@@ -928,10 +928,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#aws-bedrock-windows" class="md-nav__link">
+  <a href="#managing-both-backends-in-one-profile" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AWS Bedrock (Windows)
+        Managing both backends in one profile
       
     </span>
   </a>
@@ -939,10 +939,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#azure-ai-foundry-windows" class="md-nav__link">
+  <a href="#switching-backends" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Azure AI Foundry (Windows)
+        Switching backends
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installing-claude-code-on-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installing Claude Code on Windows
       
     </span>
   </a>
@@ -1848,10 +1859,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#aws-bedrock-windows" class="md-nav__link">
+  <a href="#managing-both-backends-in-one-profile" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AWS Bedrock (Windows)
+        Managing both backends in one profile
       
     </span>
   </a>
@@ -1859,10 +1870,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#azure-ai-foundry-windows" class="md-nav__link">
+  <a href="#switching-backends" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Azure AI Foundry (Windows)
+        Switching backends
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installing-claude-code-on-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installing Claude Code on Windows
       
     </span>
   </a>
@@ -3780,47 +3802,83 @@ Save these settings to ~/.azure/clauderc for future sessions? (Y/n):
 <li>AWS Bedrock profile in <code>~/.aws/config</code></li>
 </ol>
 <h3 id="6-optional-using-claude-code-natively-on-windows-via-powershell">6. (Optional) Using Claude Code Natively on Windows via PowerShell<a class="headerlink" href="#6-optional-using-claude-code-natively-on-windows-via-powershell" title="Permanent link">&para;</a></h3>
-<p>If you are running Claude Code directly on Windows (not inside WSL), you can configure the required environment variables in your PowerShell profile so they are set automatically in every session.</p>
+<p>If you are running Claude Code directly on Windows (not inside WSL), configure the required environment variables in your PowerShell profile so they are set automatically in every session.</p>
 <p>Open your profile file in an editor:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">notepad</span> <span class="nv">$PROFILE</span><span class="p">.</span><span class="n">CurrentUserAllHosts</span>
 </code></pre></div></td></tr></table></div>
-<h4 id="aws-bedrock-windows">AWS Bedrock (Windows)<a class="headerlink" href="#aws-bedrock-windows" title="Permanent link">&para;</a></h4>
-<p>Add these lines to your profile:</p>
+<h4 id="managing-both-backends-in-one-profile">Managing both backends in one profile<a class="headerlink" href="#managing-both-backends-in-one-profile" title="Permanent link">&para;</a></h4>
+<p>The recommended approach is to keep both backend configurations in your profile and comment out whichever one is not active. To switch backends, swap which block is commented out and reload the profile.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c"># My PowerShell-only environment variables</span>
+<span class="c"># ─────────────────────────────────────────</span>
+<span class="c"># Switch backends by commenting/uncommenting the relevant block,</span>
+<span class="c"># then reload with: . $PROFILE.CurrentUserAllHosts</span>
+
+<span class="c"># ── Option A: AWS Bedrock ──────────────────────────────────────</span>
+<span class="c"># $env:CLAUDE_CODE_USE_BEDROCK               = 1</span>
+<span class="c"># $env:CLAUDE_CODE_USE_FOUNDRY               = 0</span>
+<span class="c"># $env:AWS_REGION                            = &quot;us-west-2&quot;</span>
+<span class="c"># $env:AWS_PROFILE                           = &quot;bedrock&quot;</span>
+<span class="c"># $env:ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION = $env:AWS_REGION</span>
+<span class="c"># $env:ANTHROPIC_DEFAULT_OPUS_MODEL          = &quot;global.anthropic.claude-opus-4-6-v1&quot;</span>
+<span class="c"># $env:ANTHROPIC_DEFAULT_SONNET_MODEL        = &quot;global.anthropic.claude-sonnet-4-6&quot;</span>
+
+<span class="c"># ── Option B: Azure AI Foundry ────────────────────────────────</span>
+<span class="nv">$env:CLAUDE_CODE_USE_FOUNDRY</span>        <span class="p">=</span> <span class="n">1</span>
+<span class="nv">$env:CLAUDE_CODE_USE_BEDROCK</span>        <span class="p">=</span> <span class="n">0</span>
+<span class="nv">$env:ANTHROPIC_FOUNDRY_BASE_URL</span>     <span class="p">=</span> <span class="s2">&quot;https://xxxxxxxxxxxx.azure-api.net/anthropic&quot;</span>
+<span class="nv">$env:ANTHROPIC_FOUNDRY_API_KEY</span>      <span class="p">=</span> <span class="s2">&quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</span>
+<span class="nv">$env:ANTHROPIC_DEFAULT_OPUS_MODEL</span>   <span class="p">=</span> <span class="s2">&quot;claude-opus-4-6&quot;</span>
+<span class="nv">$env:ANTHROPIC_DEFAULT_SONNET_MODEL</span> <span class="p">=</span> <span class="s2">&quot;claude-sonnet-4-6&quot;</span>
+</code></pre></div></td></tr></table></div>
+<p><strong>AWS Bedrock notes</strong>: credentials must also be present in <code>~\.aws\credentials</code> under a <code>[bedrock]</code> profile (see step 1). The PowerShell variables handle region and model selection; the credentials file handles authentication.</p>
+<p><strong>Azure AI Foundry notes</strong>: replace the URL and API key with the values from your Azure AI Foundry deployment. No <code>~\.aws\credentials</code> file is needed.</p>
+<h4 id="switching-backends">Switching backends<a class="headerlink" href="#switching-backends" title="Permanent link">&para;</a></h4>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
 <span class="normal">5</span>
 <span class="normal">6</span>
-<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c"># Claude Code — AWS Bedrock backend</span>
-<span class="nv">$env:DEFAULT_AWS_REGION</span>                    <span class="p">=</span> <span class="s2">&quot;us-west-2&quot;</span>
-<span class="nv">$env:AWS_REGION</span>                            <span class="p">=</span> <span class="nv">$env:DEFAULT_AWS_REGION</span>
-<span class="nv">$env:CLAUDE_CODE_USE_BEDROCK</span>               <span class="p">=</span> <span class="n">1</span>
-<span class="nv">$env:ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION</span> <span class="p">=</span> <span class="nv">$env:AWS_REGION</span>
-<span class="nv">$env:ANTHROPIC_DEFAULT_OPUS_MODEL</span>          <span class="p">=</span> <span class="s2">&quot;global.anthropic.claude-opus-4-6-v1&quot;</span>
-<span class="nv">$env:ANTHROPIC_DEFAULT_SONNET_MODEL</span>        <span class="p">=</span> <span class="s2">&quot;global.anthropic.claude-sonnet-4-6&quot;</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c"># 1. Open the profile</span>
+<span class="n">notepad</span> <span class="nv">$PROFILE</span><span class="p">.</span><span class="n">CurrentUserAllHosts</span>
+
+<span class="c"># 2. Comment out the active block, uncomment the other</span>
+
+<span class="c"># 3. Reload without restarting the terminal</span>
+<span class="p">.</span> <span class="nv">$PROFILE</span><span class="p">.</span><span class="n">CurrentUserAllHosts</span>
 </code></pre></div></td></tr></table></div>
-<p>AWS credentials still need to be present in <code>~\.aws\credentials</code> under a <code>[bedrock]</code> profile — the same file used in step 1. PowerShell environment variables handle the region and model selection; the credentials file handles the authentication.</p>
-<h4 id="azure-ai-foundry-windows">Azure AI Foundry (Windows)<a class="headerlink" href="#azure-ai-foundry-windows" title="Permanent link">&para;</a></h4>
-<p>If you are using Azure instead of AWS, add these lines to your profile instead:</p>
+<h4 id="installing-claude-code-on-windows">Installing Claude Code on Windows<a class="headerlink" href="#installing-claude-code-on-windows" title="Permanent link">&para;</a></h4>
+<p>Install Claude Code via npm (requires Node.js):</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">npm</span> <span class="n">install</span> <span class="n">-g</span> <span class="nv">@anthropic</span><span class="n">-ai</span><span class="p">/</span><span class="n">claude-code</span>
+</code></pre></div></td></tr></table></div>
+<p>Then run it from any directory that contains a git repo:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c"># Claude Code — Azure AI Foundry backend</span>
-<span class="nv">$env:CLAUDE_CODE_USE_FOUNDRY</span>        <span class="p">=</span> <span class="n">1</span>
-<span class="nv">$env:ANTHROPIC_FOUNDRY_BASE_URL</span>     <span class="p">=</span> <span class="s2">&quot;https://xxxxxxxxxxxxx.azure-api.net/anthropic&quot;</span>
-<span class="nv">$env:ANTHROPIC_FOUNDRY_API_KEY</span>      <span class="p">=</span> <span class="s2">&quot;xxxxxxxxxxxxxxxxxx&quot;</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">cd </span><span class="n">C</span><span class="p">:\</span><span class="n">Users</span><span class="p">\</span><span class="n">you</span><span class="p">\</span><span class="n">gh</span><span class="p">\</span><span class="n">myproject</span>
+<span class="n">claude</span>
 </code></pre></div></td></tr></table></div>
-<p>Replace the URL and key with the values from your Azure AI Foundry deployment.</p>
-<div class="admonition tip">
-<p class="admonition-title">Apply changes without restarting</p>
-<p>After editing the profile, reload it in the current session:
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="p">.</span> <span class="nv">$PROFILE</span><span class="p">.</span><span class="n">CurrentUserAllHosts</span>
-</code></pre></div></td></tr></table></div></p>
-</div>
 <div class="admonition note">
 <p class="admonition-title">WSL users</p>
-<p>If you are running Claude Code inside WSL, use the Linux-based setup in steps 1–5 above. The PowerShell profile approach is only needed when running <code>claude</code> natively from a Windows terminal (e.g. <code>cmd</code>, PowerShell, Windows Terminal without WSL). For a one-command WSL appliance setup, see the <a href="../../shell/wsl/#wsl-coding-appliance-kanna-code">WSL Coding Appliance</a> guide.</p>
+<p>If you are running Claude Code inside WSL, use the Linux-based setup in steps 1–5 above. The PowerShell profile approach is only needed when running <code>claude</code> natively from a Windows terminal. For a one-command WSL appliance setup, see the <a href="../../shell/wsl/#wsl-coding-appliance-kanna-code">WSL Coding Appliance</a> guide.</p>
 </div>
 <h2 id="important-git-repository-requirement">Important: Git Repository Requirement<a class="headerlink" href="#important-git-repository-requirement" title="Permanent link">&para;</a></h2>
 <p><strong>Claude Code must always be initialized inside a git repository.</strong> This is a requirement for the tool to function properly.</p>
