@@ -127,7 +127,15 @@ find_claude_binary() {
   echo "Installing Claude Code..." >&2
   echo "Running: curl -fsSL https://claude.ai/install.sh | bash -s latest" >&2
   echo "" >&2
-  if curl -fsSL https://claude.ai/install.sh | bash -s latest; then
+  local _install_sh
+  _install_sh=$(mktemp)
+  if ! curl -fsSL -o "$_install_sh" https://claude.ai/install.sh; then
+    echo -e "${RED}✗ Failed to download Claude Code installer (HTTP error)${NC}" >&2
+    rm -f "$_install_sh"
+    return 1
+  fi
+  if bash "$_install_sh" -s latest; then
+    rm -f "$_install_sh"
     echo -e "${GREEN}✓${NC} Claude Code installed successfully" >&2
     echo "" >&2
     # Re-check PATH after installation
@@ -155,6 +163,7 @@ find_claude_binary() {
     fi
     return 1
   else
+    rm -f "$_install_sh"
     echo -e "${RED}✗ Failed to install Claude Code${NC}" >&2
     return 1
   fi
