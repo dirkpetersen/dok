@@ -2951,7 +2951,16 @@
 <span class="normal">718</span>
 <span class="normal">719</span>
 <span class="normal">720</span>
-<span class="normal">721</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">721</span>
+<span class="normal">722</span>
+<span class="normal">723</span>
+<span class="normal">724</span>
+<span class="normal">725</span>
+<span class="normal">726</span>
+<span class="normal">727</span>
+<span class="normal">728</span>
+<span class="normal">729</span>
+<span class="normal">730</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
@@ -3080,7 +3089,15 @@ find_claude_binary<span class="o">()</span><span class="w"> </span><span class="
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Installing Claude Code...&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Running: curl -fsSL https://claude.ai/install.sh | bash -s latest&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://claude.ai/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash<span class="w"> </span>-s<span class="w"> </span>latest<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span>_install_sh
+<span class="w">  </span><span class="nv">_install_sh</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_install_sh</span><span class="s2">&quot;</span><span class="w"> </span>https://claude.ai/install.sh<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Failed to download Claude Code installer (HTTP error)</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_install_sh</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">  </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>bash<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_install_sh</span><span class="s2">&quot;</span><span class="w"> </span>-s<span class="w"> </span>latest<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_install_sh</span><span class="s2">&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Claude Code installed successfully&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="c1"># Re-check PATH after installation</span>
@@ -3108,6 +3125,7 @@ find_claude_binary<span class="o">()</span><span class="w"> </span><span class="
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="w">  </span><span class="k">else</span>
+<span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_install_sh</span><span class="s2">&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Failed to install Claude Code</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="w">  </span><span class="k">fi</span>
