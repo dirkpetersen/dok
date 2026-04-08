@@ -125,7 +125,7 @@ find_claude_binary() {
   echo -e "${YELLOW}Claude Code not found in PATH${NC}" >&2
   echo "" >&2
   echo "Installing Claude Code..." >&2
-  echo "Running: curl -fsSL https://claude.ai/install.sh | bash -s latest" >&2
+  echo "Running: curl -fsSL https://claude.ai/install.sh | bash" >&2
   echo "" >&2
   local _install_sh
   _install_sh=$(mktemp)
@@ -134,7 +134,7 @@ find_claude_binary() {
     rm -f "$_install_sh"
     return 1
   fi
-  if bash "$_install_sh" -s latest; then
+  if bash "$_install_sh" latest; then
     rm -f "$_install_sh"
     echo -e "${GREEN}✓${NC} Claude Code installed successfully" >&2
     echo "" >&2
