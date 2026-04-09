@@ -192,7 +192,19 @@ export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-6"
 
 If you are running Claude Code directly on Windows (not inside WSL), configure the required environment variables in your PowerShell profile so they are set automatically in every session.
 
-Open your profile file in an editor:
+First, check whether the profile file exists — on a fresh Windows install it often does not:
+
+```powershell
+Test-Path $PROFILE.CurrentUserAllHosts
+```
+
+If it returns `False`, create it (run PowerShell **as Administrator** once):
+
+```powershell
+New-Item -Path $PROFILE.CurrentUserAllHosts -ItemType File -Force
+```
+
+Then open it in an editor:
 
 ```powershell
 notepad $PROFILE.CurrentUserAllHosts
