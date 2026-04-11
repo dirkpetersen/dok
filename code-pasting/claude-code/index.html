@@ -3821,7 +3821,13 @@ Save these settings to ~/.azure/clauderc for future sessions? (Y/n):
 </ol>
 <h3 id="6-optional-using-claude-code-natively-on-windows-via-powershell">6. (Optional) Using Claude Code Natively on Windows via PowerShell<a class="headerlink" href="#6-optional-using-claude-code-natively-on-windows-via-powershell" title="Permanent link">&para;</a></h3>
 <p>If you are running Claude Code directly on Windows (not inside WSL), configure the required environment variables in your PowerShell profile so they are set automatically in every session.</p>
-<p>Open your profile file in an editor:</p>
+<p>First, check whether the profile file exists — on a fresh Windows install it often does not:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">Test-Path</span> <span class="nv">$PROFILE</span><span class="p">.</span><span class="n">CurrentUserAllHosts</span>
+</code></pre></div></td></tr></table></div>
+<p>If it returns <code>False</code>, create it (run PowerShell <strong>as Administrator</strong> once):</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">New-Item</span> <span class="n">-Path</span> <span class="nv">$PROFILE</span><span class="p">.</span><span class="n">CurrentUserAllHosts</span> <span class="n">-ItemType</span> <span class="n">File</span> <span class="n">-Force</span>
+</code></pre></div></td></tr></table></div>
+<p>Then open it in an editor:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">notepad</span> <span class="nv">$PROFILE</span><span class="p">.</span><span class="n">CurrentUserAllHosts</span>
 </code></pre></div></td></tr></table></div>
 <h4 id="managing-both-backends-in-one-profile">Managing both backends in one profile<a class="headerlink" href="#managing-both-backends-in-one-profile" title="Permanent link">&para;</a></h4>
