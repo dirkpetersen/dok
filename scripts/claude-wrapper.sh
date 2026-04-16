@@ -626,12 +626,7 @@ if [[ "$wdebug" -eq 1 ]]; then
              CLAUDE_CODE_USE_FOUNDRY ANTHROPIC_FOUNDRY_BASE_URL \
              CLAUDE_CODE_USE_BEDROCK AWS_DEFAULT_REGION AWS_PROFILE; do
     if [[ -n "${!var+x}" ]]; then
-      # Mask API key values
-      if [[ "$var" == "ANTHROPIC_API_KEY" || "$var" == "ANTHROPIC_FOUNDRY_API_KEY" ]]; then
-        echo "  $var=${!var:0:10}..." >&2
-      else
-        echo "  $var=${!var}" >&2
-      fi
+      echo "  $var=${!var}" >&2
     fi
   done
   echo "" >&2
@@ -639,12 +634,6 @@ if [[ "$wdebug" -eq 1 ]]; then
     echo "Command: $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
   else
     echo "Command: $REAL_CLAUDE --model $mymodel --allowedTools <list> --disallowedTools <list> $*" >&2
-  fi
-  echo "" >&2
-  read -p "Execute Claude Code now? (y/n): " run_confirm
-  if [[ "$run_confirm" != "y" && "$run_confirm" != "Y" ]]; then
-    echo "Aborted." >&2
-    exit 0
   fi
   echo "" >&2
 fi
