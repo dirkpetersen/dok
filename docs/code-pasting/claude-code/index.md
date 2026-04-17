@@ -169,12 +169,12 @@ When `CLAUDE_CODE_USE_FOUNDRY=1` is active, model defaults switch to plain Anthr
 |--------|---------------------|
 | haiku  | `claude-haiku-4-5`  |
 | sonnet | `claude-sonnet-4-6` |
-| opus   | `claude-opus-4-6`   |
+| opus   | `claude-opus-4-7`   |
 
 You can override any of these by adding them to `~/.azure/clauderc`:
 
 ```bash
-export ANTHROPIC_DEFAULT_OPUS_MODEL="claude-opus-4-6"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="claude-opus-4-7"
 export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-6"
 ```
 
@@ -234,7 +234,7 @@ $env:CLAUDE_CODE_USE_FOUNDRY        = 1
 $env:CLAUDE_CODE_USE_BEDROCK        = 0
 $env:ANTHROPIC_FOUNDRY_BASE_URL     = "https://xxxxxxxxxxxx.azure-api.net/anthropic"
 $env:ANTHROPIC_FOUNDRY_API_KEY      = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-$env:ANTHROPIC_DEFAULT_OPUS_MODEL   = "claude-opus-4-6"
+$env:ANTHROPIC_DEFAULT_OPUS_MODEL   = "claude-opus-4-7"
 $env:ANTHROPIC_DEFAULT_SONNET_MODEL = "claude-sonnet-4-6"
 ```
 
