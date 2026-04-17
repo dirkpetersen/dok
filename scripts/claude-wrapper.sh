@@ -429,7 +429,38 @@ if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
 
   # Now update Claude Code itself
   echo -e "${YELLOW}Updating Claude Code...${NC}" >&2
+  mkdir -p "$HOME/.claude"
+  date +%s > "$HOME/.claude/wrapper-last-update"
   exec "$REAL_CLAUDE" update
+fi
+
+# Auto-update if it has been more than 7 days since last update
+AUTO_UPDATE_STAMP="$HOME/.claude/wrapper-last-update"
+_now=$(date +%s)
+_last=0
+[[ -f "$AUTO_UPDATE_STAMP" ]] && _last=$(cat "$AUTO_UPDATE_STAMP" 2>/dev/null || echo 0)
+if (( _now - _last > 604800 )); then
+  echo -e "${YELLOW}Auto-updating claude-wrapper (last update was >7 days ago)...${NC}" >&2
+  TEMP_WRAPPER=$(mktemp)
+  MD5_BEFORE=$(md5sum "$WRAPPER_PATH" 2>/dev/null | cut -d' ' -f1)
+  if curl -fsSL -o "$TEMP_WRAPPER" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`"; then
+    MD5_AFTER=$(md5sum "$TEMP_WRAPPER" 2>/dev/null | cut -d' ' -f1)
+    if mv "$TEMP_WRAPPER" "$WRAPPER_PATH" && chmod +x "$WRAPPER_PATH"; then
+      if [[ "$MD5_BEFORE" != "$MD5_AFTER" ]]; then
+        echo -e "${GREEN}✓${NC} Wrapper updated" >&2
+      else
+        echo -e "${GREEN}✓${NC} Wrapper already up to date" >&2
+      fi
+    else
+      echo -e "${RED}✗ Failed to replace wrapper${NC}" >&2
+      rm -f "$TEMP_WRAPPER"
+    fi
+  else
+    echo -e "${YELLOW}⚠ Auto-update skipped (no network?)${NC}" >&2
+    rm -f "$TEMP_WRAPPER"
+  fi
+  mkdir -p "$HOME/.claude"
+  date +%s > "$AUTO_UPDATE_STAMP"
 fi
 
 # Check if --local flag is used
