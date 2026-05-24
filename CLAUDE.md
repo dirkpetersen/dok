@@ -172,6 +172,8 @@ When modifying scripts:
 3. Test both interactive and force modes
 4. Ensure logging and revert functionality works
 
+**claude-wrapper.sh versioning**: Every commit that modifies `scripts/claude-wrapper.sh` must increment the `WRAPPER_VERSION` constant (e.g. `1.13` → `1.14`). The version follows simple incremental numbering with no semantic versioning.
+
 ### Style Guidelines
 
 - Use descriptive headers with clear hierarchy
