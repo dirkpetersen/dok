@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.15"
+WRAPPER_VERSION="1.16"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -29,7 +29,7 @@ _set_wrapper_env() {
   mv "$tmpf" "$ENV_FILE"
 }
 
-# One-time migration of legacy files into claude-wrapper.env (idempotent)
+# Migrate legacy files into claude-wrapper.env, then delete them (idempotent)
 _migrate_to_wrapper_env() {
   # claudelocalrc → LOCAL_* vars
   if [[ -f "$HOME/.claude/claudelocalrc" ]]; then
@@ -41,16 +41,19 @@ _migrate_to_wrapper_env() {
       _mval="${_mval#\"}" ; _mval="${_mval%\"}"
       grep -q "^${_mkey}=" "$ENV_FILE" 2>/dev/null || _set_wrapper_env "$_mkey" "$_mval"
     done < "$HOME/.claude/claudelocalrc"
+    rm -f "$HOME/.claude/claudelocalrc"
   fi
   # wrapper-last-update → WRAPPER_LAST_UPDATE
   if [[ -f "$HOME/.claude/wrapper-last-update" ]]; then
     local _mts
     _mts=$(cat "$HOME/.claude/wrapper-last-update" 2>/dev/null || echo 0)
     grep -q "^WRAPPER_LAST_UPDATE=" "$ENV_FILE" 2>/dev/null || _set_wrapper_env "WRAPPER_LAST_UPDATE" "$_mts"
+    rm -f "$HOME/.claude/wrapper-last-update"
   fi
-  # yolo-mode flag file → YOLO_MODE
+  # yolo-mode flag file → WRAPPER_YOLO
   if [[ -f "$HOME/.claude/yolo-mode" ]]; then
-    grep -q "^YOLO_MODE=" "$ENV_FILE" 2>/dev/null || _set_wrapper_env "YOLO_MODE" "1"
+    grep -q "^WRAPPER_YOLO=" "$ENV_FILE" 2>/dev/null || _set_wrapper_env "WRAPPER_YOLO" "1"
+    rm -f "$HOME/.claude/yolo-mode"
   fi
 }
 
@@ -507,18 +510,13 @@ if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
 
   # Now update Claude Code itself
   echo -e "${YELLOW}Updating Claude Code...${NC}" >&2
-  mkdir -p "$HOME/.claude"
-  _uts=$(date +%s)
-  echo "$_uts" > "$HOME/.claude/wrapper-last-update"
-  _set_wrapper_env WRAPPER_LAST_UPDATE "$_uts"
+  _set_wrapper_env WRAPPER_LAST_UPDATE "$(date +%s)"
   exec "$REAL_CLAUDE" update
 fi
 
 # Auto-update if it has been more than 7 days since last update
-AUTO_UPDATE_STAMP="$HOME/.claude/wrapper-last-update"
 _now=$(date +%s)
 _last="${WRAPPER_LAST_UPDATE:-0}"
-[[ "$_last" == "0" && -f "$AUTO_UPDATE_STAMP" ]] && _last=$(cat "$AUTO_UPDATE_STAMP" 2>/dev/null || echo 0)
 if (( _now - _last > 604800 )); then
   echo -e "${YELLOW}Auto-updating claude-wrapper (last update was >7 days ago)...${NC}" >&2
   TEMP_WRAPPER=$(mktemp)
@@ -540,10 +538,7 @@ if (( _now - _last > 604800 )); then
     echo -e "${YELLOW}⚠ Auto-update skipped (no network?)${NC}" >&2
     rm -f "$TEMP_WRAPPER"
   fi
-  mkdir -p "$HOME/.claude"
-  _ats=$(date +%s)
-  echo "$_ats" > "$AUTO_UPDATE_STAMP"
-  _set_wrapper_env WRAPPER_LAST_UPDATE "$_ats"
+  _set_wrapper_env WRAPPER_LAST_UPDATE "$(date +%s)"
 fi
 
 # Check if --local flag is used
@@ -589,14 +584,6 @@ if [[ "$1" == "--local" ]]; then
       [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && _set_wrapper_env LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
       [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]]   && _set_wrapper_env LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL   "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
       echo -e "${GREEN}✓${NC} Saved to ~/.claude/claude-wrapper.env" >&2
-      # Also write to claudelocalrc for backward compatibility
-      {
-        echo "export LOCAL_ANTHROPIC_BASE_URL=\"$LOCAL_ANTHROPIC_BASE_URL\""
-        [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]]  && echo "export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL\""
-        [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && echo "export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL\""
-        [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]]   && echo "export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL\""
-      } > "$HOME/.claude/claudelocalrc"
-      echo -e "${GREEN}✓${NC} Saved to ~/.claude/claudelocalrc (compatibility)" >&2
     fi
     echo "" >&2
   fi
