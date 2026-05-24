@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.14"
+WRAPPER_VERSION="1.15"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -278,18 +278,14 @@ install_wrapper() {
   echo "  claude                # Launch with default model (haiku unless changed)"
   echo "  claude sonnet         # Launch with Sonnet (balanced)"
   echo "  claude opus           # Launch with Opus (most capable)"
-  echo "  claude opus-1m        # Launch with Opus in fast mode"
-  echo "  claude sonnet-1m      # Launch with Sonnet in fast mode"
+  echo "  claude opus-1m        # Launch with Opus (1M token context window)"
+  echo "  claude sonnet-1m      # Launch with Sonnet (1M token context window)"
   echo "  claude -c opus        # Model name works anywhere in args"
   echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/sonnet-1m/opus-1m)"
+  echo "  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)"
   echo "  claude --models       # Show default Anthropic models"
   echo "  claude update         # Update wrapper and Claude Code"
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
-  echo ""
-
-  echo "To skip all permission prompts, run:"
-  echo ""
-  echo "  touch ~/.claude/yolo-mode"
   echo ""
 
   exit 0
@@ -448,14 +444,15 @@ if [[ "$1" == "--models" ]]; then
   exit 0
 fi
 
-# Set persistent default model
+# Set persistent defaults (model, yolo)
 if [[ "$1" == "default" ]]; then
   _valid_models="haiku sonnet opus sonnet-1m opus-1m"
   _chosen="${2:-}"
   if [[ -z "$_chosen" ]]; then
     echo -e "${YELLOW}Current default model: ${WRAPPER_DEFAULT_MODEL:-haiku}${NC}" >&2
+    echo -e "${YELLOW}Yolo mode (skip permissions): ${WRAPPER_YOLO:-0}${NC}" >&2
     echo "" >&2
-    echo "Usage: claude default <model>" >&2
+    echo "Usage: claude default <model|yolo>" >&2
     echo "Valid models: $_valid_models" >&2
     exit 0
   fi
@@ -465,9 +462,15 @@ if [[ "$1" == "default" ]]; then
       echo -e "${GREEN}✓${NC} Default model set to '$_chosen' in ~/.claude/claude-wrapper.env" >&2
       exit 0
       ;;
+    yolo)
+      _set_wrapper_env WRAPPER_YOLO "1"
+      echo -e "${GREEN}✓${NC} Yolo mode enabled (WRAPPER_YOLO=1) in ~/.claude/claude-wrapper.env" >&2
+      exit 0
+      ;;
     *)
-      echo -e "${RED}✗ Unknown model '$_chosen'${NC}" >&2
+      echo -e "${RED}✗ Unknown option '$_chosen'${NC}" >&2
       echo "Valid models: $_valid_models" >&2
+      echo "Other options: yolo" >&2
       exit 1
       ;;
   esac
@@ -756,7 +759,7 @@ if [[ "$wdebug" -eq 1 ]]; then
     fi
   done
   echo "" >&2
-  if [[ -f "$HOME/.claude/yolo-mode" ]] || [[ "${YOLO_MODE:-0}" == "1" ]]; then
+  if [[ -f "$HOME/.claude/yolo-mode" ]] || [[ "${YOLO_MODE:-0}" == "1" ]] || [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
     echo "Command: $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
   else
     echo "Command: $REAL_CLAUDE --model $mymodel --allowedTools <list> --disallowedTools <list> $*" >&2
@@ -833,7 +836,7 @@ DISALLOWED_TOOLS=(
 )
 
 # Execute Claude Code (skip permissions if ~/.claude/yolo-mode exists or YOLO_MODE=1)
-if [[ -f "$HOME/.claude/yolo-mode" ]] || [[ "${YOLO_MODE:-0}" == "1" ]]; then
+if [[ -f "$HOME/.claude/yolo-mode" ]] || [[ "${YOLO_MODE:-0}" == "1" ]] || [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
   exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
 else
   exec "$REAL_CLAUDE" --model "$mymodel" \
