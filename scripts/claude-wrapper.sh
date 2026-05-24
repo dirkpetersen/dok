@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.17"
+WRAPPER_VERSION="1.18"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -422,9 +422,9 @@ if [[ "$1" == "--models" ]]; then
     echo "Local LLM Configuration (use 'claude --local'):"
     echo ""
     echo "  Base URL: $LOCAL_ANTHROPIC_BASE_URL"
-    echo "  Haiku:    ${LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL:-hc/minimax-m2p5}"
-    echo "  Sonnet:   ${LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL:-hc/minimax-m2p5}"
-    echo "  Opus:     ${LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL:-hc/minimax-m2p5}"
+    echo "  Haiku:    ${LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL:-deepseek-flash}"
+    echo "  Sonnet:   ${LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL:-deepseek-flash}"
+    echo "  Opus:     ${LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL:-deepseek-flash}"
     echo ""
   else
     echo "Local LLM Configuration (not configured):"
@@ -432,7 +432,7 @@ if [[ "$1" == "--models" ]]; then
     echo "  Set LOCAL_ANTHROPIC_BASE_URL to activate local models"
     echo "  Example: export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.example.com/v1\""
     echo ""
-    echo "  Default models (hc/minimax-m2p5) can be overridden with:"
+    echo "  Default models (deepseek-flash) can be overridden with:"
     echo "    LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
     echo "    LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
     echo "    LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
@@ -548,9 +548,9 @@ if [[ "$1" == "--local" ]]; then
     echo "  export LOCAL_ANTHROPIC_BASE_URL=\"http://llm.dev-ai.university.edu/cc/v1\"" >&2
     echo "" >&2
     echo "Optionally, also set local model names:" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"hc/minimax-m2p5\"" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"hc/minimax-m2p5\"" >&2
-    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"hc/minimax-m2p5\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"deepseek-flash\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"deepseek-flash\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"deepseek-flash\"" >&2
     exit 1
   fi
 
