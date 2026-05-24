@@ -3064,7 +3064,7 @@
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">&quot;claude-wrapper.sh&quot;</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.17&quot;</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.18&quot;</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">&quot;</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude&quot;</span>
@@ -3482,9 +3482,9 @@ verify_path_configuration
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Local LLM Configuration (use &#39;claude --local&#39;):&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Base URL: </span><span class="nv">$LOCAL_ANTHROPIC_BASE_URL</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Haiku:    </span><span class="si">${</span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="k">:-</span><span class="nv">hc</span><span class="p">/minimax-m2p5</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Sonnet:   </span><span class="si">${</span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="k">:-</span><span class="nv">hc</span><span class="p">/minimax-m2p5</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Opus:     </span><span class="si">${</span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">hc</span><span class="p">/minimax-m2p5</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Haiku:    </span><span class="si">${</span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="k">:-</span><span class="nv">deepseek</span><span class="p">-flash</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Sonnet:   </span><span class="si">${</span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="k">:-</span><span class="nv">deepseek</span><span class="p">-flash</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Opus:     </span><span class="si">${</span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">deepseek</span><span class="p">-flash</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Local LLM Configuration (not configured):&quot;</span>
@@ -3492,7 +3492,7 @@ verify_path_configuration
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Set LOCAL_ANTHROPIC_BASE_URL to activate local models&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Example: export LOCAL_ANTHROPIC_BASE_URL=\&quot;http://llm.example.com/v1\&quot;&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Default models (hc/minimax-m2p5) can be overridden with:&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Default models (deepseek-flash) can be overridden with:&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;    LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;    LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;    LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL&quot;</span>
@@ -3608,9 +3608,9 @@ verify_path_configuration
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export LOCAL_ANTHROPIC_BASE_URL=\&quot;http://llm.dev-ai.university.edu/cc/v1\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Optionally, also set local model names:&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\&quot;hc/minimax-m2p5\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\&quot;hc/minimax-m2p5\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\&quot;hc/minimax-m2p5\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\&quot;deepseek-flash\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\&quot;deepseek-flash\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\&quot;deepseek-flash\&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="w">  </span><span class="k">fi</span>
 
