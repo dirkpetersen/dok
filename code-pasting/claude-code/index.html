@@ -3063,26 +3063,13 @@
 <span class="normal">830</span>
 <span class="normal">831</span>
 <span class="normal">832</span>
-<span class="normal">833</span>
-<span class="normal">834</span>
-<span class="normal">835</span>
-<span class="normal">836</span>
-<span class="normal">837</span>
-<span class="normal">838</span>
-<span class="normal">839</span>
-<span class="normal">840</span>
-<span class="normal">841</span>
-<span class="normal">842</span>
-<span class="normal">843</span>
-<span class="normal">844</span>
-<span class="normal">845</span>
-<span class="normal">846</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">833</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">&quot;claude-wrapper.sh&quot;</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.15&quot;</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.16&quot;</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">&quot;</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude&quot;</span>
@@ -3107,7 +3094,7 @@ _set_wrapper_env<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="w">  </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$tmpf</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span>
 <span class="o">}</span>
 
-<span class="c1"># One-time migration of legacy files into claude-wrapper.env (idempotent)</span>
+<span class="c1"># Migrate legacy files into claude-wrapper.env, then delete them (idempotent)</span>
 _migrate_to_wrapper_env<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="c1"># claudelocalrc → LOCAL_* vars</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/claudelocalrc&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -3119,16 +3106,19 @@ _migrate_to_wrapper_env<span class="o">()</span><span class="w"> </span><span cl
 <span class="w">      </span><span class="nv">_mval</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">_mval</span><span class="p">#</span><span class="se">\&quot;</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="nv">_mval</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">_mval</span><span class="p">%</span><span class="se">\&quot;</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^</span><span class="si">${</span><span class="nv">_mkey</span><span class="si">}</span><span class="s2">=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>_set_wrapper_env<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_mkey</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_mval</span><span class="s2">&quot;</span>
 <span class="w">    </span><span class="k">done</span><span class="w"> </span>&lt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/claudelocalrc&quot;</span>
+<span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/claudelocalrc&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
 <span class="w">  </span><span class="c1"># wrapper-last-update → WRAPPER_LAST_UPDATE</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/wrapper-last-update&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">local</span><span class="w"> </span>_mts
 <span class="w">    </span><span class="nv">_mts</span><span class="o">=</span><span class="k">$(</span>cat<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/wrapper-last-update&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="m">0</span><span class="k">)</span>
 <span class="w">    </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^WRAPPER_LAST_UPDATE=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>_set_wrapper_env<span class="w"> </span><span class="s2">&quot;WRAPPER_LAST_UPDATE&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_mts</span><span class="s2">&quot;</span>
+<span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/wrapper-last-update&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
-<span class="w">  </span><span class="c1"># yolo-mode flag file → YOLO_MODE</span>
+<span class="w">  </span><span class="c1"># yolo-mode flag file → WRAPPER_YOLO</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/yolo-mode&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^YOLO_MODE=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>_set_wrapper_env<span class="w"> </span><span class="s2">&quot;YOLO_MODE&quot;</span><span class="w"> </span><span class="s2">&quot;1&quot;</span>
+<span class="w">    </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^WRAPPER_YOLO=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>_set_wrapper_env<span class="w"> </span><span class="s2">&quot;WRAPPER_YOLO&quot;</span><span class="w"> </span><span class="s2">&quot;1&quot;</span>
+<span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/yolo-mode&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
 <span class="o">}</span>
 
@@ -3585,18 +3575,13 @@ verify_path_configuration
 
 <span class="w">  </span><span class="c1"># Now update Claude Code itself</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Updating Claude Code...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">  </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude&quot;</span>
-<span class="w">  </span><span class="nv">_uts</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_uts</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/wrapper-last-update&quot;</span>
-<span class="w">  </span>_set_wrapper_env<span class="w"> </span>WRAPPER_LAST_UPDATE<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_uts</span><span class="s2">&quot;</span>
+<span class="w">  </span>_set_wrapper_env<span class="w"> </span>WRAPPER_LAST_UPDATE<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">exec</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REAL_CLAUDE</span><span class="s2">&quot;</span><span class="w"> </span>update
 <span class="k">fi</span>
 
 <span class="c1"># Auto-update if it has been more than 7 days since last update</span>
-<span class="nv">AUTO_UPDATE_STAMP</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/wrapper-last-update&quot;</span>
 <span class="nv">_now</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span>
 <span class="nv">_last</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">WRAPPER_LAST_UPDATE</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_last</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;0&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AUTO_UPDATE_STAMP</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">_last</span><span class="o">=</span><span class="k">$(</span>cat<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AUTO_UPDATE_STAMP</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="m">0</span><span class="k">)</span>
 <span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>_now<span class="w"> </span>-<span class="w"> </span>_last<span class="w"> </span>&gt;<span class="w"> </span><span class="m">604800</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Auto-updating claude-wrapper (last update was &gt;7 days ago)...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nv">TEMP_WRAPPER</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
@@ -3618,10 +3603,7 @@ verify_path_configuration
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠ Auto-update skipped (no network?)</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
-<span class="w">  </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude&quot;</span>
-<span class="w">  </span><span class="nv">_ats</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_ats</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AUTO_UPDATE_STAMP</span><span class="s2">&quot;</span>
-<span class="w">  </span>_set_wrapper_env<span class="w"> </span>WRAPPER_LAST_UPDATE<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_ats</span><span class="s2">&quot;</span>
+<span class="w">  </span>_set_wrapper_env<span class="w"> </span>WRAPPER_LAST_UPDATE<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span><span class="s2">&quot;</span>
 <span class="k">fi</span>
 
 <span class="c1"># Check if --local flag is used</span>
@@ -3667,14 +3649,6 @@ verify_path_configuration
 <span class="w">      </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>_set_wrapper_env<span class="w"> </span>LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w">   </span><span class="o">&amp;&amp;</span><span class="w"> </span>_set_wrapper_env<span class="w"> </span>LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL<span class="w">   </span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Saved to ~/.claude/claude-wrapper.env&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">      </span><span class="c1"># Also write to claudelocalrc for backward compatibility</span>
-<span class="w">      </span><span class="o">{</span>
-<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export LOCAL_ANTHROPIC_BASE_URL=\&quot;</span><span class="nv">$LOCAL_ANTHROPIC_BASE_URL</span><span class="s2">\&quot;&quot;</span>
-<span class="w">        </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="s2">\&quot;&quot;</span>
-<span class="w">        </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="s2">\&quot;&quot;</span>
-<span class="w">        </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w">   </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="s2">\&quot;&quot;</span>
-<span class="w">      </span><span class="o">}</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/claudelocalrc&quot;</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Saved to ~/.claude/claudelocalrc (compatibility)&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="k">fi</span>
