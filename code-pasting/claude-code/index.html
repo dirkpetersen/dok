@@ -3041,13 +3041,45 @@
 <span class="normal">808</span>
 <span class="normal">809</span>
 <span class="normal">810</span>
-<span class="normal">811</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">811</span>
+<span class="normal">812</span>
+<span class="normal">813</span>
+<span class="normal">814</span>
+<span class="normal">815</span>
+<span class="normal">816</span>
+<span class="normal">817</span>
+<span class="normal">818</span>
+<span class="normal">819</span>
+<span class="normal">820</span>
+<span class="normal">821</span>
+<span class="normal">822</span>
+<span class="normal">823</span>
+<span class="normal">824</span>
+<span class="normal">825</span>
+<span class="normal">826</span>
+<span class="normal">827</span>
+<span class="normal">828</span>
+<span class="normal">829</span>
+<span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">&quot;claude-wrapper.sh&quot;</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.13&quot;</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.14&quot;</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">&quot;</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude&quot;</span>
@@ -3318,12 +3350,13 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;You can now run the claude wrapper from anywhere:&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude                # Launch with Haiku (fast/default)&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude                # Launch with default model (haiku unless changed)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude sonnet         # Launch with Sonnet (balanced)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude opus           # Launch with Opus (most capable)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude opus-1m        # Launch with Opus in fast mode&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude sonnet-1m      # Launch with Sonnet in fast mode&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude -c opus        # Model name works anywhere in args&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude default opus   # Set persistent default model (haiku/sonnet/opus/sonnet-1m/opus-1m)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude --models       # Show default Anthropic models&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude update         # Update wrapper and Claude Code&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)&quot;</span>
@@ -3488,6 +3521,31 @@ verify_path_configuration
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="k">fi</span>
+
+<span class="c1"># Set persistent default model</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;default&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nv">_valid_models</span><span class="o">=</span><span class="s2">&quot;haiku sonnet opus sonnet-1m opus-1m&quot;</span>
+<span class="w">  </span><span class="nv">_chosen</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">2</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_chosen</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Current default model: </span><span class="si">${</span><span class="nv">WRAPPER_DEFAULT_MODEL</span><span class="k">:-</span><span class="nv">haiku</span><span class="si">}${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Usage: claude default &lt;model&gt;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Valid models: </span><span class="nv">$_valid_models</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_chosen</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span>haiku<span class="p">|</span>sonnet<span class="p">|</span>opus<span class="p">|</span>sonnet-1m<span class="p">|</span>opus-1m<span class="o">)</span>
+<span class="w">      </span>_set_wrapper_env<span class="w"> </span>WRAPPER_DEFAULT_MODEL<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_chosen</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Default model set to &#39;</span><span class="nv">$_chosen</span><span class="s2">&#39; in ~/.claude/claude-wrapper.env&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>*<span class="o">)</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Unknown model &#39;</span><span class="nv">$_chosen</span><span class="s2">&#39;</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Valid models: </span><span class="nv">$_valid_models</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">  </span><span class="k">esac</span>
 <span class="k">fi</span>
 
 <span class="c1"># Check if update/upgrade is requested</span>
@@ -3698,9 +3756,15 @@ verify_path_configuration
 <span class="k">fi</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_SMALL_FAST_MODEL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<span class="c1"># Default model is Haiku</span>
-<span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;haiku&quot;</span>
+<span class="c1"># Default model — haiku unless overridden by &#39;claude default &lt;model&gt;&#39;</span>
+<span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">WRAPPER_DEFAULT_MODEL</span><span class="k">:-</span><span class="nv">haiku</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$model_name</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
+<span class="w">  </span>opus-1m<span class="o">)</span><span class="w">   </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}</span><span class="s2">[1m]&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span>opus<span class="o">)</span><span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span>sonnet-1m<span class="o">)</span><span class="w"> </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}</span><span class="s2">[1m]&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span>sonnet<span class="o">)</span><span class="w">    </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span>*<span class="o">)</span><span class="w">         </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;haiku&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="k">esac</span>
 
 <span class="c1"># Scan all arguments for model selection (allows e.g. &quot;claude -c opus&quot;)</span>
 <span class="nv">wdebug</span><span class="o">=</span><span class="m">0</span>
