@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.16"
+WRAPPER_VERSION="1.17"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -317,21 +317,16 @@ if [[ -f "$HOME/.azure/clauderc" ]]; then
   source "$HOME/.azure/clauderc"
 fi
 
-# Source ~/.claude/claudelocalrc if it exists (loads local LLM settings)
-LOCALRC_LOADED=0
-if [[ -f "$HOME/.claude/claudelocalrc" ]]; then
-  LOCALRC_LOADED=1
-  # shellcheck source=/dev/null
-  source "$HOME/.claude/claudelocalrc"
-fi
+# Migrate any legacy files into claude-wrapper.env (deletes them on success)
+_migrate_to_wrapper_env
 
-# Load claude-wrapper.env (settings here override claudelocalrc values)
+# Load claude-wrapper.env — single source of truth for wrapper settings
+ENV_FILE_LOADED=0
 if [[ -f "$ENV_FILE" ]]; then
+  ENV_FILE_LOADED=1
   # shellcheck source=/dev/null
   set -a; source "$ENV_FILE"; set +a
 fi
-# Migrate legacy files into claude-wrapper.env on first encounter (idempotent)
-_migrate_to_wrapper_env
 
 # Verify PATH configuration first, before doing anything
 verify_path_configuration
@@ -571,7 +566,7 @@ if [[ "$1" == "--local" ]]; then
   export CLAUDE_CODE_USE_BEDROCK=0
   export CLAUDE_CODE_USE_FOUNDRY=0
 
-  # Offer to persist settings to claude-wrapper.env (and claudelocalrc for compatibility)
+  # Offer to persist settings to claude-wrapper.env
   if { [[ ! -f "$ENV_FILE" ]] || ! grep -q "^LOCAL_ANTHROPIC_BASE_URL=" "$ENV_FILE" 2>/dev/null; } && [[ -t 0 ]]; then
     echo "" >&2
     echo -e "${YELLOW}Local LLM vars are set but not yet saved to ~/.claude/claude-wrapper.env.${NC}" >&2
@@ -725,7 +720,7 @@ if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
   echo -e "${GREEN}${_msg}${NC}" >&2
 elif [[ "${USING_LOCAL:-0}" == "1" ]]; then
   _msg="Local Model: $mymodel, URL: $ANTHROPIC_BASE_URL"
-  [[ "$LOCALRC_LOADED" == "1" ]] && _msg="Reading ~/.claude/claudelocalrc, $_msg"
+  [[ "$ENV_FILE_LOADED" == "1" ]] && _msg="Reading ~/.claude/claude-wrapper.env, $_msg"
   echo -e "${GREEN}${_msg}${NC}" >&2
 elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   echo -e "${GREEN}Local Model: $mymodel, URL: $ANTHROPIC_BASE_URL${NC}" >&2
@@ -746,7 +741,7 @@ if [[ "$wdebug" -eq 1 ]]; then
     fi
   done
   echo "" >&2
-  if [[ -f "$HOME/.claude/yolo-mode" ]] || [[ "${YOLO_MODE:-0}" == "1" ]] || [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
+  if [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
     echo "Command: $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
   else
     echo "Command: $REAL_CLAUDE --model $mymodel --allowedTools <list> --disallowedTools <list> $*" >&2
@@ -822,8 +817,8 @@ DISALLOWED_TOOLS=(
   "Bash(:(){ :|:& };:)"
 )
 
-# Execute Claude Code (skip permissions if ~/.claude/yolo-mode exists or YOLO_MODE=1)
-if [[ -f "$HOME/.claude/yolo-mode" ]] || [[ "${YOLO_MODE:-0}" == "1" ]] || [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
+# Execute Claude Code (skip permissions if WRAPPER_YOLO=1)
+if [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
   exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
 else
   exec "$REAL_CLAUDE" --model "$mymodel" \
