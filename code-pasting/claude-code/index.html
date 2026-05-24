@@ -3058,18 +3058,13 @@
 <span class="normal">825</span>
 <span class="normal">826</span>
 <span class="normal">827</span>
-<span class="normal">828</span>
-<span class="normal">829</span>
-<span class="normal">830</span>
-<span class="normal">831</span>
-<span class="normal">832</span>
-<span class="normal">833</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">828</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">&quot;claude-wrapper.sh&quot;</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.16&quot;</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.17&quot;</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">&quot;</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude&quot;</span>
@@ -3382,21 +3377,16 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">source</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.azure/clauderc&quot;</span>
 <span class="k">fi</span>
 
-<span class="c1"># Source ~/.claude/claudelocalrc if it exists (loads local LLM settings)</span>
-<span class="nv">LOCALRC_LOADED</span><span class="o">=</span><span class="m">0</span>
-<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/claudelocalrc&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">  </span><span class="nv">LOCALRC_LOADED</span><span class="o">=</span><span class="m">1</span>
-<span class="w">  </span><span class="c1"># shellcheck source=/dev/null</span>
-<span class="w">  </span><span class="nb">source</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/claudelocalrc&quot;</span>
-<span class="k">fi</span>
+<span class="c1"># Migrate any legacy files into claude-wrapper.env (deletes them on success)</span>
+_migrate_to_wrapper_env
 
-<span class="c1"># Load claude-wrapper.env (settings here override claudelocalrc values)</span>
+<span class="c1"># Load claude-wrapper.env — single source of truth for wrapper settings</span>
+<span class="nv">ENV_FILE_LOADED</span><span class="o">=</span><span class="m">0</span>
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nv">ENV_FILE_LOADED</span><span class="o">=</span><span class="m">1</span>
 <span class="w">  </span><span class="c1"># shellcheck source=/dev/null</span>
 <span class="w">  </span><span class="nb">set</span><span class="w"> </span>-a<span class="p">;</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>+a
 <span class="k">fi</span>
-<span class="c1"># Migrate legacy files into claude-wrapper.env on first encounter (idempotent)</span>
-_migrate_to_wrapper_env
 
 <span class="c1"># Verify PATH configuration first, before doing anything</span>
 verify_path_configuration
@@ -3636,7 +3626,7 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="o">=</span><span class="m">0</span>
 
-<span class="w">  </span><span class="c1"># Offer to persist settings to claude-wrapper.env (and claudelocalrc for compatibility)</span>
+<span class="w">  </span><span class="c1"># Offer to persist settings to claude-wrapper.env</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>!<span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^LOCAL_ANTHROPIC_BASE_URL=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="o">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-t<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Local LLM vars are set but not yet saved to ~/.claude/claude-wrapper.env.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
@@ -3790,7 +3780,7 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}${</span><span class="nv">_msg</span><span class="si">}${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USING_LOCAL</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nv">_msg</span><span class="o">=</span><span class="s2">&quot;Local Model: </span><span class="nv">$mymodel</span><span class="s2">, URL: </span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCALRC_LOADED</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">_msg</span><span class="o">=</span><span class="s2">&quot;Reading ~/.claude/claudelocalrc, </span><span class="nv">$_msg</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE_LOADED</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">_msg</span><span class="o">=</span><span class="s2">&quot;Reading ~/.claude/claude-wrapper.env, </span><span class="nv">$_msg</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}${</span><span class="nv">_msg</span><span class="si">}${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">Local Model: </span><span class="nv">$mymodel</span><span class="s2">, URL: </span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
@@ -3811,7 +3801,7 @@ verify_path_configuration
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">done</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/yolo-mode&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YOLO_MODE</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">WRAPPER_YOLO</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">WRAPPER_YOLO</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Command: </span><span class="nv">$REAL_CLAUDE</span><span class="s2"> --model </span><span class="nv">$mymodel</span><span class="s2"> --dangerously-skip-permissions </span><span class="nv">$*</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Command: </span><span class="nv">$REAL_CLAUDE</span><span class="s2"> --model </span><span class="nv">$mymodel</span><span class="s2"> --allowedTools &lt;list&gt; --disallowedTools &lt;list&gt; </span><span class="nv">$*</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
@@ -3887,8 +3877,8 @@ verify_path_configuration
 <span class="w">  </span><span class="s2">&quot;Bash(:(){ :|:&amp; };:)&quot;</span>
 <span class="o">)</span>
 
-<span class="c1"># Execute Claude Code (skip permissions if ~/.claude/yolo-mode exists or YOLO_MODE=1)</span>
-<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/yolo-mode&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YOLO_MODE</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">WRAPPER_YOLO</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="c1"># Execute Claude Code (skip permissions if WRAPPER_YOLO=1)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">WRAPPER_YOLO</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nb">exec</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REAL_CLAUDE</span><span class="s2">&quot;</span><span class="w"> </span>--model<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$mymodel</span><span class="s2">&quot;</span><span class="w"> </span>--dangerously-skip-permissions<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span>
 <span class="k">else</span>
 <span class="w">  </span><span class="nb">exec</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REAL_CLAUDE</span><span class="s2">&quot;</span><span class="w"> </span>--model<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$mymodel</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
