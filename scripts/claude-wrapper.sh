@@ -4,6 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
+WRAPPER_VERSION="1.13"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -13,6 +14,45 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
+
+ENV_FILE="$HOME/.claude/claude-wrapper.env"
+
+# Write or update a single KEY=VALUE line in claude-wrapper.env (no export prefix)
+_set_wrapper_env() {
+  local key="$1" value="$2"
+  mkdir -p "$HOME/.claude"
+  [[ -f "$ENV_FILE" ]] || printf "# Claude wrapper settings\n" > "$ENV_FILE"
+  local tmpf
+  tmpf=$(mktemp)
+  grep -v "^${key}=" "$ENV_FILE" > "$tmpf" 2>/dev/null || true
+  printf "%s=%s\n" "$key" "$value" >> "$tmpf"
+  mv "$tmpf" "$ENV_FILE"
+}
+
+# One-time migration of legacy files into claude-wrapper.env (idempotent)
+_migrate_to_wrapper_env() {
+  # claudelocalrc → LOCAL_* vars
+  if [[ -f "$HOME/.claude/claudelocalrc" ]]; then
+    while IFS= read -r _mline; do
+      _mline="${_mline#export }"
+      [[ "$_mline" =~ ^LOCAL_[A-Z_]+=.* ]] || continue
+      local _mkey="${_mline%%=*}"
+      local _mval="${_mline#*=}"
+      _mval="${_mval#\"}" ; _mval="${_mval%\"}"
+      grep -q "^${_mkey}=" "$ENV_FILE" 2>/dev/null || _set_wrapper_env "$_mkey" "$_mval"
+    done < "$HOME/.claude/claudelocalrc"
+  fi
+  # wrapper-last-update → WRAPPER_LAST_UPDATE
+  if [[ -f "$HOME/.claude/wrapper-last-update" ]]; then
+    local _mts
+    _mts=$(cat "$HOME/.claude/wrapper-last-update" 2>/dev/null || echo 0)
+    grep -q "^WRAPPER_LAST_UPDATE=" "$ENV_FILE" 2>/dev/null || _set_wrapper_env "WRAPPER_LAST_UPDATE" "$_mts"
+  fi
+  # yolo-mode flag file → YOLO_MODE
+  if [[ -f "$HOME/.claude/yolo-mode" ]]; then
+    grep -q "^YOLO_MODE=" "$ENV_FILE" 2>/dev/null || _set_wrapper_env "YOLO_MODE" "1"
+  fi
+}
 
 # Function to verify PATH configuration
 verify_path_configuration() {
@@ -285,6 +325,14 @@ if [[ -f "$HOME/.claude/claudelocalrc" ]]; then
   source "$HOME/.claude/claudelocalrc"
 fi
 
+# Load claude-wrapper.env (settings here override claudelocalrc values)
+if [[ -f "$ENV_FILE" ]]; then
+  # shellcheck source=/dev/null
+  set -a; source "$ENV_FILE"; set +a
+fi
+# Migrate legacy files into claude-wrapper.env on first encounter (idempotent)
+_migrate_to_wrapper_env
+
 # Verify PATH configuration first, before doing anything
 verify_path_configuration
 if [[ $? -ne 0 ]]; then
@@ -411,11 +459,12 @@ if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
   if curl -fsSL -o "$TEMP_WRAPPER" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`"; then
     MD5_AFTER=$(md5sum "$TEMP_WRAPPER" 2>/dev/null | cut -d' ' -f1)
     # Replace the installed wrapper
+    _new_ver=$(grep '^WRAPPER_VERSION=' "$TEMP_WRAPPER" 2>/dev/null | head -1 | cut -d'"' -f2)
     if mv "$TEMP_WRAPPER" "$WRAPPER_PATH" && chmod +x "$WRAPPER_PATH"; then
       if [[ "$MD5_BEFORE" != "$MD5_AFTER" ]]; then
-        echo -e "${GREEN}✓${NC} Wrapper updated successfully" >&2
+        echo -e "${GREEN}✓${NC} Wrapper updated successfully (now v${_new_ver:-unknown})" >&2
       else
-        echo -e "${GREEN}✓${NC} Wrapper already up to date" >&2
+        echo -e "${GREEN}✓${NC} Wrapper already up to date (v${_new_ver:-$WRAPPER_VERSION})" >&2
       fi
       echo "" >&2
     else
@@ -430,26 +479,29 @@ if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
   # Now update Claude Code itself
   echo -e "${YELLOW}Updating Claude Code...${NC}" >&2
   mkdir -p "$HOME/.claude"
-  date +%s > "$HOME/.claude/wrapper-last-update"
+  _uts=$(date +%s)
+  echo "$_uts" > "$HOME/.claude/wrapper-last-update"
+  _set_wrapper_env WRAPPER_LAST_UPDATE "$_uts"
   exec "$REAL_CLAUDE" update
 fi
 
 # Auto-update if it has been more than 7 days since last update
 AUTO_UPDATE_STAMP="$HOME/.claude/wrapper-last-update"
 _now=$(date +%s)
-_last=0
-[[ -f "$AUTO_UPDATE_STAMP" ]] && _last=$(cat "$AUTO_UPDATE_STAMP" 2>/dev/null || echo 0)
+_last="${WRAPPER_LAST_UPDATE:-0}"
+[[ "$_last" == "0" && -f "$AUTO_UPDATE_STAMP" ]] && _last=$(cat "$AUTO_UPDATE_STAMP" 2>/dev/null || echo 0)
 if (( _now - _last > 604800 )); then
   echo -e "${YELLOW}Auto-updating claude-wrapper (last update was >7 days ago)...${NC}" >&2
   TEMP_WRAPPER=$(mktemp)
   MD5_BEFORE=$(md5sum "$WRAPPER_PATH" 2>/dev/null | cut -d' ' -f1)
   if curl -fsSL -o "$TEMP_WRAPPER" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`"; then
     MD5_AFTER=$(md5sum "$TEMP_WRAPPER" 2>/dev/null | cut -d' ' -f1)
+    _new_ver=$(grep '^WRAPPER_VERSION=' "$TEMP_WRAPPER" 2>/dev/null | head -1 | cut -d'"' -f2)
     if mv "$TEMP_WRAPPER" "$WRAPPER_PATH" && chmod +x "$WRAPPER_PATH"; then
       if [[ "$MD5_BEFORE" != "$MD5_AFTER" ]]; then
-        echo -e "${GREEN}✓${NC} Wrapper updated" >&2
+        echo -e "${GREEN}✓${NC} Wrapper updated (now v${_new_ver:-unknown})" >&2
       else
-        echo -e "${GREEN}✓${NC} Wrapper already up to date" >&2
+        echo -e "${GREEN}✓${NC} Wrapper already up to date (v${_new_ver:-$WRAPPER_VERSION})" >&2
       fi
     else
       echo -e "${RED}✗ Failed to replace wrapper${NC}" >&2
@@ -460,7 +512,9 @@ if (( _now - _last > 604800 )); then
     rm -f "$TEMP_WRAPPER"
   fi
   mkdir -p "$HOME/.claude"
-  date +%s > "$AUTO_UPDATE_STAMP"
+  _ats=$(date +%s)
+  echo "$_ats" > "$AUTO_UPDATE_STAMP"
+  _set_wrapper_env WRAPPER_LAST_UPDATE "$_ats"
 fi
 
 # Check if --local flag is used
@@ -490,21 +544,30 @@ if [[ "$1" == "--local" ]]; then
   [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && export ANTHROPIC_DEFAULT_SONNET_MODEL="$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
   [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]] && export ANTHROPIC_DEFAULT_OPUS_MODEL="$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
   USING_LOCAL=1
+  export CLAUDE_CODE_USE_BEDROCK=0
+  export CLAUDE_CODE_USE_FOUNDRY=0
 
-  # Offer to persist settings to ~/.claude/claudelocalrc if it doesn't exist yet
-  if [[ ! -f "$HOME/.claude/claudelocalrc" ]] && [[ -t 0 ]]; then
+  # Offer to persist settings to claude-wrapper.env (and claudelocalrc for compatibility)
+  if { [[ ! -f "$ENV_FILE" ]] || ! grep -q "^LOCAL_ANTHROPIC_BASE_URL=" "$ENV_FILE" 2>/dev/null; } && [[ -t 0 ]]; then
     echo "" >&2
-    echo -e "${YELLOW}Local LLM vars are set but ~/.claude/claudelocalrc does not exist.${NC}" >&2
-    read -p "Save these settings to ~/.claude/claudelocalrc for future sessions? (Y/n): " _save_local
+    echo -e "${YELLOW}Local LLM vars are set but not yet saved to ~/.claude/claude-wrapper.env.${NC}" >&2
+    read -p "Save these settings for future sessions? (Y/n): " _save_local
     if [[ -z "$_save_local" || "$_save_local" == "y" || "$_save_local" == "Y" ]]; then
       mkdir -p "$HOME/.claude"
+      # Write to claude-wrapper.env (primary)
+      _set_wrapper_env LOCAL_ANTHROPIC_BASE_URL "$LOCAL_ANTHROPIC_BASE_URL"
+      [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]]  && _set_wrapper_env LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL  "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
+      [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && _set_wrapper_env LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
+      [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]]   && _set_wrapper_env LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL   "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
+      echo -e "${GREEN}✓${NC} Saved to ~/.claude/claude-wrapper.env" >&2
+      # Also write to claudelocalrc for backward compatibility
       {
         echo "export LOCAL_ANTHROPIC_BASE_URL=\"$LOCAL_ANTHROPIC_BASE_URL\""
         [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]]  && echo "export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL\""
         [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && echo "export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL\""
         [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]]   && echo "export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL\""
       } > "$HOME/.claude/claudelocalrc"
-      echo -e "${GREEN}✓${NC} Saved to ~/.claude/claudelocalrc" >&2
+      echo -e "${GREEN}✓${NC} Saved to ~/.claude/claudelocalrc (compatibility)" >&2
     fi
     echo "" >&2
   fi
@@ -661,7 +724,7 @@ if [[ "$wdebug" -eq 1 ]]; then
     fi
   done
   echo "" >&2
-  if [[ -f "$HOME/.claude/yolo-mode" ]]; then
+  if [[ -f "$HOME/.claude/yolo-mode" ]] || [[ "${YOLO_MODE:-0}" == "1" ]]; then
     echo "Command: $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
   else
     echo "Command: $REAL_CLAUDE --model $mymodel --allowedTools <list> --disallowedTools <list> $*" >&2
@@ -682,18 +745,16 @@ fi
 
 # Check if current directory is inside a git repository
 if ! git rev-parse --git-dir > /dev/null 2>&1; then
-  echo -e "${YELLOW}⚠ Warning: Current directory is not a git repository${NC}" >&2
+  echo -e "${YELLOW}⚠ Recommendation: Running Claude Code inside a git repository is highly recommended.${NC}" >&2
   echo "" >&2
-  echo "You can do one of these two things:" >&2
+  echo "To set one up, run one of these before starting Claude:" >&2
   echo "" >&2
   echo "  1. Clone an existing repository from GitHub:" >&2
-  echo "     git clone https://github.com/username/repo-name" >&2
-  echo "     cd repo-name" >&2
+  echo "     git clone https://github.com/username/repo-name && cd repo-name" >&2
   echo "" >&2
-  echo "  2. Initialize a new local git repository (for a quick test):" >&2
+  echo "  2. Initialize a new local git repository:" >&2
   echo "     git init" >&2
   echo "" >&2
-  exit 1
 fi
 
 # Allowed/disallowed tools for non-yolo mode
@@ -739,8 +800,8 @@ DISALLOWED_TOOLS=(
   "Bash(:(){ :|:& };:)"
 )
 
-# Execute Claude Code (skip permissions only if ~/.claude/yolo-mode exists)
-if [[ -f "$HOME/.claude/yolo-mode" ]]; then
+# Execute Claude Code (skip permissions if ~/.claude/yolo-mode exists or YOLO_MODE=1)
+if [[ -f "$HOME/.claude/yolo-mode" ]] || [[ "${YOLO_MODE:-0}" == "1" ]]; then
   exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
 else
   exec "$REAL_CLAUDE" --model "$mymodel" \
