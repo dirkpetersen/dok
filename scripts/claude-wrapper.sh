@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.13"
+WRAPPER_VERSION="1.14"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -275,12 +275,13 @@ install_wrapper() {
   echo ""
   echo "You can now run the claude wrapper from anywhere:"
   echo ""
-  echo "  claude                # Launch with Haiku (fast/default)"
+  echo "  claude                # Launch with default model (haiku unless changed)"
   echo "  claude sonnet         # Launch with Sonnet (balanced)"
   echo "  claude opus           # Launch with Opus (most capable)"
   echo "  claude opus-1m        # Launch with Opus in fast mode"
   echo "  claude sonnet-1m      # Launch with Sonnet in fast mode"
   echo "  claude -c opus        # Model name works anywhere in args"
+  echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/sonnet-1m/opus-1m)"
   echo "  claude --models       # Show default Anthropic models"
   echo "  claude update         # Update wrapper and Claude Code"
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
@@ -445,6 +446,31 @@ if [[ "$1" == "--models" ]]; then
   fi
 
   exit 0
+fi
+
+# Set persistent default model
+if [[ "$1" == "default" ]]; then
+  _valid_models="haiku sonnet opus sonnet-1m opus-1m"
+  _chosen="${2:-}"
+  if [[ -z "$_chosen" ]]; then
+    echo -e "${YELLOW}Current default model: ${WRAPPER_DEFAULT_MODEL:-haiku}${NC}" >&2
+    echo "" >&2
+    echo "Usage: claude default <model>" >&2
+    echo "Valid models: $_valid_models" >&2
+    exit 0
+  fi
+  case "$_chosen" in
+    haiku|sonnet|opus|sonnet-1m|opus-1m)
+      _set_wrapper_env WRAPPER_DEFAULT_MODEL "$_chosen"
+      echo -e "${GREEN}✓${NC} Default model set to '$_chosen' in ~/.claude/claude-wrapper.env" >&2
+      exit 0
+      ;;
+    *)
+      echo -e "${RED}✗ Unknown model '$_chosen'${NC}" >&2
+      echo "Valid models: $_valid_models" >&2
+      exit 1
+      ;;
+  esac
 fi
 
 # Check if update/upgrade is requested
@@ -655,9 +681,15 @@ else
 fi
 export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 
-# Default model is Haiku
-mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
-model_name="haiku"
+# Default model — haiku unless overridden by 'claude default <model>'
+model_name="${WRAPPER_DEFAULT_MODEL:-haiku}"
+case "$model_name" in
+  opus-1m)   mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}[1m]" ;;
+  opus)      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}" ;;
+  sonnet-1m) mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}[1m]" ;;
+  sonnet)    mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}" ;;
+  *)         mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}" ; model_name="haiku" ;;
+esac
 
 # Scan all arguments for model selection (allows e.g. "claude -c opus")
 wdebug=0
