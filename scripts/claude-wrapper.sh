@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.18"
+WRAPPER_VERSION="1.19"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -393,11 +393,11 @@ if [[ "$1" == "--models" ]]; then
   echo ""
   echo "  Haiku:  ${ANTHROPIC_DEFAULT_HAIKU_MODEL:-us.anthropic.claude-haiku-4-5-20251001-v1:0}"
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}"
-  echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-7}"
+  echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}"
   echo ""
   echo "Fast mode models (append [1m] to base model):"
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}[1m]"
-  echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-7}[1m]"
+  echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}[1m]"
   echo ""
 
   # Show Foundry configuration section
@@ -407,7 +407,7 @@ if [[ "$1" == "--models" ]]; then
     echo "  Base URL: $ANTHROPIC_FOUNDRY_BASE_URL"
     echo "  Haiku:    ${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4-5}"
     echo "  Sonnet:   ${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet-4-6}"
-    echo "  Opus:     ${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-7}"
+    echo "  Opus:     ${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-8}"
     echo ""
   elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" ]]; then
     echo "Foundry Configuration (CLAUDE_CODE_USE_FOUNDRY=1 set but incomplete):"
@@ -658,11 +658,11 @@ fi
 if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
   export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet-4-6}"
   export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4-5}"
-  export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-7}"
+  export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-8}"
 else
   export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-us.anthropic.claude-haiku-4-5-20251001-v1:0}"
   export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}"
-  export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-7}"
+  export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}"
 fi
 export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 
