@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.19"
+WRAPPER_VERSION="1.20"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -17,7 +17,19 @@ NC='\033[0m' # No Color
 
 ENV_FILE="$HOME/.claude/claude-wrapper.env"
 
-# Write or update a single KEY=VALUE line in claude-wrapper.env (no export prefix)
+# Portable file checksum: md5sum on Linux, md5 on macOS/BSD. Prints the hash
+# only, or nothing if neither tool is available (callers treat empty as "unknown").
+_file_md5() {
+  if command -v md5sum >/dev/null 2>&1; then
+    md5sum "$1" 2>/dev/null | cut -d' ' -f1
+  elif command -v md5 >/dev/null 2>&1; then
+    md5 -q "$1" 2>/dev/null
+  fi
+}
+
+# Write or update a single KEY="value" line in claude-wrapper.env.
+# Values are double-quoted so the file can be safely `source`d even when a
+# value contains spaces; any embedded double quotes are escaped.
 _set_wrapper_env() {
   local key="$1" value="$2"
   mkdir -p "$HOME/.claude"
@@ -25,7 +37,7 @@ _set_wrapper_env() {
   local tmpf
   tmpf=$(mktemp)
   grep -v "^${key}=" "$ENV_FILE" > "$tmpf" 2>/dev/null || true
-  printf "%s=%s\n" "$key" "$value" >> "$tmpf"
+  printf '%s="%s"\n' "$key" "${value//\"/\\\"}" >> "$tmpf"
   mv "$tmpf" "$ENV_FILE"
 }
 
@@ -141,7 +153,8 @@ verify_path_configuration() {
 # Function to find the real claude binary (not in ~/bin)
 find_claude_binary() {
   # Get all claude executables in PATH
-  local claude_paths=$(which -a claude 2>/dev/null || true)
+  local claude_paths
+  claude_paths=$(which -a claude 2>/dev/null || true)
 
   # Find first claude that is NOT in ~/bin
   local home_bin_expanded="$HOME/bin"
@@ -217,7 +230,10 @@ install_wrapper() {
   echo -e "${YELLOW}Installing Claude Code wrapper...${NC}"
 
   # Find the real claude binary (this will auto-install if not found)
-  local real_claude=$(find_claude_binary)
+  # Declare first, then assign separately — combining `local x=$(...)` would
+  # capture local's exit status (always 0) instead of find_claude_binary's.
+  local real_claude
+  real_claude=$(find_claude_binary)
   local find_result=$?
 
   if [[ $find_result -ne 0 ]] || [[ -z "$real_claude" ]]; then
@@ -286,6 +302,7 @@ install_wrapper() {
   echo "  claude -c opus        # Model name works anywhere in args"
   echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/sonnet-1m/opus-1m)"
   echo "  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)"
+  echo "  claude default noyolo # Re-enable permission prompts (sets WRAPPER_YOLO=0)"
   echo "  claude --models       # Show default Anthropic models"
   echo "  claude update         # Update wrapper and Claude Code"
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
@@ -399,6 +416,9 @@ if [[ "$1" == "--models" ]]; then
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}[1m]"
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}[1m]"
   echo ""
+  echo "Persistent default (set with 'claude default <model>'):"
+  echo "  ${WRAPPER_DEFAULT_MODEL:-haiku}"
+  echo ""
 
   # Show Foundry configuration section
   if [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" && -n "$ANTHROPIC_FOUNDRY_BASE_URL" && -n "$ANTHROPIC_FOUNDRY_API_KEY" ]]; then
@@ -450,7 +470,7 @@ if [[ "$1" == "default" ]]; then
     echo -e "${YELLOW}Current default model: ${WRAPPER_DEFAULT_MODEL:-haiku}${NC}" >&2
     echo -e "${YELLOW}Yolo mode (skip permissions): ${WRAPPER_YOLO:-0}${NC}" >&2
     echo "" >&2
-    echo "Usage: claude default <model|yolo>" >&2
+    echo "Usage: claude default <model|yolo|noyolo>" >&2
     echo "Valid models: $_valid_models" >&2
     exit 0
   fi
@@ -465,10 +485,15 @@ if [[ "$1" == "default" ]]; then
       echo -e "${GREEN}✓${NC} Yolo mode enabled (WRAPPER_YOLO=1) in ~/.claude/claude-wrapper.env" >&2
       exit 0
       ;;
+    noyolo)
+      _set_wrapper_env WRAPPER_YOLO "0"
+      echo -e "${GREEN}✓${NC} Yolo mode disabled (WRAPPER_YOLO=0) in ~/.claude/claude-wrapper.env" >&2
+      exit 0
+      ;;
     *)
       echo -e "${RED}✗ Unknown option '$_chosen'${NC}" >&2
       echo "Valid models: $_valid_models" >&2
-      echo "Other options: yolo" >&2
+      echo "Other options: yolo, noyolo" >&2
       exit 1
       ;;
   esac
@@ -479,12 +504,12 @@ if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
   echo -e "${YELLOW}Updating claude-wrapper...${NC}" >&2
 
   # Checksum before download
-  MD5_BEFORE=$(md5sum "$WRAPPER_PATH" 2>/dev/null | cut -d' ' -f1)
+  MD5_BEFORE=$(_file_md5 "$WRAPPER_PATH")
 
   # Download new wrapper to temp file
   TEMP_WRAPPER=$(mktemp)
   if curl -fsSL -o "$TEMP_WRAPPER" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`"; then
-    MD5_AFTER=$(md5sum "$TEMP_WRAPPER" 2>/dev/null | cut -d' ' -f1)
+    MD5_AFTER=$(_file_md5 "$TEMP_WRAPPER")
     # Replace the installed wrapper
     _new_ver=$(grep '^WRAPPER_VERSION=' "$TEMP_WRAPPER" 2>/dev/null | head -1 | cut -d'"' -f2)
     if mv "$TEMP_WRAPPER" "$WRAPPER_PATH" && chmod +x "$WRAPPER_PATH"; then
@@ -515,9 +540,9 @@ _last="${WRAPPER_LAST_UPDATE:-0}"
 if (( _now - _last > 604800 )); then
   echo -e "${YELLOW}Auto-updating claude-wrapper (last update was >7 days ago)...${NC}" >&2
   TEMP_WRAPPER=$(mktemp)
-  MD5_BEFORE=$(md5sum "$WRAPPER_PATH" 2>/dev/null | cut -d' ' -f1)
+  MD5_BEFORE=$(_file_md5 "$WRAPPER_PATH")
   if curl -fsSL -o "$TEMP_WRAPPER" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`"; then
-    MD5_AFTER=$(md5sum "$TEMP_WRAPPER" 2>/dev/null | cut -d' ' -f1)
+    MD5_AFTER=$(_file_md5 "$TEMP_WRAPPER")
     _new_ver=$(grep '^WRAPPER_VERSION=' "$TEMP_WRAPPER" 2>/dev/null | head -1 | cut -d'"' -f2)
     if mv "$TEMP_WRAPPER" "$WRAPPER_PATH" && chmod +x "$WRAPPER_PATH"; then
       if [[ "$MD5_BEFORE" != "$MD5_AFTER" ]]; then
@@ -558,11 +583,14 @@ if [[ "$1" == "--local" ]]; then
   export ANTHROPIC_BASE_URL="$LOCAL_ANTHROPIC_BASE_URL"
   export ANTHROPIC_API_KEY="sk-ant-dummy"
 
-  # Set model configurations if LOCAL_* variants exist
-  [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]] && export ANTHROPIC_DEFAULT_HAIKU_MODEL="$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
-  [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && export ANTHROPIC_DEFAULT_SONNET_MODEL="$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
-  [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]] && export ANTHROPIC_DEFAULT_OPUS_MODEL="$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
+  # Apply local model names, defaulting to deepseek-flash so the runtime models
+  # match what 'claude --models' advertises (otherwise the later Model
+  # Configuration block would fill in Bedrock-prefixed IDs for a local endpoint).
+  export ANTHROPIC_DEFAULT_HAIKU_MODEL="${LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL:-deepseek-flash}"
+  export ANTHROPIC_DEFAULT_SONNET_MODEL="${LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL:-deepseek-flash}"
+  export ANTHROPIC_DEFAULT_OPUS_MODEL="${LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL:-deepseek-flash}"
   USING_LOCAL=1
+  # Local LLM endpoint — make sure neither cloud backend is active.
   export CLAUDE_CODE_USE_BEDROCK=0
   export CLAUDE_CODE_USE_FOUNDRY=0
 
@@ -585,6 +613,9 @@ if [[ "$1" == "--local" ]]; then
 
 # Check if ANTHROPIC_BASE_URL is already set (for local LLM usage without --local flag)
 elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
+  # Custom endpoint — neither cloud backend should be active.
+  export CLAUDE_CODE_USE_BEDROCK=0
+  export CLAUDE_CODE_USE_FOUNDRY=0
   # Set ANTHROPIC_API_KEY to dummy value if not set or invalid
   if [[ -z "$ANTHROPIC_API_KEY" ]] || [[ ! "$ANTHROPIC_API_KEY" =~ ^sk-ant- ]]; then
     export ANTHROPIC_API_KEY="sk-ant-dummy"
@@ -607,6 +638,8 @@ elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" ]]; then
   fi
   export ANTHROPIC_BASE_URL="$ANTHROPIC_FOUNDRY_BASE_URL"
   export ANTHROPIC_API_KEY="sk-ant-dummy"
+  # Foundry endpoint — Bedrock must not be active.
+  export CLAUDE_CODE_USE_BEDROCK=0
   USING_FOUNDRY=1
 
   # Offer to persist settings to ~/.azure/clauderc if it doesn't exist yet
@@ -626,9 +659,13 @@ EOF
     echo "" >&2
   fi
 
-# Default: AWS Bedrock Configuration - only enable if bedrock is configured
-elif grep -q "bedrock" "$HOME/.aws/config" 2>/dev/null; then
+# Default: AWS Bedrock Configuration - only enable if a 'bedrock' profile exists.
+# Match the section header precisely ([profile bedrock] or [bedrock]) rather than
+# a bare substring, so unrelated text (comments, regions, other profiles) does not
+# accidentally trigger Bedrock mode.
+elif grep -Eq '^\[(profile[[:space:]]+)?bedrock\]' "$HOME/.aws/config" 2>/dev/null; then
   export CLAUDE_CODE_USE_BEDROCK=1
+  export CLAUDE_CODE_USE_FOUNDRY=0
   export AWS_DEFAULT_REGION=us-west-2
   export AWS_PROFILE=bedrock
 
@@ -676,7 +713,10 @@ case "$model_name" in
   *)         mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}" ; model_name="haiku" ;;
 esac
 
-# Scan all arguments for model selection (allows e.g. "claude -c opus")
+# Scan all arguments for model selection (allows e.g. "claude -c opus").
+# Trade-off: a bare arg equal to a model keyword (opus/sonnet/haiku/-1m) is
+# consumed as a model selector and not forwarded to Claude Code. This is
+# intentional so the keyword works anywhere in the arg list.
 wdebug=0
 new_args=()
 for arg in "$@"; do
