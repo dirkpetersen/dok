@@ -3058,13 +3058,53 @@
 <span class="normal">825</span>
 <span class="normal">826</span>
 <span class="normal">827</span>
-<span class="normal">828</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">828</span>
+<span class="normal">829</span>
+<span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">&quot;claude-wrapper.sh&quot;</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.19&quot;</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.20&quot;</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">&quot;</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude&quot;</span>
@@ -3077,7 +3117,19 @@
 
 <span class="nv">ENV_FILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/claude-wrapper.env&quot;</span>
 
-<span class="c1"># Write or update a single KEY=VALUE line in claude-wrapper.env (no export prefix)</span>
+<span class="c1"># Portable file checksum: md5sum on Linux, md5 on macOS/BSD. Prints the hash</span>
+<span class="c1"># only, or nothing if neither tool is available (callers treat empty as &quot;unknown&quot;).</span>
+_file_md5<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>md5sum<span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>md5sum<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39; &#39;</span><span class="w"> </span>-f1
+<span class="w">  </span><span class="k">elif</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>md5<span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>md5<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null
+<span class="w">  </span><span class="k">fi</span>
+<span class="o">}</span>
+
+<span class="c1"># Write or update a single KEY=&quot;value&quot; line in claude-wrapper.env.</span>
+<span class="c1"># Values are double-quoted so the file can be safely `source`d even when a</span>
+<span class="c1"># value contains spaces; any embedded double quotes are escaped.</span>
 _set_wrapper_env<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
 <span class="w">  </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude&quot;</span>
@@ -3085,7 +3137,7 @@ _set_wrapper_env<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span>tmpf
 <span class="w">  </span><span class="nv">tmpf</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
 <span class="w">  </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">&quot;^</span><span class="si">${</span><span class="nv">key</span><span class="si">}</span><span class="s2">=&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$tmpf</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<span class="w">  </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;%s=%s\n&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$key</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$value</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$tmpf</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;%s=&quot;%s&quot;\n&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$key</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">value</span><span class="p">//</span><span class="se">\&quot;</span><span class="p">/</span><span class="se">\\\&quot;</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$tmpf</span><span class="s2">&quot;</span>
 <span class="w">  </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$tmpf</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ENV_FILE</span><span class="s2">&quot;</span>
 <span class="o">}</span>
 
@@ -3201,7 +3253,8 @@ verify_path_configuration<span class="o">()</span><span class="w"> </span><span 
 <span class="c1"># Function to find the real claude binary (not in ~/bin)</span>
 find_claude_binary<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="c1"># Get all claude executables in PATH</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">claude_paths</span><span class="o">=</span><span class="k">$(</span>which<span class="w"> </span>-a<span class="w"> </span>claude<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span><span class="k">)</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span>claude_paths
+<span class="w">  </span><span class="nv">claude_paths</span><span class="o">=</span><span class="k">$(</span>which<span class="w"> </span>-a<span class="w"> </span>claude<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span><span class="k">)</span>
 
 <span class="w">  </span><span class="c1"># Find first claude that is NOT in ~/bin</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">home_bin_expanded</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
@@ -3277,7 +3330,10 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Installing Claude Code wrapper...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 
 <span class="w">  </span><span class="c1"># Find the real claude binary (this will auto-install if not found)</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">real_claude</span><span class="o">=</span><span class="k">$(</span>find_claude_binary<span class="k">)</span>
+<span class="w">  </span><span class="c1"># Declare first, then assign separately — combining `local x=$(...)` would</span>
+<span class="w">  </span><span class="c1"># capture local&#39;s exit status (always 0) instead of find_claude_binary&#39;s.</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span>real_claude
+<span class="w">  </span><span class="nv">real_claude</span><span class="o">=</span><span class="k">$(</span>find_claude_binary<span class="k">)</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">find_result</span><span class="o">=</span><span class="nv">$?</span>
 
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$find_result</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$real_claude</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -3346,6 +3402,7 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude -c opus        # Model name works anywhere in args&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude default opus   # Set persistent default model (haiku/sonnet/opus/sonnet-1m/opus-1m)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude default noyolo # Re-enable permission prompts (sets WRAPPER_YOLO=0)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude --models       # Show default Anthropic models&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude update         # Update wrapper and Claude Code&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)&quot;</span>
@@ -3459,6 +3516,9 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Sonnet: </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-sonnet-4-6</span><span class="si">}</span><span class="s2">[1m]&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Opus:   </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-opus-4-8</span><span class="si">}</span><span class="s2">[1m]&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Persistent default (set with &#39;claude default &lt;model&gt;&#39;):&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  </span><span class="si">${</span><span class="nv">WRAPPER_DEFAULT_MODEL</span><span class="k">:-</span><span class="nv">haiku</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 
 <span class="w">  </span><span class="c1"># Show Foundry configuration section</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_FOUNDRY_BASE_URL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_FOUNDRY_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -3510,7 +3570,7 @@ verify_path_configuration
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Current default model: </span><span class="si">${</span><span class="nv">WRAPPER_DEFAULT_MODEL</span><span class="k">:-</span><span class="nv">haiku</span><span class="si">}${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Yolo mode (skip permissions): </span><span class="si">${</span><span class="nv">WRAPPER_YOLO</span><span class="k">:-</span><span class="nv">0</span><span class="si">}${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Usage: claude default &lt;model|yolo&gt;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Usage: claude default &lt;model|yolo|noyolo&gt;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Valid models: </span><span class="nv">$_valid_models</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
 <span class="w">  </span><span class="k">fi</span>
@@ -3525,10 +3585,15 @@ verify_path_configuration
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Yolo mode enabled (WRAPPER_YOLO=1) in ~/.claude/claude-wrapper.env&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
 <span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>noyolo<span class="o">)</span>
+<span class="w">      </span>_set_wrapper_env<span class="w"> </span>WRAPPER_YOLO<span class="w"> </span><span class="s2">&quot;0&quot;</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Yolo mode disabled (WRAPPER_YOLO=0) in ~/.claude/claude-wrapper.env&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>*<span class="o">)</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Unknown option &#39;</span><span class="nv">$_chosen</span><span class="s2">&#39;</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Valid models: </span><span class="nv">$_valid_models</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Other options: yolo&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Other options: yolo, noyolo&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="w">      </span><span class="p">;;</span>
 <span class="w">  </span><span class="k">esac</span>
@@ -3539,12 +3604,12 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Updating claude-wrapper...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 
 <span class="w">  </span><span class="c1"># Checksum before download</span>
-<span class="w">  </span><span class="nv">MD5_BEFORE</span><span class="o">=</span><span class="k">$(</span>md5sum<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WRAPPER_PATH</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39; &#39;</span><span class="w"> </span>-f1<span class="k">)</span>
+<span class="w">  </span><span class="nv">MD5_BEFORE</span><span class="o">=</span><span class="k">$(</span>_file_md5<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WRAPPER_PATH</span><span class="s2">&quot;</span><span class="k">)</span>
 
 <span class="w">  </span><span class="c1"># Download new wrapper to temp file</span>
 <span class="w">  </span><span class="nv">TEMP_WRAPPER</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nv">MD5_AFTER</span><span class="o">=</span><span class="k">$(</span>md5sum<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39; &#39;</span><span class="w"> </span>-f1<span class="k">)</span>
+<span class="w">    </span><span class="nv">MD5_AFTER</span><span class="o">=</span><span class="k">$(</span>_file_md5<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span><span class="k">)</span>
 <span class="w">    </span><span class="c1"># Replace the installed wrapper</span>
 <span class="w">    </span><span class="nv">_new_ver</span><span class="o">=</span><span class="k">$(</span>grep<span class="w"> </span><span class="s1">&#39;^WRAPPER_VERSION=&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;&quot;&#39;</span><span class="w"> </span>-f2<span class="k">)</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WRAPPER_PATH</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WRAPPER_PATH</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -3575,9 +3640,9 @@ verify_path_configuration
 <span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>_now<span class="w"> </span>-<span class="w"> </span>_last<span class="w"> </span>&gt;<span class="w"> </span><span class="m">604800</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Auto-updating claude-wrapper (last update was &gt;7 days ago)...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nv">TEMP_WRAPPER</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
-<span class="w">  </span><span class="nv">MD5_BEFORE</span><span class="o">=</span><span class="k">$(</span>md5sum<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WRAPPER_PATH</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39; &#39;</span><span class="w"> </span>-f1<span class="k">)</span>
+<span class="w">  </span><span class="nv">MD5_BEFORE</span><span class="o">=</span><span class="k">$(</span>_file_md5<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WRAPPER_PATH</span><span class="s2">&quot;</span><span class="k">)</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nv">MD5_AFTER</span><span class="o">=</span><span class="k">$(</span>md5sum<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39; &#39;</span><span class="w"> </span>-f1<span class="k">)</span>
+<span class="w">    </span><span class="nv">MD5_AFTER</span><span class="o">=</span><span class="k">$(</span>_file_md5<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span><span class="k">)</span>
 <span class="w">    </span><span class="nv">_new_ver</span><span class="o">=</span><span class="k">$(</span>grep<span class="w"> </span><span class="s1">&#39;^WRAPPER_VERSION=&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;&quot;&#39;</span><span class="w"> </span>-f2<span class="k">)</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TEMP_WRAPPER</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WRAPPER_PATH</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WRAPPER_PATH</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$MD5_BEFORE</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$MD5_AFTER</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -3618,11 +3683,14 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_BASE_URL</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_BASE_URL</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span><span class="s2">&quot;sk-ant-dummy&quot;</span>
 
-<span class="w">  </span><span class="c1"># Set model configurations if LOCAL_* variants exist</span>
-<span class="w">  </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="c1"># Apply local model names, defaulting to deepseek-flash so the runtime models</span>
+<span class="w">  </span><span class="c1"># match what &#39;claude --models&#39; advertises (otherwise the later Model</span>
+<span class="w">  </span><span class="c1"># Configuration block would fill in Bedrock-prefixed IDs for a local endpoint).</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="k">:-</span><span class="nv">deepseek</span><span class="p">-flash</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="k">:-</span><span class="nv">deepseek</span><span class="p">-flash</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">deepseek</span><span class="p">-flash</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nv">USING_LOCAL</span><span class="o">=</span><span class="m">1</span>
+<span class="w">  </span><span class="c1"># Local LLM endpoint — make sure neither cloud backend is active.</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="o">=</span><span class="m">0</span>
 
@@ -3645,6 +3713,9 @@ verify_path_configuration
 
 <span class="c1"># Check if ANTHROPIC_BASE_URL is already set (for local LLM usage without --local flag)</span>
 <span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="c1"># Custom endpoint — neither cloud backend should be active.</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">0</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="c1"># Set ANTHROPIC_API_KEY to dummy value if not set or invalid</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span>~<span class="w"> </span>^sk-ant-<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span><span class="s2">&quot;sk-ant-dummy&quot;</span>
@@ -3667,6 +3738,8 @@ verify_path_configuration
 <span class="w">  </span><span class="k">fi</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_BASE_URL</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_FOUNDRY_BASE_URL</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span><span class="s2">&quot;sk-ant-dummy&quot;</span>
+<span class="w">  </span><span class="c1"># Foundry endpoint — Bedrock must not be active.</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nv">USING_FOUNDRY</span><span class="o">=</span><span class="m">1</span>
 
 <span class="w">  </span><span class="c1"># Offer to persist settings to ~/.azure/clauderc if it doesn&#39;t exist yet</span>
@@ -3686,9 +3759,13 @@ verify_path_configuration
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="k">fi</span>
 
-<span class="c1"># Default: AWS Bedrock Configuration - only enable if bedrock is configured</span>
-<span class="k">elif</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;bedrock&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.aws/config&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="c1"># Default: AWS Bedrock Configuration - only enable if a &#39;bedrock&#39; profile exists.</span>
+<span class="c1"># Match the section header precisely ([profile bedrock] or [bedrock]) rather than</span>
+<span class="c1"># a bare substring, so unrelated text (comments, regions, other profiles) does not</span>
+<span class="c1"># accidentally trigger Bedrock mode.</span>
+<span class="k">elif</span><span class="w"> </span>grep<span class="w"> </span>-Eq<span class="w"> </span><span class="s1">&#39;^\[(profile[[:space:]]+)?bedrock\]&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.aws/config&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">1</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_DEFAULT_REGION</span><span class="o">=</span>us-west-2
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_PROFILE</span><span class="o">=</span>bedrock
 
@@ -3736,7 +3813,10 @@ verify_path_configuration
 <span class="w">  </span>*<span class="o">)</span><span class="w">         </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;haiku&quot;</span><span class="w"> </span><span class="p">;;</span>
 <span class="k">esac</span>
 
-<span class="c1"># Scan all arguments for model selection (allows e.g. &quot;claude -c opus&quot;)</span>
+<span class="c1"># Scan all arguments for model selection (allows e.g. &quot;claude -c opus&quot;).</span>
+<span class="c1"># Trade-off: a bare arg equal to a model keyword (opus/sonnet/haiku/-1m) is</span>
+<span class="c1"># consumed as a model selector and not forwarded to Claude Code. This is</span>
+<span class="c1"># intentional so the keyword works anywhere in the arg list.</span>
 <span class="nv">wdebug</span><span class="o">=</span><span class="m">0</span>
 <span class="nv">new_args</span><span class="o">=()</span>
 <span class="k">for</span><span class="w"> </span>arg<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
