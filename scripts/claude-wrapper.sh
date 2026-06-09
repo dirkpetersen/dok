@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.21"
+WRAPPER_VERSION="1.22"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -298,8 +298,8 @@ install_wrapper() {
   echo "  claude sonnet         # Launch with Sonnet (balanced)"
   echo "  claude opus           # Launch with Opus (most capable)"
   echo "  claude opus-1m        # Launch with Opus (1M token context window)"
-  echo "  claude fable          # Launch with Fable 5"
-  echo "  claude fable-1m       # Launch with Fable 5 (1M token context window)"
+  echo "  claude fable          # Launch with Fable 5 (1M context window by default)"
+  echo "  claude fable-1m       # Alias for fable (1M is already the default)"
   echo "  claude sonnet-1m      # Launch with Sonnet (1M token context window)"
   echo "  claude -c opus        # Model name works anywhere in args"
   echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/fable/sonnet-1m/opus-1m/fable-1m)"
@@ -418,7 +418,7 @@ if [[ "$1" == "--models" ]]; then
   echo "Fast mode models (append [1m] to base model):"
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}[1m]"
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}[1m]"
-  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-anthropic.claude-fable-5}[1m]"
+  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-anthropic.claude-fable-5}  (1M context by default, no [1m] suffix needed)"
   echo ""
   echo "Persistent default (set with 'claude default <model>'):"
   echo "  ${WRAPPER_DEFAULT_MODEL:-haiku}"
@@ -718,7 +718,7 @@ export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 # Default model — haiku unless overridden by 'claude default <model>'
 model_name="${WRAPPER_DEFAULT_MODEL:-haiku}"
 case "$model_name" in
-  fable-1m)  mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}[1m]" ;;
+  fable-1m)  mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}" ;;
   fable)     mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}" ;;
   opus-1m)   mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}[1m]" ;;
   opus)      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}" ;;
@@ -736,7 +736,7 @@ new_args=()
 for arg in "$@"; do
   case "$arg" in
     fable-1m)
-      mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}[1m]"
+      mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}"
       model_name="fable-1m"
       ;;
     fable)
