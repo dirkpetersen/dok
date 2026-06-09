@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.20"
+WRAPPER_VERSION="1.21"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -298,9 +298,11 @@ install_wrapper() {
   echo "  claude sonnet         # Launch with Sonnet (balanced)"
   echo "  claude opus           # Launch with Opus (most capable)"
   echo "  claude opus-1m        # Launch with Opus (1M token context window)"
+  echo "  claude fable          # Launch with Fable 5"
+  echo "  claude fable-1m       # Launch with Fable 5 (1M token context window)"
   echo "  claude sonnet-1m      # Launch with Sonnet (1M token context window)"
   echo "  claude -c opus        # Model name works anywhere in args"
-  echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/sonnet-1m/opus-1m)"
+  echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/fable/sonnet-1m/opus-1m/fable-1m)"
   echo "  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)"
   echo "  claude default noyolo # Re-enable permission prompts (sets WRAPPER_YOLO=0)"
   echo "  claude --models       # Show default Anthropic models"
@@ -411,10 +413,12 @@ if [[ "$1" == "--models" ]]; then
   echo "  Haiku:  ${ANTHROPIC_DEFAULT_HAIKU_MODEL:-us.anthropic.claude-haiku-4-5-20251001-v1:0}"
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}"
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}"
+  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-anthropic.claude-fable-5}"
   echo ""
   echo "Fast mode models (append [1m] to base model):"
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}[1m]"
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}[1m]"
+  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-anthropic.claude-fable-5}[1m]"
   echo ""
   echo "Persistent default (set with 'claude default <model>'):"
   echo "  ${WRAPPER_DEFAULT_MODEL:-haiku}"
@@ -428,6 +432,7 @@ if [[ "$1" == "--models" ]]; then
     echo "  Haiku:    ${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4-5}"
     echo "  Sonnet:   ${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet-4-6}"
     echo "  Opus:     ${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-8}"
+    echo "  Fable:    ${ANTHROPIC_DEFAULT_FABLE_MODEL:-claude-fable-5}"
     echo ""
   elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" ]]; then
     echo "Foundry Configuration (CLAUDE_CODE_USE_FOUNDRY=1 set but incomplete):"
@@ -445,6 +450,7 @@ if [[ "$1" == "--models" ]]; then
     echo "  Haiku:    ${LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL:-deepseek-flash}"
     echo "  Sonnet:   ${LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL:-deepseek-flash}"
     echo "  Opus:     ${LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL:-deepseek-flash}"
+    echo "  Fable:    ${LOCAL_ANTHROPIC_DEFAULT_FABLE_MODEL:-deepseek-flash}"
     echo ""
   else
     echo "Local LLM Configuration (not configured):"
@@ -456,6 +462,7 @@ if [[ "$1" == "--models" ]]; then
     echo "    LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
     echo "    LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
     echo "    LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
+    echo "    LOCAL_ANTHROPIC_DEFAULT_FABLE_MODEL"
     echo ""
   fi
 
@@ -464,7 +471,7 @@ fi
 
 # Set persistent defaults (model, yolo)
 if [[ "$1" == "default" ]]; then
-  _valid_models="haiku sonnet opus sonnet-1m opus-1m"
+  _valid_models="haiku sonnet opus fable sonnet-1m opus-1m fable-1m"
   _chosen="${2:-}"
   if [[ -z "$_chosen" ]]; then
     echo -e "${YELLOW}Current default model: ${WRAPPER_DEFAULT_MODEL:-haiku}${NC}" >&2
@@ -475,7 +482,7 @@ if [[ "$1" == "default" ]]; then
     exit 0
   fi
   case "$_chosen" in
-    haiku|sonnet|opus|sonnet-1m|opus-1m)
+    haiku|sonnet|opus|fable|sonnet-1m|opus-1m|fable-1m)
       _set_wrapper_env WRAPPER_DEFAULT_MODEL "$_chosen"
       echo -e "${GREEN}✓${NC} Default model set to '$_chosen' in ~/.claude/claude-wrapper.env" >&2
       exit 0
@@ -576,6 +583,7 @@ if [[ "$1" == "--local" ]]; then
     echo "  export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL=\"deepseek-flash\"" >&2
     echo "  export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL=\"deepseek-flash\"" >&2
     echo "  export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL=\"deepseek-flash\"" >&2
+    echo "  export LOCAL_ANTHROPIC_DEFAULT_FABLE_MODEL=\"deepseek-flash\"" >&2
     exit 1
   fi
 
@@ -589,6 +597,7 @@ if [[ "$1" == "--local" ]]; then
   export ANTHROPIC_DEFAULT_HAIKU_MODEL="${LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL:-deepseek-flash}"
   export ANTHROPIC_DEFAULT_SONNET_MODEL="${LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL:-deepseek-flash}"
   export ANTHROPIC_DEFAULT_OPUS_MODEL="${LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL:-deepseek-flash}"
+  export ANTHROPIC_DEFAULT_FABLE_MODEL="${LOCAL_ANTHROPIC_DEFAULT_FABLE_MODEL:-deepseek-flash}"
   USING_LOCAL=1
   # Local LLM endpoint — make sure neither cloud backend is active.
   export CLAUDE_CODE_USE_BEDROCK=0
@@ -606,6 +615,7 @@ if [[ "$1" == "--local" ]]; then
       [[ -n "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL" ]]  && _set_wrapper_env LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL  "$LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL"
       [[ -n "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL" ]] && _set_wrapper_env LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL "$LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL"
       [[ -n "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL" ]]   && _set_wrapper_env LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL   "$LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL"
+      [[ -n "$LOCAL_ANTHROPIC_DEFAULT_FABLE_MODEL" ]]  && _set_wrapper_env LOCAL_ANTHROPIC_DEFAULT_FABLE_MODEL  "$LOCAL_ANTHROPIC_DEFAULT_FABLE_MODEL"
       echo -e "${GREEN}✓${NC} Saved to ~/.claude/claude-wrapper.env" >&2
     fi
     echo "" >&2
@@ -696,16 +706,20 @@ if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
   export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet-4-6}"
   export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4-5}"
   export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-8}"
+  export ANTHROPIC_DEFAULT_FABLE_MODEL="${ANTHROPIC_DEFAULT_FABLE_MODEL:-claude-fable-5}"
 else
   export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-us.anthropic.claude-haiku-4-5-20251001-v1:0}"
   export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}"
   export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}"
+  export ANTHROPIC_DEFAULT_FABLE_MODEL="${ANTHROPIC_DEFAULT_FABLE_MODEL:-anthropic.claude-fable-5}"
 fi
 export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 
 # Default model — haiku unless overridden by 'claude default <model>'
 model_name="${WRAPPER_DEFAULT_MODEL:-haiku}"
 case "$model_name" in
+  fable-1m)  mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}[1m]" ;;
+  fable)     mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}" ;;
   opus-1m)   mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}[1m]" ;;
   opus)      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}" ;;
   sonnet-1m) mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}[1m]" ;;
@@ -721,6 +735,14 @@ wdebug=0
 new_args=()
 for arg in "$@"; do
   case "$arg" in
+    fable-1m)
+      mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}[1m]"
+      model_name="fable-1m"
+      ;;
+    fable)
+      mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}"
+      model_name="fable"
+      ;;
     opus-1m)
       mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}[1m]"
       model_name="opus-1m"
@@ -773,7 +795,8 @@ if [[ "$wdebug" -eq 1 ]]; then
   echo "Environment variables set by wrapper:" >&2
   for var in ANTHROPIC_MODEL ANTHROPIC_BASE_URL ANTHROPIC_API_KEY \
              ANTHROPIC_DEFAULT_HAIKU_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL \
-             ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_SMALL_FAST_MODEL \
+             ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_FABLE_MODEL \
+             ANTHROPIC_SMALL_FAST_MODEL \
              CLAUDE_CODE_USE_FOUNDRY ANTHROPIC_FOUNDRY_BASE_URL \
              CLAUDE_CODE_USE_BEDROCK AWS_DEFAULT_REGION AWS_PROFILE; do
     if [[ -n "${!var+x}" ]]; then

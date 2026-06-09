@@ -109,6 +109,7 @@ export LOCAL_ANTHROPIC_BASE_URL="http://llm.dev-ai.university.edu/cc/v1"
 export LOCAL_ANTHROPIC_DEFAULT_HAIKU_MODEL="hc/glm-4.7"
 export LOCAL_ANTHROPIC_DEFAULT_SONNET_MODEL="hc/glm-4.7"
 export LOCAL_ANTHROPIC_DEFAULT_OPUS_MODEL="hc/glm-4.7"
+export LOCAL_ANTHROPIC_DEFAULT_FABLE_MODEL="hc/glm-4.7"
 
 claude --local
 ```
@@ -170,11 +171,13 @@ When `CLAUDE_CODE_USE_FOUNDRY=1` is active, model defaults switch to plain Anthr
 | haiku  | `claude-haiku-4-5`  |
 | sonnet | `claude-sonnet-4-6` |
 | opus   | `claude-opus-4-8`   |
+| fable  | `claude-fable-5`    |
 
 You can override any of these by adding them to `~/.azure/clauderc`:
 
 ```bash
 export ANTHROPIC_DEFAULT_OPUS_MODEL="claude-opus-4-8"
+export ANTHROPIC_DEFAULT_FABLE_MODEL="claude-fable-5"
 export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-6"
 ```
 
@@ -227,6 +230,7 @@ The recommended approach is to keep both backend configurations in your profile 
 # $env:AWS_PROFILE                           = "bedrock"
 # $env:ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION = $env:AWS_REGION
 # $env:ANTHROPIC_DEFAULT_OPUS_MODEL          = "global.anthropic.claude-opus-4-8"
+# $env:ANTHROPIC_DEFAULT_FABLE_MODEL         = "anthropic.claude-fable-5"
 # $env:ANTHROPIC_DEFAULT_SONNET_MODEL        = "global.anthropic.claude-sonnet-4-6"
 
 # ── Option B: Azure AI Foundry ────────────────────────────────
@@ -235,6 +239,7 @@ $env:CLAUDE_CODE_USE_BEDROCK        = 0
 $env:ANTHROPIC_FOUNDRY_BASE_URL     = "https://xxxxxxxxxxxx.azure-api.net/anthropic"
 $env:ANTHROPIC_FOUNDRY_API_KEY      = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 $env:ANTHROPIC_DEFAULT_OPUS_MODEL   = "claude-opus-4-8"
+$env:ANTHROPIC_DEFAULT_FABLE_MODEL  = "claude-fable-5"
 $env:ANTHROPIC_DEFAULT_SONNET_MODEL = "claude-sonnet-4-6"
 ```
 
@@ -389,6 +394,7 @@ Environment variables set by wrapper:
   ANTHROPIC_DEFAULT_HAIKU_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
   ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-4-6
   ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-4-8
+  ANTHROPIC_DEFAULT_FABLE_MODEL=anthropic.claude-fable-5
   ANTHROPIC_SMALL_FAST_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
   CLAUDE_CODE_USE_BEDROCK=1
   AWS_DEFAULT_REGION=us-west-2
