@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.23"
+WRAPPER_VERSION="1.24"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -308,6 +308,7 @@ install_wrapper() {
   echo "  claude --models       # Show default Anthropic models"
   echo "  claude update         # Update wrapper and Claude Code"
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
+  echo "  claude --aws          # Force AWS Bedrock even if MS Foundry is configured"
   echo ""
 
   exit 0
@@ -568,6 +569,28 @@ if (( _now - _last > 604800 )); then
   _set_wrapper_env WRAPPER_LAST_UPDATE "$(date +%s)"
 fi
 
+# Pre-scan args for --local / --aws conflict and strip --aws early
+FORCE_AWS=0
+_prescan_args=()
+for _parg in "$@"; do
+  if [[ "$_parg" == "--aws" ]]; then
+    FORCE_AWS=1
+  else
+    _prescan_args+=("$_parg")
+  fi
+done
+set -- "${_prescan_args[@]}"
+
+# Conflict: --local and --aws are mutually exclusive
+if [[ "$FORCE_AWS" == "1" ]] && [[ " $* " == *" --local "* || "${_prescan_args[0]:-}" == "--local" ]]; then
+  echo -e "${RED}✗ Error: --local and --aws cannot be used together${NC}" >&2
+  echo "" >&2
+  echo "  --local  routes to a local LLM endpoint" >&2
+  echo "  --aws    forces AWS Bedrock" >&2
+  echo "" >&2
+  exit 1
+fi
+
 # Check if --local flag is used
 if [[ "$1" == "--local" ]]; then
   shift  # Remove --local from arguments
@@ -631,8 +654,8 @@ elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
     export ANTHROPIC_API_KEY="sk-ant-dummy"
   fi
 
-# Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1
-elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" ]]; then
+# Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1 (skipped when --aws)
+elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" && "${FORCE_AWS:-0}" != "1" ]]; then
   if [[ -z "$ANTHROPIC_FOUNDRY_BASE_URL" || -z "$ANTHROPIC_FOUNDRY_API_KEY" ]]; then
     echo -e "${RED}✗ Error: CLAUDE_CODE_USE_FOUNDRY=1 but required variables are not set${NC}" >&2
     echo "" >&2
@@ -669,11 +692,19 @@ EOF
     echo "" >&2
   fi
 
-# Default: AWS Bedrock Configuration - only enable if a 'bedrock' profile exists.
+# Default: AWS Bedrock Configuration - enable if a 'bedrock' profile exists, or --aws forces it.
 # Match the section header precisely ([profile bedrock] or [bedrock]) rather than
 # a bare substring, so unrelated text (comments, regions, other profiles) does not
 # accidentally trigger Bedrock mode.
-elif grep -Eq '^\[(profile[[:space:]]+)?bedrock\]' "$HOME/.aws/config" 2>/dev/null; then
+elif [[ "${FORCE_AWS:-0}" == "1" ]] || grep -Eq '^\[(profile[[:space:]]+)?bedrock\]' "$HOME/.aws/config" 2>/dev/null; then
+  if [[ "${FORCE_AWS:-0}" == "1" ]] && ! grep -Eq '^\[(profile[[:space:]]+)?bedrock\]' "$HOME/.aws/config" 2>/dev/null; then
+    echo -e "${RED}✗ Error: --aws flag used but no [bedrock] profile found in ~/.aws/config${NC}" >&2
+    echo "" >&2
+    echo "Set up AWS Bedrock credentials:" >&2
+    echo "  aws configure --profile bedrock" >&2
+    echo "" >&2
+    exit 1
+  fi
   export CLAUDE_CODE_USE_BEDROCK=1
   export CLAUDE_CODE_USE_FOUNDRY=0
   export AWS_DEFAULT_REGION=us-west-2
@@ -775,7 +806,7 @@ set -- "${new_args[@]}"
 
 export ANTHROPIC_MODEL="$mymodel"
 
-# Show status message for Foundry / local / custom base URL
+# Show status message for Foundry / local / custom base URL / forced Bedrock
 if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
   _msg="Foundry Model: $mymodel, URL: $ANTHROPIC_BASE_URL"
   [[ "$CLAUDERC_LOADED" == "1" ]] && _msg="Reading ~/.azure/clauderc, $_msg"
@@ -786,6 +817,8 @@ elif [[ "${USING_LOCAL:-0}" == "1" ]]; then
   echo -e "${GREEN}${_msg}${NC}" >&2
 elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   echo -e "${GREEN}Local Model: $mymodel, URL: $ANTHROPIC_BASE_URL${NC}" >&2
+elif [[ "${FORCE_AWS:-0}" == "1" ]]; then
+  echo -e "${GREEN}AWS Bedrock (forced via --aws): $mymodel${NC}" >&2
 fi
 
 # Show debug info if --wdebug was requested
