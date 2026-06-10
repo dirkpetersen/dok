@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.22"
+WRAPPER_VERSION="1.23"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -413,12 +413,12 @@ if [[ "$1" == "--models" ]]; then
   echo "  Haiku:  ${ANTHROPIC_DEFAULT_HAIKU_MODEL:-us.anthropic.claude-haiku-4-5-20251001-v1:0}"
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}"
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}"
-  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-anthropic.claude-fable-5}"
+  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-global.anthropic.claude-fable-5}"
   echo ""
   echo "Fast mode models (append [1m] to base model):"
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}[1m]"
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}[1m]"
-  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-anthropic.claude-fable-5}  (1M context by default, no [1m] suffix needed)"
+  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-global.anthropic.claude-fable-5}  (1M context by default, no [1m] suffix needed)"
   echo ""
   echo "Persistent default (set with 'claude default <model>'):"
   echo "  ${WRAPPER_DEFAULT_MODEL:-haiku}"
@@ -711,7 +711,7 @@ else
   export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-us.anthropic.claude-haiku-4-5-20251001-v1:0}"
   export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}"
   export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}"
-  export ANTHROPIC_DEFAULT_FABLE_MODEL="${ANTHROPIC_DEFAULT_FABLE_MODEL:-anthropic.claude-fable-5}"
+  export ANTHROPIC_DEFAULT_FABLE_MODEL="${ANTHROPIC_DEFAULT_FABLE_MODEL:-global.anthropic.claude-fable-5}"
 fi
 export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 
