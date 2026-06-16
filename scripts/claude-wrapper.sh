@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.24"
+WRAPPER_VERSION="1.25"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -25,6 +25,27 @@ _file_md5() {
   elif command -v md5 >/dev/null 2>&1; then
     md5 -q "$1" 2>/dev/null
   fi
+}
+
+# Detect whether the user has logged in via `claude /login` (native claude.ai oauth).
+# Returns 0 if a valid, non-expired token is found in ~/.claude/.credentials.json.
+_is_claude_logged_in() {
+  local creds="$HOME/.claude/.credentials.json"
+  [[ -f "$creds" ]] || return 1
+  local token expires_ms
+  if command -v jq >/dev/null 2>&1; then
+    token=$(jq -r '.claudeAiOauth.accessToken // empty' "$creds" 2>/dev/null)
+    expires_ms=$(jq -r '.claudeAiOauth.expiresAt // 0' "$creds" 2>/dev/null)
+    [[ -n "$token" ]] || return 1
+    if [[ "${expires_ms:-0}" != "0" ]]; then
+      local now_ms=$(( $(date +%s) * 1000 ))
+      (( expires_ms > now_ms )) || return 1
+    fi
+  else
+    # Fallback: grep for a non-empty accessToken value
+    grep -q '"accessToken"[[:space:]]*:[[:space:]]*"[^"]' "$creds" 2>/dev/null || return 1
+  fi
+  return 0
 }
 
 # Write or update a single KEY="value" line in claude-wrapper.env.
@@ -425,6 +446,12 @@ if [[ "$1" == "--models" ]]; then
   echo "  ${WRAPPER_DEFAULT_MODEL:-haiku}"
   echo ""
 
+  # Show native login status
+  if _is_claude_logged_in; then
+    echo "Native Login (claude /login): active — Bedrock/Foundry vars will be unset"
+    echo ""
+  fi
+
   # Show Foundry configuration section
   if [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" && -n "$ANTHROPIC_FOUNDRY_BASE_URL" && -n "$ANTHROPIC_FOUNDRY_API_KEY" ]]; then
     echo "Foundry Configuration (active via CLAUDE_CODE_USE_FOUNDRY=1):"
@@ -654,6 +681,15 @@ elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
     export ANTHROPIC_API_KEY="sk-ant-dummy"
   fi
 
+# Native claude.ai login — oauth token found in ~/.claude/.credentials.json
+elif [[ "${FORCE_AWS:-0}" != "1" ]] && _is_claude_logged_in; then
+  # Clear all cloud-backend vars so Claude Code uses its own oauth token
+  unset ANTHROPIC_API_KEY
+  unset ANTHROPIC_BASE_URL
+  export CLAUDE_CODE_USE_BEDROCK=0
+  export CLAUDE_CODE_USE_FOUNDRY=0
+  USING_NATIVE=1
+
 # Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1 (skipped when --aws)
 elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" && "${FORCE_AWS:-0}" != "1" ]]; then
   if [[ -z "$ANTHROPIC_FOUNDRY_BASE_URL" || -z "$ANTHROPIC_FOUNDRY_API_KEY" ]]; then
@@ -716,24 +752,27 @@ else
   echo "" >&2
   echo "Options to fix this:" >&2
   echo "" >&2
-  echo "1. Use Azure AI Foundry — paste these exports into your shell (or add to ~/.bashrc):" >&2
+  echo "1. Log in with your Claude.ai account:" >&2
+  echo "   claude /login" >&2
+  echo "" >&2
+  echo "2. Use Azure AI Foundry — paste these exports into your shell (or add to ~/.bashrc):" >&2
   echo "   export CLAUDE_CODE_USE_FOUNDRY=1" >&2
   echo "   export ANTHROPIC_FOUNDRY_BASE_URL=https://xxxxxxxxxxxxx.azure-api.net/anthropic" >&2
   echo "   export ANTHROPIC_FOUNDRY_API_KEY=xxxxxxxxxxxxxxxxxx" >&2
   echo "" >&2
-  echo "2. Configure AWS Bedrock — get AWS creds and run:" >&2
+  echo "3. Configure AWS Bedrock — get AWS creds and run:" >&2
   echo "   aws configure --profile bedrock" >&2
   echo "" >&2
-  echo "3. Use --local flag with a local LLM endpoint:" >&2
+  echo "4. Use --local flag with a local LLM endpoint:" >&2
   echo "   claude --local" >&2
   echo "" >&2
-  echo "4. Bypass this wrapper and run Claude Code directly:" >&2
+  echo "5. Bypass this wrapper and run Claude Code directly:" >&2
   echo "   ~/.local/bin/claude" >&2
   exit 1
 fi
 
-# Model Configuration — Foundry uses plain model names; Bedrock uses prefixed IDs
-if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
+# Model Configuration — Foundry/native use plain model names; Bedrock uses prefixed IDs
+if [[ "${USING_FOUNDRY:-0}" == "1" || "${USING_NATIVE:-0}" == "1" ]]; then
   export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet-4-6}"
   export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4-5}"
   export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-8}"
@@ -806,8 +845,10 @@ set -- "${new_args[@]}"
 
 export ANTHROPIC_MODEL="$mymodel"
 
-# Show status message for Foundry / local / custom base URL / forced Bedrock
-if [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
+# Show status message for native / Foundry / local / custom base URL / forced Bedrock
+if [[ "${USING_NATIVE:-0}" == "1" ]]; then
+  echo -e "${GREEN}Claude.ai (native login): $mymodel${NC}" >&2
+elif [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
   _msg="Foundry Model: $mymodel, URL: $ANTHROPIC_BASE_URL"
   [[ "$CLAUDERC_LOADED" == "1" ]] && _msg="Reading ~/.azure/clauderc, $_msg"
   echo -e "${GREEN}${_msg}${NC}" >&2
@@ -831,7 +872,8 @@ if [[ "$wdebug" -eq 1 ]]; then
              ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_FABLE_MODEL \
              ANTHROPIC_SMALL_FAST_MODEL \
              CLAUDE_CODE_USE_FOUNDRY ANTHROPIC_FOUNDRY_BASE_URL \
-             CLAUDE_CODE_USE_BEDROCK AWS_DEFAULT_REGION AWS_PROFILE; do
+             CLAUDE_CODE_USE_BEDROCK AWS_DEFAULT_REGION AWS_PROFILE \
+             USING_NATIVE; do
     if [[ -n "${!var+x}" ]]; then
       echo "  $var=${!var}" >&2
     fi
