@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.25"
+WRAPPER_VERSION="1.26"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -329,7 +329,8 @@ install_wrapper() {
   echo "  claude --models       # Show default Anthropic models"
   echo "  claude update         # Update wrapper and Claude Code"
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
-  echo "  claude --aws          # Force AWS Bedrock even if MS Foundry is configured"
+  echo "  claude --aws          # Force AWS Bedrock (overrides Foundry and native login)"
+  echo "  claude --az           # Force Azure AI Foundry (overrides native login)"
   echo ""
 
   exit 0
@@ -449,6 +450,7 @@ if [[ "$1" == "--models" ]]; then
   # Show native login status
   if _is_claude_logged_in; then
     echo "Native Login (claude /login): active — Bedrock/Foundry vars will be unset"
+    echo "  Override per-run with: claude --aws (Bedrock) or claude --az (Foundry)"
     echo ""
   fi
 
@@ -596,24 +598,42 @@ if (( _now - _last > 604800 )); then
   _set_wrapper_env WRAPPER_LAST_UPDATE "$(date +%s)"
 fi
 
-# Pre-scan args for --local / --aws conflict and strip --aws early
+# Pre-scan args for backend-forcing flags (--aws / --az) and strip them early.
+# --local presence is tracked too so conflicting combinations can be rejected.
+# --aws forces AWS Bedrock, --az forces Azure AI Foundry — each overrides native
+# claude.ai login (useful for switching between a personal and a work account).
 FORCE_AWS=0
+FORCE_AZ=0
+_has_local=0
 _prescan_args=()
 for _parg in "$@"; do
-  if [[ "$_parg" == "--aws" ]]; then
-    FORCE_AWS=1
-  else
-    _prescan_args+=("$_parg")
-  fi
+  case "$_parg" in
+    --aws) FORCE_AWS=1 ;;
+    --az)  FORCE_AZ=1 ;;
+    --local) _has_local=1; _prescan_args+=("$_parg") ;;
+    *) _prescan_args+=("$_parg") ;;
+  esac
 done
 set -- "${_prescan_args[@]}"
 
-# Conflict: --local and --aws are mutually exclusive
-if [[ "$FORCE_AWS" == "1" ]] && [[ " $* " == *" --local "* || "${_prescan_args[0]:-}" == "--local" ]]; then
-  echo -e "${RED}✗ Error: --local and --aws cannot be used together${NC}" >&2
+# Conflict: --aws and --az are mutually exclusive (both force a cloud backend)
+if [[ "$FORCE_AWS" == "1" && "$FORCE_AZ" == "1" ]]; then
+  echo -e "${RED}✗ Error: --aws and --az cannot be used together${NC}" >&2
+  echo "" >&2
+  echo "  --aws  forces AWS Bedrock" >&2
+  echo "  --az   forces Azure AI Foundry" >&2
+  echo "" >&2
+  exit 1
+fi
+
+# Conflict: --local cannot be combined with --aws or --az
+if [[ "$_has_local" == "1" ]] && [[ "$FORCE_AWS" == "1" || "$FORCE_AZ" == "1" ]]; then
+  _other="--aws"; [[ "$FORCE_AZ" == "1" ]] && _other="--az"
+  echo -e "${RED}✗ Error: --local and $_other cannot be used together${NC}" >&2
   echo "" >&2
   echo "  --local  routes to a local LLM endpoint" >&2
   echo "  --aws    forces AWS Bedrock" >&2
+  echo "  --az     forces Azure AI Foundry" >&2
   echo "" >&2
   exit 1
 fi
@@ -682,7 +702,8 @@ elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   fi
 
 # Native claude.ai login — oauth token found in ~/.claude/.credentials.json
-elif [[ "${FORCE_AWS:-0}" != "1" ]] && _is_claude_logged_in; then
+# (skipped when --aws or --az forces a specific cloud backend)
+elif [[ "${FORCE_AWS:-0}" != "1" && "${FORCE_AZ:-0}" != "1" ]] && _is_claude_logged_in; then
   # Clear all cloud-backend vars so Claude Code uses its own oauth token
   unset ANTHROPIC_API_KEY
   unset ANTHROPIC_BASE_URL
@@ -690,10 +711,15 @@ elif [[ "${FORCE_AWS:-0}" != "1" ]] && _is_claude_logged_in; then
   export CLAUDE_CODE_USE_FOUNDRY=0
   USING_NATIVE=1
 
-# Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1 (skipped when --aws)
-elif [[ "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" && "${FORCE_AWS:-0}" != "1" ]]; then
+# Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1 or --az
+# forces it (skipped when --aws). --az overrides native claude.ai login.
+elif [[ "${FORCE_AWS:-0}" != "1" ]] && [[ "${FORCE_AZ:-0}" == "1" || "${CLAUDE_CODE_USE_FOUNDRY:-0}" == "1" ]]; then
   if [[ -z "$ANTHROPIC_FOUNDRY_BASE_URL" || -z "$ANTHROPIC_FOUNDRY_API_KEY" ]]; then
-    echo -e "${RED}✗ Error: CLAUDE_CODE_USE_FOUNDRY=1 but required variables are not set${NC}" >&2
+    if [[ "${FORCE_AZ:-0}" == "1" ]]; then
+      echo -e "${RED}✗ Error: --az flag used but Azure Foundry variables are not set${NC}" >&2
+    else
+      echo -e "${RED}✗ Error: CLAUDE_CODE_USE_FOUNDRY=1 but required variables are not set${NC}" >&2
+    fi
     echo "" >&2
     echo "Both of these must be set in your ~/.profile (or ~/.bashrc / ~/.zshrc):" >&2
     echo "" >&2
@@ -850,6 +876,7 @@ if [[ "${USING_NATIVE:-0}" == "1" ]]; then
   echo -e "${GREEN}Claude.ai (native login): $mymodel${NC}" >&2
 elif [[ "${USING_FOUNDRY:-0}" == "1" ]]; then
   _msg="Foundry Model: $mymodel, URL: $ANTHROPIC_BASE_URL"
+  [[ "${FORCE_AZ:-0}" == "1" ]] && _msg="(forced via --az) $_msg"
   [[ "$CLAUDERC_LOADED" == "1" ]] && _msg="Reading ~/.azure/clauderc, $_msg"
   echo -e "${GREEN}${_msg}${NC}" >&2
 elif [[ "${USING_LOCAL:-0}" == "1" ]]; then

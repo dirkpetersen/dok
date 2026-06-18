@@ -4,7 +4,7 @@ Documentation for Claude Code, an AI-powered development tool integrated into th
 
 ## Overview
 
-Claude Code provides AI-assisted development capabilities for code generation, analysis, and problem-solving. This setup supports multiple inference backends: **AWS Bedrock** (default), **Microsoft Azure AI Foundry**, or a **local LLM** endpoint.
+Claude Code provides AI-assisted development capabilities for code generation, analysis, and problem-solving. This setup supports multiple inference backends: a **native claude.ai login** (`claude /login`), **AWS Bedrock**, **Microsoft Azure AI Foundry**, or a **local LLM** endpoint.
 
 !!! warning "Prerequisites: Shell Environment Required"
     Claude Code depends on a properly configured shell environment with git and GitHub working correctly. Before installing Claude Code, ensure your shell is set up properly. If you need help with shell configuration, SSH keys, or Git setup, see our **[Shell Setup Guide](../../shell/index.md)** for automated configuration.
@@ -182,14 +182,22 @@ export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-6"
 ```
 
 !!! warning "Both Foundry variables must be set"
-    If `CLAUDE_CODE_USE_FOUNDRY=1` but either `ANTHROPIC_FOUNDRY_BASE_URL` or `ANTHROPIC_FOUNDRY_API_KEY` is missing, the wrapper exits immediately with an error listing exactly which variable needs to be set.
+    If `CLAUDE_CODE_USE_FOUNDRY=1` (or `--az`) is active but either `ANTHROPIC_FOUNDRY_BASE_URL` or `ANTHROPIC_FOUNDRY_API_KEY` is missing, the wrapper exits immediately with an error listing exactly which variable needs to be set.
 
 **Backend priority** (highest to lowest):
 
 1. `--local` flag (always wins)
 2. `ANTHROPIC_BASE_URL` already set in environment
-3. `CLAUDE_CODE_USE_FOUNDRY=1`
-4. AWS Bedrock profile in `~/.aws/config`
+3. Native claude.ai login (token in `~/.claude/.credentials.json` from `claude /login`)
+4. `CLAUDE_CODE_USE_FOUNDRY=1`
+5. AWS Bedrock profile in `~/.aws/config`
+
+The `--aws` and `--az` flags are *forcing overrides*: they take priority over native login (and each other is mutually exclusive). Use them to pick a specific backend per run — for example to switch between a personal claude.ai account and a work Azure/AWS account:
+
+- `claude --aws` — force AWS Bedrock even when logged in or when Foundry is configured.
+- `claude --az` — force Azure AI Foundry even when logged in. Requires `ANTHROPIC_FOUNDRY_BASE_URL` and `ANTHROPIC_FOUNDRY_API_KEY` (normally loaded from `~/.azure/clauderc`).
+
+Neither flag can be combined with `--local`, and `--aws` and `--az` cannot be used together.
 
 ### 6. (Optional) Using Claude Code Natively on Windows via PowerShell
 
@@ -409,7 +417,7 @@ Answering `y` launches Claude Code; anything else exits without running it. This
 
 ## Configuration Notes
 
-- **Inference Backend**: AWS Bedrock (default), Azure AI Foundry (`CLAUDE_CODE_USE_FOUNDRY=1`), or local LLM (`--local`)
+- **Inference Backend**: native claude.ai login (`claude /login`), AWS Bedrock, Azure AI Foundry (`CLAUDE_CODE_USE_FOUNDRY=1`), or local LLM (`--local`). Force a specific cloud backend per run with `--aws` (Bedrock) or `--az` (Foundry).
 - **Permissions**: By default the wrapper uses `--allowedTools` / `--disallowedTools` to allow a broad but safe set of commands. To grant full unrestricted permissions, create `~/.claude/yolo-mode`:
   ```bash
   touch ~/.claude/yolo-mode   # enables --dangerously-skip-permissions
