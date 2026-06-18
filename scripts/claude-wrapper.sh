@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.27"
+WRAPPER_VERSION="1.28"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -321,9 +321,8 @@ install_wrapper() {
   echo "  claude opus           # Launch with Opus (most capable, 1M context by default)"
   echo "  claude opus-1m        # Alias for opus (Opus 4.8 has no separate 1M variant)"
   echo "  claude fable          # Launch with Fable 5 (1M context window by default)"
-  echo "  claude fable-1m       # Alias for fable (1M is already the default)"
   echo "  claude -c opus        # Model name works anywhere in args"
-  echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/fable/sonnet-1m/opus-1m/fable-1m)"
+  echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/fable/sonnet-1m/opus-1m)"
   echo "  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)"
   echo "  claude default noyolo # Re-enable permission prompts (sets WRAPPER_YOLO=0)"
   echo "  claude --models       # Show default Anthropic models"
@@ -443,7 +442,7 @@ if [[ "$1" == "--models" ]]; then
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}  (1M context by default, no [1m] suffix)"
   echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-global.anthropic.claude-fable-5}  (1M context by default, no [1m] suffix)"
   echo ""
-  echo "  (the -1m aliases — sonnet-1m/opus-1m/fable-1m — resolve to the same models)"
+  echo "  (the legacy -1m aliases — sonnet-1m/opus-1m — resolve to the same models)"
   echo ""
   echo "Persistent default (set with 'claude default <model>'):"
   echo "  ${WRAPPER_DEFAULT_MODEL:-haiku}"
@@ -503,7 +502,7 @@ fi
 
 # Set persistent defaults (model, yolo)
 if [[ "$1" == "default" ]]; then
-  _valid_models="haiku sonnet opus fable sonnet-1m opus-1m fable-1m"
+  _valid_models="haiku sonnet opus fable sonnet-1m opus-1m"
   _chosen="${2:-}"
   if [[ -z "$_chosen" ]]; then
     echo -e "${YELLOW}Current default model: ${WRAPPER_DEFAULT_MODEL:-haiku}${NC}" >&2
@@ -514,7 +513,7 @@ if [[ "$1" == "default" ]]; then
     exit 0
   fi
   case "$_chosen" in
-    haiku|sonnet|opus|fable|sonnet-1m|opus-1m|fable-1m)
+    haiku|sonnet|opus|fable|sonnet-1m|opus-1m)
       _set_wrapper_env WRAPPER_DEFAULT_MODEL "$_chosen"
       echo -e "${GREEN}✓${NC} Default model set to '$_chosen' in ~/.claude/claude-wrapper.env" >&2
       exit 0
@@ -818,7 +817,6 @@ model_name="${WRAPPER_DEFAULT_MODEL:-haiku}"
 case "$model_name" in
   # Sonnet always runs with [1m] (1M context); Opus/Fable have no separate 1M
   # variant, so both their aliases map to the plain model ID.
-  fable-1m)  mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}" ;;
   fable)     mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}" ;;
   opus-1m)   mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}" ;;
   opus)      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}" ;;
@@ -835,10 +833,6 @@ wdebug=0
 new_args=()
 for arg in "$@"; do
   case "$arg" in
-    fable-1m)
-      mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}"
-      model_name="fable-1m"
-      ;;
     fable)
       mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}"
       model_name="fable"
