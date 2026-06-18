@@ -2185,7 +2185,7 @@
 <h1 id="claude-code">Claude Code<a class="headerlink" href="#claude-code" title="Permanent link">&para;</a></h1>
 <p>Documentation for Claude Code, an AI-powered development tool integrated into this workflow.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>Claude Code provides AI-assisted development capabilities for code generation, analysis, and problem-solving. This setup supports multiple inference backends: <strong>AWS Bedrock</strong> (default), <strong>Microsoft Azure AI Foundry</strong>, or a <strong>local LLM</strong> endpoint.</p>
+<p>Claude Code provides AI-assisted development capabilities for code generation, analysis, and problem-solving. This setup supports multiple inference backends: a <strong>native claude.ai login</strong> (<code>claude /login</code>), <strong>AWS Bedrock</strong>, <strong>Microsoft Azure AI Foundry</strong>, or a <strong>local LLM</strong> endpoint.</p>
 <div class="admonition warning">
 <p class="admonition-title">Prerequisites: Shell Environment Required</p>
 <p>Claude Code depends on a properly configured shell environment with git and GitHub working correctly. Before installing Claude Code, ensure your shell is set up properly. If you need help with shell configuration, SSH keys, or Git setup, see our <strong><a href="../../shell/">Shell Setup Guide</a></strong> for automated configuration.</p>
@@ -3196,13 +3196,40 @@
 <span class="normal">963</span>
 <span class="normal">964</span>
 <span class="normal">965</span>
-<span class="normal">966</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">966</span>
+<span class="normal">967</span>
+<span class="normal">968</span>
+<span class="normal">969</span>
+<span class="normal">970</span>
+<span class="normal">971</span>
+<span class="normal">972</span>
+<span class="normal">973</span>
+<span class="normal">974</span>
+<span class="normal">975</span>
+<span class="normal">976</span>
+<span class="normal">977</span>
+<span class="normal">978</span>
+<span class="normal">979</span>
+<span class="normal">980</span>
+<span class="normal">981</span>
+<span class="normal">982</span>
+<span class="normal">983</span>
+<span class="normal">984</span>
+<span class="normal">985</span>
+<span class="normal">986</span>
+<span class="normal">987</span>
+<span class="normal">988</span>
+<span class="normal">989</span>
+<span class="normal">990</span>
+<span class="normal">991</span>
+<span class="normal">992</span>
+<span class="normal">993</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">&quot;claude-wrapper.sh&quot;</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.25&quot;</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.26&quot;</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">&quot;</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude&quot;</span>
@@ -3527,7 +3554,8 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude --models       # Show default Anthropic models&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude update         # Update wrapper and Claude Code&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude --aws          # Force AWS Bedrock even if MS Foundry is configured&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude --aws          # Force AWS Bedrock (overrides Foundry and native login)&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude --az           # Force Azure AI Foundry (overrides native login)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 
 <span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
@@ -3647,6 +3675,7 @@ verify_path_configuration
 <span class="w">  </span><span class="c1"># Show native login status</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>_is_claude_logged_in<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Native Login (claude /login): active — Bedrock/Foundry vars will be unset&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Override per-run with: claude --aws (Bedrock) or claude --az (Foundry)&quot;</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="w">  </span><span class="k">fi</span>
 
@@ -3794,24 +3823,42 @@ verify_path_configuration
 <span class="w">  </span>_set_wrapper_env<span class="w"> </span>WRAPPER_LAST_UPDATE<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span><span class="s2">&quot;</span>
 <span class="k">fi</span>
 
-<span class="c1"># Pre-scan args for --local / --aws conflict and strip --aws early</span>
+<span class="c1"># Pre-scan args for backend-forcing flags (--aws / --az) and strip them early.</span>
+<span class="c1"># --local presence is tracked too so conflicting combinations can be rejected.</span>
+<span class="c1"># --aws forces AWS Bedrock, --az forces Azure AI Foundry — each overrides native</span>
+<span class="c1"># claude.ai login (useful for switching between a personal and a work account).</span>
 <span class="nv">FORCE_AWS</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">FORCE_AZ</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">_has_local</span><span class="o">=</span><span class="m">0</span>
 <span class="nv">_prescan_args</span><span class="o">=()</span>
 <span class="k">for</span><span class="w"> </span>_parg<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_parg</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;--aws&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nv">FORCE_AWS</span><span class="o">=</span><span class="m">1</span>
-<span class="w">  </span><span class="k">else</span>
-<span class="w">    </span><span class="nv">_prescan_args</span><span class="o">+=(</span><span class="s2">&quot;</span><span class="nv">$_parg</span><span class="s2">&quot;</span><span class="o">)</span>
-<span class="w">  </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_parg</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span>--aws<span class="o">)</span><span class="w"> </span><span class="nv">FORCE_AWS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">    </span>--az<span class="o">)</span><span class="w">  </span><span class="nv">FORCE_AZ</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">    </span>--local<span class="o">)</span><span class="w"> </span><span class="nv">_has_local</span><span class="o">=</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="nv">_prescan_args</span><span class="o">+=(</span><span class="s2">&quot;</span><span class="nv">$_parg</span><span class="s2">&quot;</span><span class="o">)</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">    </span>*<span class="o">)</span><span class="w"> </span><span class="nv">_prescan_args</span><span class="o">+=(</span><span class="s2">&quot;</span><span class="nv">$_parg</span><span class="s2">&quot;</span><span class="o">)</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span><span class="k">esac</span>
 <span class="k">done</span>
 <span class="nb">set</span><span class="w"> </span>--<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">_prescan_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<span class="c1"># Conflict: --local and --aws are mutually exclusive</span>
-<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_AWS</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot; </span><span class="nv">$*</span><span class="s2"> &quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*<span class="s2">&quot; --local &quot;</span>*<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">_prescan_args</span><span class="p">[0]</span><span class="k">:-</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;--local&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: --local and --aws cannot be used together</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="c1"># Conflict: --aws and --az are mutually exclusive (both force a cloud backend)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_AWS</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_AZ</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: --aws and --az cannot be used together</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  --aws  forces AWS Bedrock&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  --az   forces Azure AI Foundry&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="c1"># Conflict: --local cannot be combined with --aws or --az</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_has_local</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_AWS</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_AZ</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nv">_other</span><span class="o">=</span><span class="s2">&quot;--aws&quot;</span><span class="p">;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORCE_AZ</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">_other</span><span class="o">=</span><span class="s2">&quot;--az&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: --local and </span><span class="nv">$_other</span><span class="s2"> cannot be used together</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  --local  routes to a local LLM endpoint&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  --aws    forces AWS Bedrock&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  --az     forces Azure AI Foundry&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="k">fi</span>
@@ -3880,7 +3927,8 @@ verify_path_configuration
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="c1"># Native claude.ai login — oauth token found in ~/.claude/.credentials.json</span>
-<span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FORCE_AWS</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>_is_claude_logged_in<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="c1"># (skipped when --aws or --az forces a specific cloud backend)</span>
+<span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FORCE_AWS</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FORCE_AZ</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>_is_claude_logged_in<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="c1"># Clear all cloud-backend vars so Claude Code uses its own oauth token</span>
 <span class="w">  </span><span class="nb">unset</span><span class="w"> </span>ANTHROPIC_API_KEY
 <span class="w">  </span><span class="nb">unset</span><span class="w"> </span>ANTHROPIC_BASE_URL
@@ -3888,10 +3936,15 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nv">USING_NATIVE</span><span class="o">=</span><span class="m">1</span>
 
-<span class="c1"># Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1 (skipped when --aws)</span>
-<span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FORCE_AWS</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="c1"># Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1 or --az</span>
+<span class="c1"># forces it (skipped when --aws). --az overrides native claude.ai login.</span>
+<span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FORCE_AWS</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FORCE_AZ</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_FOUNDRY_BASE_URL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_FOUNDRY_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: CLAUDE_CODE_USE_FOUNDRY=1 but required variables are not set</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FORCE_AZ</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: --az flag used but Azure Foundry variables are not set</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: CLAUDE_CODE_USE_FOUNDRY=1 but required variables are not set</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="k">fi</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Both of these must be set in your ~/.profile (or ~/.bashrc / ~/.zshrc):&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
@@ -4048,6 +4101,7 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">Claude.ai (native login): </span><span class="nv">$mymodel</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USING_FOUNDRY</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nv">_msg</span><span class="o">=</span><span class="s2">&quot;Foundry Model: </span><span class="nv">$mymodel</span><span class="s2">, URL: </span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="s2">&quot;</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FORCE_AZ</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">_msg</span><span class="o">=</span><span class="s2">&quot;(forced via --az) </span><span class="nv">$_msg</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CLAUDERC_LOADED</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">_msg</span><span class="o">=</span><span class="s2">&quot;Reading ~/.azure/clauderc, </span><span class="nv">$_msg</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}${</span><span class="nv">_msg</span><span class="si">}${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USING_LOCAL</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -4290,15 +4344,22 @@ Save these settings to ~/.azure/clauderc for future sessions? (Y/n):
 </code></pre></div></td></tr></table></div>
 <div class="admonition warning">
 <p class="admonition-title">Both Foundry variables must be set</p>
-<p>If <code>CLAUDE_CODE_USE_FOUNDRY=1</code> but either <code>ANTHROPIC_FOUNDRY_BASE_URL</code> or <code>ANTHROPIC_FOUNDRY_API_KEY</code> is missing, the wrapper exits immediately with an error listing exactly which variable needs to be set.</p>
+<p>If <code>CLAUDE_CODE_USE_FOUNDRY=1</code> (or <code>--az</code>) is active but either <code>ANTHROPIC_FOUNDRY_BASE_URL</code> or <code>ANTHROPIC_FOUNDRY_API_KEY</code> is missing, the wrapper exits immediately with an error listing exactly which variable needs to be set.</p>
 </div>
 <p><strong>Backend priority</strong> (highest to lowest):</p>
 <ol>
 <li><code>--local</code> flag (always wins)</li>
 <li><code>ANTHROPIC_BASE_URL</code> already set in environment</li>
+<li>Native claude.ai login (token in <code>~/.claude/.credentials.json</code> from <code>claude /login</code>)</li>
 <li><code>CLAUDE_CODE_USE_FOUNDRY=1</code></li>
 <li>AWS Bedrock profile in <code>~/.aws/config</code></li>
 </ol>
+<p>The <code>--aws</code> and <code>--az</code> flags are <em>forcing overrides</em>: they take priority over native login (and each other is mutually exclusive). Use them to pick a specific backend per run — for example to switch between a personal claude.ai account and a work Azure/AWS account:</p>
+<ul>
+<li><code>claude --aws</code> — force AWS Bedrock even when logged in or when Foundry is configured.</li>
+<li><code>claude --az</code> — force Azure AI Foundry even when logged in. Requires <code>ANTHROPIC_FOUNDRY_BASE_URL</code> and <code>ANTHROPIC_FOUNDRY_API_KEY</code> (normally loaded from <code>~/.azure/clauderc</code>).</li>
+</ul>
+<p>Neither flag can be combined with <code>--local</code>, and <code>--aws</code> and <code>--az</code> cannot be used together.</p>
 <h3 id="6-optional-using-claude-code-natively-on-windows-via-powershell">6. (Optional) Using Claude Code Natively on Windows via PowerShell<a class="headerlink" href="#6-optional-using-claude-code-natively-on-windows-via-powershell" title="Permanent link">&para;</a></h3>
 <p>If you are running Claude Code directly on Windows (not inside WSL), configure the required environment variables in your PowerShell profile so they are set automatically in every session.</p>
 <p>First, check whether the profile file exists — on a fresh Windows install it often does not:</p>
@@ -4536,7 +4597,7 @@ Execute Claude Code now? (y/n):
 <p>Answering <code>y</code> launches Claude Code; anything else exits without running it. This is especially useful when troubleshooting model selection, local LLM routing, or Bedrock credential issues.</p>
 <h2 id="configuration-notes">Configuration Notes<a class="headerlink" href="#configuration-notes" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Inference Backend</strong>: AWS Bedrock (default), Azure AI Foundry (<code>CLAUDE_CODE_USE_FOUNDRY=1</code>), or local LLM (<code>--local</code>)</li>
+<li><strong>Inference Backend</strong>: native claude.ai login (<code>claude /login</code>), AWS Bedrock, Azure AI Foundry (<code>CLAUDE_CODE_USE_FOUNDRY=1</code>), or local LLM (<code>--local</code>). Force a specific cloud backend per run with <code>--aws</code> (Bedrock) or <code>--az</code> (Foundry).</li>
 <li><strong>Permissions</strong>: By default the wrapper uses <code>--allowedTools</code> / <code>--disallowedTools</code> to allow a broad but safe set of commands. To grant full unrestricted permissions, create <code>~/.claude/yolo-mode</code>:
   <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>touch<span class="w"> </span>~/.claude/yolo-mode<span class="w">   </span><span class="c1"># enables --dangerously-skip-permissions</span>
