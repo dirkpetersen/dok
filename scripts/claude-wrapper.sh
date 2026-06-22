@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.29"
+WRAPPER_VERSION="1.30"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -320,7 +320,7 @@ install_wrapper() {
   echo "  claude sonnet-1m      # Alias for sonnet"
   echo "  claude opus           # Launch with Opus (most capable, 1M context on AWS)"
   echo "  claude opus-1m        # Alias for opus"
-  echo "  claude fable          # Launch with Fable 5 (1M context on AWS)"
+  echo "  claude fable          # Launch with Fable 5"
   echo "  claude -c opus        # Model name works anywhere in args"
   echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/fable/sonnet-1m/opus-1m)"
   echo "  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)"
@@ -440,7 +440,7 @@ if [[ "$1" == "--models" ]]; then
   echo "Effective model the wrapper launches (AWS Bedrock — [1m] suffix added):"
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}[1m]  (1M context)"
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}[1m]  (1M context)"
-  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-global.anthropic.claude-fable-5}[1m]  (1M context)"
+  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-global.anthropic.claude-fable-5}  (no [1m] variant)"
   echo ""
   echo "  (the legacy -1m aliases — sonnet-1m/opus-1m — resolve to the same models)"
   echo ""
@@ -812,8 +812,9 @@ else
 fi
 export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 
-# In AWS Bedrock, Sonnet/Opus/Fable all use the 1M-context [1m] variant.
-# Foundry/native backends don't use the [1m] suffix, so M1 is empty there.
+# In AWS Bedrock, Sonnet and Opus use the 1M-context [1m] variant (Fable has
+# no [1m] option). Foundry/native backends don't use the suffix, so M1 is
+# empty there.
 if [[ "${USING_FOUNDRY:-0}" == "1" || "${USING_NATIVE:-0}" == "1" ]]; then
   M1=""
 else
@@ -823,9 +824,9 @@ fi
 # Default model — haiku unless overridden by 'claude default <model>'
 model_name="${WRAPPER_DEFAULT_MODEL:-haiku}"
 case "$model_name" in
-  # On AWS Bedrock, Sonnet/Opus/Fable all run with [1m] (1M context); the
-  # legacy -1m aliases resolve to the same model.
-  fable)     mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}${M1}" ;;
+  # On AWS Bedrock, Sonnet and Opus always run with [1m] (1M context); the
+  # legacy -1m aliases resolve to the same model. Fable has no [1m] variant.
+  fable)     mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}" ;;
   opus-1m)   mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}${M1}" ;;
   opus)      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}${M1}" ;;
   sonnet-1m) mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}${M1}" ;;
@@ -842,7 +843,8 @@ new_args=()
 for arg in "$@"; do
   case "$arg" in
     fable)
-      mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}${M1}"
+      # Fable has no [1m] variant
+      mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}"
       model_name="fable"
       ;;
     opus-1m)
