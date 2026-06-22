@@ -3231,13 +3231,15 @@
 <span class="normal"> 998</span>
 <span class="normal"> 999</span>
 <span class="normal">1000</span>
-<span class="normal">1001</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1001</span>
+<span class="normal">1002</span>
+<span class="normal">1003</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">&quot;claude-wrapper.sh&quot;</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.29&quot;</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.30&quot;</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">&quot;</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude&quot;</span>
@@ -3553,7 +3555,7 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude sonnet-1m      # Alias for sonnet&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude opus           # Launch with Opus (most capable, 1M context on AWS)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude opus-1m        # Alias for opus&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude fable          # Launch with Fable 5 (1M context on AWS)&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude fable          # Launch with Fable 5&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude -c opus        # Model name works anywhere in args&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude default opus   # Set persistent default model (haiku/sonnet/opus/fable/sonnet-1m/opus-1m)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)&quot;</span>
@@ -3673,7 +3675,7 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Effective model the wrapper launches (AWS Bedrock — [1m] suffix added):&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Sonnet: </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-sonnet-4-6</span><span class="si">}</span><span class="s2">[1m]  (1M context)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Opus:   </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-opus-4-8</span><span class="si">}</span><span class="s2">[1m]  (1M context)&quot;</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Fable:  </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-fable-5</span><span class="si">}</span><span class="s2">[1m]  (1M context)&quot;</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  Fable:  </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-fable-5</span><span class="si">}</span><span class="s2">  (no [1m] variant)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  (the legacy -1m aliases — sonnet-1m/opus-1m — resolve to the same models)&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
@@ -4045,8 +4047,9 @@ verify_path_configuration
 <span class="k">fi</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_SMALL_FAST_MODEL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<span class="c1"># In AWS Bedrock, Sonnet/Opus/Fable all use the 1M-context [1m] variant.</span>
-<span class="c1"># Foundry/native backends don&#39;t use the [1m] suffix, so M1 is empty there.</span>
+<span class="c1"># In AWS Bedrock, Sonnet and Opus use the 1M-context [1m] variant (Fable has</span>
+<span class="c1"># no [1m] option). Foundry/native backends don&#39;t use the suffix, so M1 is</span>
+<span class="c1"># empty there.</span>
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USING_FOUNDRY</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USING_NATIVE</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nv">M1</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
 <span class="k">else</span>
@@ -4056,9 +4059,9 @@ verify_path_configuration
 <span class="c1"># Default model — haiku unless overridden by &#39;claude default &lt;model&gt;&#39;</span>
 <span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">WRAPPER_DEFAULT_MODEL</span><span class="k">:-</span><span class="nv">haiku</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$model_name</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
-<span class="w">  </span><span class="c1"># On AWS Bedrock, Sonnet/Opus/Fable all run with [1m] (1M context); the</span>
-<span class="w">  </span><span class="c1"># legacy -1m aliases resolve to the same model.</span>
-<span class="w">  </span>fable<span class="o">)</span><span class="w">     </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span><span class="c1"># On AWS Bedrock, Sonnet and Opus always run with [1m] (1M context); the</span>
+<span class="w">  </span><span class="c1"># legacy -1m aliases resolve to the same model. Fable has no [1m] variant.</span>
+<span class="w">  </span>fable<span class="o">)</span><span class="w">     </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
 <span class="w">  </span>opus-1m<span class="o">)</span><span class="w">   </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
 <span class="w">  </span>opus<span class="o">)</span><span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
 <span class="w">  </span>sonnet-1m<span class="o">)</span><span class="w"> </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
@@ -4075,7 +4078,8 @@ verify_path_configuration
 <span class="k">for</span><span class="w"> </span>arg<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$arg</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
 <span class="w">    </span>fable<span class="o">)</span>
-<span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="c1"># Fable has no [1m] variant</span>
+<span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;fable&quot;</span>
 <span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>opus-1m<span class="o">)</span>
