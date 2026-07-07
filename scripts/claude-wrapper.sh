@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.31"
+WRAPPER_VERSION="1.32"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -711,6 +711,13 @@ elif [[ "${FORCE_AWS:-0}" != "1" && "${FORCE_AZ:-0}" != "1" ]] && _is_claude_log
   export CLAUDE_CODE_USE_BEDROCK=0
   export CLAUDE_CODE_USE_FOUNDRY=0
   USING_NATIVE=1
+  # The wrapper can only clear environment variables — if ANTHROPIC_API_KEY is
+  # baked into ~/.claude/settings.json (env block or apiKeyHelper), Claude Code
+  # re-adds it itself and warns about mixed auth. Point the user at the file.
+  if [[ -f "$HOME/.claude/settings.json" ]] && grep -Eq '"ANTHROPIC_API_KEY"|"apiKeyHelper"' "$HOME/.claude/settings.json" 2>/dev/null; then
+    echo -e "${YELLOW}⚠ ~/.claude/settings.json sets ANTHROPIC_API_KEY (or apiKeyHelper).${NC}" >&2
+    echo -e "${YELLOW}  Remove it from that file to stop the 'Both claude.ai and ANTHROPIC_API_KEY set' warning.${NC}" >&2
+  fi
 
 # Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1 or --az
 # forces it (skipped when --aws). --az overrides native claude.ai login.
@@ -733,7 +740,15 @@ elif [[ "${FORCE_AWS:-0}" != "1" ]] && [[ "${FORCE_AZ:-0}" == "1" || "${CLAUDE_C
     exit 1
   fi
   export ANTHROPIC_BASE_URL="$ANTHROPIC_FOUNDRY_BASE_URL"
-  export ANTHROPIC_API_KEY="sk-ant-dummy"
+  # Foundry authenticates via ANTHROPIC_FOUNDRY_API_KEY. The dummy
+  # ANTHROPIC_API_KEY only exists to skip the first-run API-key approval
+  # prompt; when a native claude.ai login is present, leave the key unset so
+  # Claude Code does not warn about mixed auth (claude.ai + ANTHROPIC_API_KEY).
+  if _is_claude_logged_in; then
+    unset ANTHROPIC_API_KEY
+  else
+    export ANTHROPIC_API_KEY="sk-ant-dummy"
+  fi
   # Foundry endpoint — Bedrock must not be active.
   export CLAUDE_CODE_USE_BEDROCK=0
   USING_FOUNDRY=1
@@ -772,6 +787,10 @@ elif [[ "${FORCE_AWS:-0}" == "1" ]] || grep -Eq '^\[(profile[[:space:]]+)?bedroc
   export CLAUDE_CODE_USE_FOUNDRY=0
   export AWS_DEFAULT_REGION=us-west-2
   export AWS_PROFILE=bedrock
+  # Bedrock authenticates via the AWS profile — a leftover ANTHROPIC_API_KEY
+  # from the shell only triggers Claude Code's mixed-auth warning when a
+  # native claude.ai login also exists, and is never used here.
+  unset ANTHROPIC_API_KEY
 
 # No valid configuration found
 else
