@@ -3251,13 +3251,28 @@
 <span class="normal">1018</span>
 <span class="normal">1019</span>
 <span class="normal">1020</span>
-<span class="normal">1021</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1021</span>
+<span class="normal">1022</span>
+<span class="normal">1023</span>
+<span class="normal">1024</span>
+<span class="normal">1025</span>
+<span class="normal">1026</span>
+<span class="normal">1027</span>
+<span class="normal">1028</span>
+<span class="normal">1029</span>
+<span class="normal">1030</span>
+<span class="normal">1031</span>
+<span class="normal">1032</span>
+<span class="normal">1033</span>
+<span class="normal">1034</span>
+<span class="normal">1035</span>
+<span class="normal">1036</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">&quot;claude-wrapper.sh&quot;</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.33&quot;</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.34&quot;</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">&quot;</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude&quot;</span>
@@ -4085,23 +4100,24 @@ _migrate_to_wrapper_env
 <span class="c1"># Sonnet and Opus always use the 1M-context [1m] variant on AWS Bedrock,</span>
 <span class="c1"># Azure Foundry and native claude.ai logins (Fable has no [1m] option).</span>
 <span class="c1"># Local LLMs (--local) and custom ANTHROPIC_BASE_URL endpoints get no suffix.</span>
-<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USING_LOCAL</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USING_FOUNDRY</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="o">}</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">  </span><span class="nv">M1</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-<span class="k">else</span>
-<span class="w">  </span><span class="nv">M1</span><span class="o">=</span><span class="s2">&quot;[1m]&quot;</span>
+<span class="c1"># The suffix is baked into the exported ANTHROPIC_DEFAULT_*_MODEL vars so</span>
+<span class="c1"># Claude Code&#39;s own sonnet/opus aliases resolve to the [1m] variants too</span>
+<span class="c1"># (guarded so an already-suffixed user override is not suffixed twice).</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USING_LOCAL</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USING_FOUNDRY</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="o">}</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span>*<span class="s1">&#39;[1m]&#39;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}</span><span class="s2">[1m]&quot;</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="s2">&quot;</span><span class="w">   </span>!<span class="o">=</span><span class="w"> </span>*<span class="s1">&#39;[1m]&#39;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}</span><span class="s2">[1m]&quot;</span>
 <span class="k">fi</span>
 
 <span class="c1"># Default model — haiku unless overridden by &#39;claude default &lt;model&gt;&#39;</span>
 <span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">WRAPPER_DEFAULT_MODEL</span><span class="k">:-</span><span class="nv">haiku</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$model_name</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
-<span class="w">  </span><span class="c1"># On Bedrock/Foundry/native, Sonnet and Opus always run with [1m] (1M</span>
-<span class="w">  </span><span class="c1"># context); the legacy -1m aliases resolve to the same model. Fable has</span>
-<span class="w">  </span><span class="c1"># no [1m] variant.</span>
+<span class="w">  </span><span class="c1"># The legacy -1m aliases resolve to the same models; Fable has no [1m]</span>
+<span class="w">  </span><span class="c1"># variant.</span>
 <span class="w">  </span>fable<span class="o">)</span><span class="w">     </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
-<span class="w">  </span>opus-1m<span class="o">)</span><span class="w">   </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
-<span class="w">  </span>opus<span class="o">)</span><span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
-<span class="w">  </span>sonnet-1m<span class="o">)</span><span class="w"> </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
-<span class="w">  </span>sonnet<span class="o">)</span><span class="w">    </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span>opus-1m<span class="o">)</span><span class="w">   </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span>opus<span class="o">)</span><span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span>sonnet-1m<span class="o">)</span><span class="w"> </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span>sonnet<span class="o">)</span><span class="w">    </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
 <span class="w">  </span>*<span class="o">)</span><span class="w">         </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;haiku&quot;</span><span class="w"> </span><span class="p">;;</span>
 <span class="k">esac</span>
 
@@ -4119,21 +4135,19 @@ _migrate_to_wrapper_env
 <span class="w">      </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;fable&quot;</span>
 <span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>opus-1m<span class="o">)</span>
-<span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;opus-1m&quot;</span>
 <span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>opus<span class="o">)</span>
-<span class="w">      </span><span class="c1"># On Bedrock/Foundry/native, Opus runs with [1m] (1M context)</span>
-<span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;opus&quot;</span>
 <span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>sonnet-1m<span class="o">)</span>
-<span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;sonnet-1m&quot;</span>
 <span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>sonnet<span class="o">)</span>
-<span class="w">      </span><span class="c1"># On Bedrock/Foundry/native, Sonnet runs with [1m] (1M context)</span>
-<span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}${</span><span class="nv">M1</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;sonnet&quot;</span>
 <span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>haiku<span class="o">)</span>
@@ -4193,6 +4207,16 @@ _migrate_to_wrapper_env
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Command: </span><span class="nv">$REAL_CLAUDE</span><span class="s2"> --model </span><span class="nv">$mymodel</span><span class="s2"> --allowedTools &lt;list&gt; --disallowedTools &lt;list&gt; </span><span class="nv">$*</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="k">fi</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="c1"># Debug mode never launches Claude Code on its own — prompt when</span>
+<span class="w">  </span><span class="c1"># interactive, exit otherwise.</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-t<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">read</span><span class="w"> </span>-rp<span class="w"> </span><span class="s2">&quot;Execute Claude Code now? (y/n): &quot;</span><span class="w"> </span>_wdebug_go
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_wdebug_go</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;y&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_wdebug_go</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;Y&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">fi</span>
 <span class="k">fi</span>
 
 <span class="c1"># Block running Claude Code directly in the home directory</span>
@@ -4263,13 +4287,19 @@ _migrate_to_wrapper_env
 <span class="w">  </span><span class="s2">&quot;Bash(:(){ :|:&amp; };:)&quot;</span>
 <span class="o">)</span>
 
+<span class="c1"># Join each tool list into a single comma-separated argument. Passed as</span>
+<span class="c1"># separate words, the variadic --allowedTools/--disallowedTools options would</span>
+<span class="c1"># swallow any user positional (e.g. a prompt) that follows them.</span>
+<span class="nv">_allowed_csv</span><span class="o">=</span><span class="k">$(</span><span class="nv">IFS</span><span class="o">=</span>,<span class="p">;</span><span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;%s&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ALLOWED_TOOLS</span><span class="p">[*]</span><span class="si">}</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="nv">_disallowed_csv</span><span class="o">=</span><span class="k">$(</span><span class="nv">IFS</span><span class="o">=</span>,<span class="p">;</span><span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;%s&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">DISALLOWED_TOOLS</span><span class="p">[*]</span><span class="si">}</span><span class="s2">&quot;</span><span class="k">)</span>
+
 <span class="c1"># Execute Claude Code (skip permissions if WRAPPER_YOLO=1)</span>
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">WRAPPER_YOLO</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nb">exec</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REAL_CLAUDE</span><span class="s2">&quot;</span><span class="w"> </span>--model<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$mymodel</span><span class="s2">&quot;</span><span class="w"> </span>--dangerously-skip-permissions<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span>
 <span class="k">else</span>
 <span class="w">  </span><span class="nb">exec</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REAL_CLAUDE</span><span class="s2">&quot;</span><span class="w"> </span>--model<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$mymodel</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--allowedTools<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ALLOWED_TOOLS</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--disallowedTools<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">DISALLOWED_TOOLS</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--allowedTools<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_allowed_csv</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--disallowedTools<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_disallowed_csv</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span>
 <span class="k">fi</span>
 </code></pre></div></td></tr></table></div>
@@ -4636,17 +4666,17 @@ claude<span class="w"> </span>--wdebug<span class="w"> </span>opus<span class="w
 <span class="normal">16</span></pre></div></td><td class="code"><div><pre><span></span><code>=== claude-wrapper debug ===
 
 Environment variables set by wrapper:
-  ANTHROPIC_MODEL=global.anthropic.claude-sonnet-4-6
+  ANTHROPIC_MODEL=global.anthropic.claude-sonnet-4-6[1m]
   ANTHROPIC_DEFAULT_HAIKU_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
-  ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-4-6
-  ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-4-8
+  ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-4-6[1m]
+  ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-4-8[1m]
   ANTHROPIC_DEFAULT_FABLE_MODEL=global.anthropic.claude-fable-5
   ANTHROPIC_SMALL_FAST_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
   CLAUDE_CODE_USE_BEDROCK=1
   AWS_DEFAULT_REGION=us-west-2
   AWS_PROFILE=bedrock
 
-Command: /home/user/.local/bin/claude --model global.anthropic.claude-sonnet-4-6 --allowedTools &lt;list&gt; --disallowedTools &lt;list&gt;
+Command: /home/user/.local/bin/claude --model global.anthropic.claude-sonnet-4-6[1m] --allowedTools &lt;list&gt; --disallowedTools &lt;list&gt;
 
 Execute Claude Code now? (y/n):
 </code></pre></div></td></tr></table></div>
