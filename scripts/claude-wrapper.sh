@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.33"
+WRAPPER_VERSION="1.34"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -832,23 +832,24 @@ export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 # Sonnet and Opus always use the 1M-context [1m] variant on AWS Bedrock,
 # Azure Foundry and native claude.ai logins (Fable has no [1m] option).
 # Local LLMs (--local) and custom ANTHROPIC_BASE_URL endpoints get no suffix.
-if [[ "${USING_LOCAL:-0}" == "1" ]] || { [[ -n "$ANTHROPIC_BASE_URL" ]] && [[ "${USING_FOUNDRY:-0}" != "1" ]]; }; then
-  M1=""
-else
-  M1="[1m]"
+# The suffix is baked into the exported ANTHROPIC_DEFAULT_*_MODEL vars so
+# Claude Code's own sonnet/opus aliases resolve to the [1m] variants too
+# (guarded so an already-suffixed user override is not suffixed twice).
+if [[ "${USING_LOCAL:-0}" != "1" ]] && { [[ -z "$ANTHROPIC_BASE_URL" ]] || [[ "${USING_FOUNDRY:-0}" == "1" ]]; }; then
+  [[ "$ANTHROPIC_DEFAULT_SONNET_MODEL" != *'[1m]' ]] && export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL}[1m]"
+  [[ "$ANTHROPIC_DEFAULT_OPUS_MODEL"   != *'[1m]' ]] && export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL}[1m]"
 fi
 
 # Default model — haiku unless overridden by 'claude default <model>'
 model_name="${WRAPPER_DEFAULT_MODEL:-haiku}"
 case "$model_name" in
-  # On Bedrock/Foundry/native, Sonnet and Opus always run with [1m] (1M
-  # context); the legacy -1m aliases resolve to the same model. Fable has
-  # no [1m] variant.
+  # The legacy -1m aliases resolve to the same models; Fable has no [1m]
+  # variant.
   fable)     mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}" ;;
-  opus-1m)   mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}${M1}" ;;
-  opus)      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}${M1}" ;;
-  sonnet-1m) mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}${M1}" ;;
-  sonnet)    mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}${M1}" ;;
+  opus-1m)   mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}" ;;
+  opus)      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}" ;;
+  sonnet-1m) mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}" ;;
+  sonnet)    mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}" ;;
   *)         mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}" ; model_name="haiku" ;;
 esac
 
@@ -866,21 +867,19 @@ for arg in "$@"; do
       model_name="fable"
       ;;
     opus-1m)
-      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}${M1}"
+      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}"
       model_name="opus-1m"
       ;;
     opus)
-      # On Bedrock/Foundry/native, Opus runs with [1m] (1M context)
-      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}${M1}"
+      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}"
       model_name="opus"
       ;;
     sonnet-1m)
-      mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}${M1}"
+      mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}"
       model_name="sonnet-1m"
       ;;
     sonnet)
-      # On Bedrock/Foundry/native, Sonnet runs with [1m] (1M context)
-      mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}${M1}"
+      mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}"
       model_name="sonnet"
       ;;
     haiku)
@@ -940,6 +939,16 @@ if [[ "$wdebug" -eq 1 ]]; then
     echo "Command: $REAL_CLAUDE --model $mymodel --allowedTools <list> --disallowedTools <list> $*" >&2
   fi
   echo "" >&2
+  # Debug mode never launches Claude Code on its own — prompt when
+  # interactive, exit otherwise.
+  if [[ -t 0 ]]; then
+    read -rp "Execute Claude Code now? (y/n): " _wdebug_go
+    if [[ "$_wdebug_go" != "y" && "$_wdebug_go" != "Y" ]]; then
+      exit 0
+    fi
+  else
+    exit 0
+  fi
 fi
 
 # Block running Claude Code directly in the home directory
@@ -1010,12 +1019,18 @@ DISALLOWED_TOOLS=(
   "Bash(:(){ :|:& };:)"
 )
 
+# Join each tool list into a single comma-separated argument. Passed as
+# separate words, the variadic --allowedTools/--disallowedTools options would
+# swallow any user positional (e.g. a prompt) that follows them.
+_allowed_csv=$(IFS=,; printf '%s' "${ALLOWED_TOOLS[*]}")
+_disallowed_csv=$(IFS=,; printf '%s' "${DISALLOWED_TOOLS[*]}")
+
 # Execute Claude Code (skip permissions if WRAPPER_YOLO=1)
 if [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
   exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
 else
   exec "$REAL_CLAUDE" --model "$mymodel" \
-    --allowedTools "${ALLOWED_TOOLS[@]}" \
-    --disallowedTools "${DISALLOWED_TOOLS[@]}" \
+    --allowedTools "$_allowed_csv" \
+    --disallowedTools "$_disallowed_csv" \
     "$@"
 fi

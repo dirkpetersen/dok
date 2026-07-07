@@ -398,17 +398,17 @@ The flag can appear anywhere in the argument list. It prints a summary to stderr
 === claude-wrapper debug ===
 
 Environment variables set by wrapper:
-  ANTHROPIC_MODEL=global.anthropic.claude-sonnet-4-6
+  ANTHROPIC_MODEL=global.anthropic.claude-sonnet-4-6[1m]
   ANTHROPIC_DEFAULT_HAIKU_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
-  ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-4-6
-  ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-4-8
+  ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-4-6[1m]
+  ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-4-8[1m]
   ANTHROPIC_DEFAULT_FABLE_MODEL=global.anthropic.claude-fable-5
   ANTHROPIC_SMALL_FAST_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
   CLAUDE_CODE_USE_BEDROCK=1
   AWS_DEFAULT_REGION=us-west-2
   AWS_PROFILE=bedrock
 
-Command: /home/user/.local/bin/claude --model global.anthropic.claude-sonnet-4-6 --allowedTools <list> --disallowedTools <list>
+Command: /home/user/.local/bin/claude --model global.anthropic.claude-sonnet-4-6[1m] --allowedTools <list> --disallowedTools <list>
 
 Execute Claude Code now? (y/n):
 ```
