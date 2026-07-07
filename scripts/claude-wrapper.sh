@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.32"
+WRAPPER_VERSION="1.33"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -27,6 +27,33 @@ _file_md5() {
   fi
 }
 
+# Download the latest wrapper from GitHub and replace the installed copy.
+# Prints the result on success or replace-failure; stays silent on download
+# failure so callers can print a context-appropriate message. Returns 0 on
+# success (including already up to date), 1 on any failure.
+_self_update() {
+  local temp_wrapper md5_before md5_after new_ver
+  md5_before=$(_file_md5 "$WRAPPER_PATH")
+  temp_wrapper=$(mktemp)
+  if ! curl -fsSL --connect-timeout 5 -o "$temp_wrapper" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?$(date +%s)"; then
+    rm -f "$temp_wrapper"
+    return 1
+  fi
+  md5_after=$(_file_md5 "$temp_wrapper")
+  new_ver=$(grep '^WRAPPER_VERSION=' "$temp_wrapper" 2>/dev/null | head -1 | cut -d'"' -f2)
+  if mv "$temp_wrapper" "$WRAPPER_PATH" && chmod +x "$WRAPPER_PATH"; then
+    if [[ "$md5_before" != "$md5_after" ]]; then
+      echo -e "${GREEN}✓${NC} Wrapper updated successfully (now v${new_ver:-unknown})" >&2
+    else
+      echo -e "${GREEN}✓${NC} Wrapper already up to date (v${new_ver:-$WRAPPER_VERSION})" >&2
+    fi
+    return 0
+  fi
+  echo -e "${RED}✗ Failed to replace wrapper${NC}" >&2
+  rm -f "$temp_wrapper"
+  return 1
+}
+
 # Detect whether the user has logged in via `claude /login` (native claude.ai oauth).
 # Returns 0 if a valid, non-expired token is found in ~/.claude/.credentials.json.
 _is_claude_logged_in() {
@@ -37,7 +64,9 @@ _is_claude_logged_in() {
     token=$(jq -r '.claudeAiOauth.accessToken // empty' "$creds" 2>/dev/null)
     expires_ms=$(jq -r '.claudeAiOauth.expiresAt // 0' "$creds" 2>/dev/null)
     [[ -n "$token" ]] || return 1
-    if [[ "${expires_ms:-0}" != "0" ]]; then
+    # Only enforce expiry when expiresAt is a plausible number; a missing or
+    # malformed value means "can't tell", not "expired".
+    if [[ "$expires_ms" =~ ^[0-9]+$ ]] && [[ "$expires_ms" != "0" ]]; then
       local now_ms=$(( $(date +%s) * 1000 ))
       (( expires_ms > now_ms )) || return 1
     fi
@@ -54,7 +83,10 @@ _is_claude_logged_in() {
 _set_wrapper_env() {
   local key="$1" value="$2"
   mkdir -p "$HOME/.claude"
-  [[ -f "$ENV_FILE" ]] || printf "# Claude wrapper settings\n" > "$ENV_FILE"
+  if [[ ! -f "$ENV_FILE" ]]; then
+    printf "# Claude wrapper settings\n" > "$ENV_FILE"
+    chmod 600 "$ENV_FILE"
+  fi
   local tmpf
   tmpf=$(mktemp)
   grep -v "^${key}=" "$ENV_FILE" > "$tmpf" 2>/dev/null || true
@@ -285,7 +317,7 @@ install_wrapper() {
   # Always download from GitHub in this case to ensure latest version
   if [[ "$0" == "bash" ]] || [[ ! -f "$0" ]]; then
     echo -e "${YELLOW}Downloading wrapper script from GitHub...${NC}"
-    if curl -fsSL -o "$WRAPPER_PATH" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`"; then
+    if curl -fsSL -o "$WRAPPER_PATH" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?$(date +%s)"; then
       echo -e "${GREEN}✓${NC} Downloaded wrapper script"
     else
       echo -e "${RED}✗ Failed to download wrapper script${NC}" >&2
@@ -370,8 +402,7 @@ if [[ -f "$ENV_FILE" ]]; then
 fi
 
 # Verify PATH configuration first, before doing anything
-verify_path_configuration
-if [[ $? -ne 0 ]]; then
+if ! verify_path_configuration; then
   exit 1
 fi
 
@@ -400,7 +431,7 @@ else
   # Check if stdin is a terminal (interactive) or pipe (non-interactive)
   if [[ -t 0 ]]; then
     # Interactive mode - prompt user
-    read -p "Install to ~/bin/claude? (y/n): " install_confirm
+    read -rp "Install to ~/bin/claude? (y/n): " install_confirm
 
     if [[ "$install_confirm" == "y" || "$install_confirm" == "Y" ]]; then
       install_wrapper
@@ -540,31 +571,10 @@ fi
 # Check if update/upgrade is requested
 if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
   echo -e "${YELLOW}Updating claude-wrapper...${NC}" >&2
-
-  # Checksum before download
-  MD5_BEFORE=$(_file_md5 "$WRAPPER_PATH")
-
-  # Download new wrapper to temp file
-  TEMP_WRAPPER=$(mktemp)
-  if curl -fsSL -o "$TEMP_WRAPPER" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`"; then
-    MD5_AFTER=$(_file_md5 "$TEMP_WRAPPER")
-    # Replace the installed wrapper
-    _new_ver=$(grep '^WRAPPER_VERSION=' "$TEMP_WRAPPER" 2>/dev/null | head -1 | cut -d'"' -f2)
-    if mv "$TEMP_WRAPPER" "$WRAPPER_PATH" && chmod +x "$WRAPPER_PATH"; then
-      if [[ "$MD5_BEFORE" != "$MD5_AFTER" ]]; then
-        echo -e "${GREEN}✓${NC} Wrapper updated successfully (now v${_new_ver:-unknown})" >&2
-      else
-        echo -e "${GREEN}✓${NC} Wrapper already up to date (v${_new_ver:-$WRAPPER_VERSION})" >&2
-      fi
-      echo "" >&2
-    else
-      echo -e "${RED}✗ Failed to replace wrapper${NC}" >&2
-      rm -f "$TEMP_WRAPPER"
-    fi
-  else
+  if ! _self_update; then
     echo -e "${RED}✗ Failed to download wrapper${NC}" >&2
-    rm -f "$TEMP_WRAPPER"
   fi
+  echo "" >&2
 
   # Now update Claude Code itself
   echo -e "${YELLOW}Updating Claude Code...${NC}" >&2
@@ -572,31 +582,18 @@ if [[ "$1" == "update" || "$1" == "upgrade" ]]; then
   exec "$REAL_CLAUDE" update
 fi
 
-# Auto-update if it has been more than 7 days since last update
+# Auto-update if it has been more than 7 days since last update. The
+# timestamp is only advanced on success so a failed attempt (e.g. offline)
+# is retried on the next run instead of being deferred another 7 days.
 _now=$(date +%s)
 _last="${WRAPPER_LAST_UPDATE:-0}"
 if (( _now - _last > 604800 )); then
   echo -e "${YELLOW}Auto-updating claude-wrapper (last update was >7 days ago)...${NC}" >&2
-  TEMP_WRAPPER=$(mktemp)
-  MD5_BEFORE=$(_file_md5 "$WRAPPER_PATH")
-  if curl -fsSL -o "$TEMP_WRAPPER" "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/claude-wrapper.sh?`date +%s`"; then
-    MD5_AFTER=$(_file_md5 "$TEMP_WRAPPER")
-    _new_ver=$(grep '^WRAPPER_VERSION=' "$TEMP_WRAPPER" 2>/dev/null | head -1 | cut -d'"' -f2)
-    if mv "$TEMP_WRAPPER" "$WRAPPER_PATH" && chmod +x "$WRAPPER_PATH"; then
-      if [[ "$MD5_BEFORE" != "$MD5_AFTER" ]]; then
-        echo -e "${GREEN}✓${NC} Wrapper updated (now v${_new_ver:-unknown})" >&2
-      else
-        echo -e "${GREEN}✓${NC} Wrapper already up to date (v${_new_ver:-$WRAPPER_VERSION})" >&2
-      fi
-    else
-      echo -e "${RED}✗ Failed to replace wrapper${NC}" >&2
-      rm -f "$TEMP_WRAPPER"
-    fi
+  if _self_update; then
+    _set_wrapper_env WRAPPER_LAST_UPDATE "$(date +%s)"
   else
-    echo -e "${YELLOW}⚠ Auto-update skipped (no network?)${NC}" >&2
-    rm -f "$TEMP_WRAPPER"
+    echo -e "${YELLOW}⚠ Auto-update skipped (no network?) — will retry next run${NC}" >&2
   fi
-  _set_wrapper_env WRAPPER_LAST_UPDATE "$(date +%s)"
 fi
 
 # Pre-scan args for backend-forcing flags (--aws / --az) and strip them early.
@@ -678,7 +675,7 @@ if [[ "$1" == "--local" ]]; then
   if { [[ ! -f "$ENV_FILE" ]] || ! grep -q "^LOCAL_ANTHROPIC_BASE_URL=" "$ENV_FILE" 2>/dev/null; } && [[ -t 0 ]]; then
     echo "" >&2
     echo -e "${YELLOW}Local LLM vars are set but not yet saved to ~/.claude/claude-wrapper.env.${NC}" >&2
-    read -p "Save these settings for future sessions? (Y/n): " _save_local
+    read -rp "Save these settings for future sessions? (Y/n): " _save_local
     if [[ -z "$_save_local" || "$_save_local" == "y" || "$_save_local" == "Y" ]]; then
       mkdir -p "$HOME/.claude"
       # Write to claude-wrapper.env (primary)
@@ -757,7 +754,7 @@ elif [[ "${FORCE_AWS:-0}" != "1" ]] && [[ "${FORCE_AZ:-0}" == "1" || "${CLAUDE_C
   if [[ ! -f "$HOME/.azure/clauderc" ]] && [[ -t 0 ]]; then
     echo "" >&2
     echo -e "${YELLOW}Azure Foundry vars are set but ~/.azure/clauderc does not exist.${NC}" >&2
-    read -p "Save these settings to ~/.azure/clauderc for future sessions? (Y/n): " _save_confirm
+    read -rp "Save these settings to ~/.azure/clauderc for future sessions? (Y/n): " _save_confirm
     if [[ -z "$_save_confirm" || "$_save_confirm" == "y" || "$_save_confirm" == "Y" ]]; then
       mkdir -p "$HOME/.azure"
       cat > "$HOME/.azure/clauderc" <<EOF
@@ -765,6 +762,7 @@ export CLAUDE_CODE_USE_FOUNDRY=1
 export ANTHROPIC_FOUNDRY_BASE_URL="$ANTHROPIC_FOUNDRY_BASE_URL"
 export ANTHROPIC_FOUNDRY_API_KEY="$ANTHROPIC_FOUNDRY_API_KEY"
 EOF
+      chmod 600 "$HOME/.azure/clauderc"
       echo -e "${GREEN}✓${NC} Saved to ~/.azure/clauderc" >&2
     fi
     echo "" >&2
