@@ -3234,13 +3234,32 @@
 <span class="normal">1001</span>
 <span class="normal">1002</span>
 <span class="normal">1003</span>
-<span class="normal">1004</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1004</span>
+<span class="normal">1005</span>
+<span class="normal">1006</span>
+<span class="normal">1007</span>
+<span class="normal">1008</span>
+<span class="normal">1009</span>
+<span class="normal">1010</span>
+<span class="normal">1011</span>
+<span class="normal">1012</span>
+<span class="normal">1013</span>
+<span class="normal">1014</span>
+<span class="normal">1015</span>
+<span class="normal">1016</span>
+<span class="normal">1017</span>
+<span class="normal">1018</span>
+<span class="normal">1019</span>
+<span class="normal">1020</span>
+<span class="normal">1021</span>
+<span class="normal">1022</span>
+<span class="normal">1023</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">&quot;claude-wrapper.sh&quot;</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.31&quot;</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">&quot;1.32&quot;</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">&quot;</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude&quot;</span>
@@ -3947,6 +3966,13 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nv">USING_NATIVE</span><span class="o">=</span><span class="m">1</span>
+<span class="w">  </span><span class="c1"># The wrapper can only clear environment variables — if ANTHROPIC_API_KEY is</span>
+<span class="w">  </span><span class="c1"># baked into ~/.claude/settings.json (env block or apiKeyHelper), Claude Code</span>
+<span class="w">  </span><span class="c1"># re-adds it itself and warns about mixed auth. Point the user at the file.</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/settings.json&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>grep<span class="w"> </span>-Eq<span class="w"> </span><span class="s1">&#39;&quot;ANTHROPIC_API_KEY&quot;|&quot;apiKeyHelper&quot;&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.claude/settings.json&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠ ~/.claude/settings.json sets ANTHROPIC_API_KEY (or apiKeyHelper).</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">  Remove it from that file to stop the &#39;Both claude.ai and ANTHROPIC_API_KEY set&#39; warning.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="k">fi</span>
 
 <span class="c1"># Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1 or --az</span>
 <span class="c1"># forces it (skipped when --aws). --az overrides native claude.ai login.</span>
@@ -3969,7 +3995,15 @@ verify_path_configuration
 <span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="w">  </span><span class="k">fi</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_BASE_URL</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$ANTHROPIC_FOUNDRY_BASE_URL</span><span class="s2">&quot;</span>
-<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span><span class="s2">&quot;sk-ant-dummy&quot;</span>
+<span class="w">  </span><span class="c1"># Foundry authenticates via ANTHROPIC_FOUNDRY_API_KEY. The dummy</span>
+<span class="w">  </span><span class="c1"># ANTHROPIC_API_KEY only exists to skip the first-run API-key approval</span>
+<span class="w">  </span><span class="c1"># prompt; when a native claude.ai login is present, leave the key unset so</span>
+<span class="w">  </span><span class="c1"># Claude Code does not warn about mixed auth (claude.ai + ANTHROPIC_API_KEY).</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>_is_claude_logged_in<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">unset</span><span class="w"> </span>ANTHROPIC_API_KEY
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span><span class="s2">&quot;sk-ant-dummy&quot;</span>
+<span class="w">  </span><span class="k">fi</span>
 <span class="w">  </span><span class="c1"># Foundry endpoint — Bedrock must not be active.</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nv">USING_FOUNDRY</span><span class="o">=</span><span class="m">1</span>
@@ -4008,6 +4042,10 @@ verify_path_configuration
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_DEFAULT_REGION</span><span class="o">=</span>us-west-2
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_PROFILE</span><span class="o">=</span>bedrock
+<span class="w">  </span><span class="c1"># Bedrock authenticates via the AWS profile — a leftover ANTHROPIC_API_KEY</span>
+<span class="w">  </span><span class="c1"># from the shell only triggers Claude Code&#39;s mixed-auth warning when a</span>
+<span class="w">  </span><span class="c1"># native claude.ai login also exists, and is never used here.</span>
+<span class="w">  </span><span class="nb">unset</span><span class="w"> </span>ANTHROPIC_API_KEY
 
 <span class="c1"># No valid configuration found</span>
 <span class="k">else</span>
