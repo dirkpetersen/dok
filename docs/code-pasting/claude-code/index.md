@@ -338,6 +338,25 @@ Understanding the differences between the three available models helps you choos
 | **Complex Tasks** | ⭐⭐⭐ Medium | ⭐⭐⭐⭐ High | ⭐⭐⭐⭐⭐ Excellent |
 | **Coding Skills** | ⭐⭐⭐⭐ High | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐⭐ Excellent |
 
+### 1M Context Window by Backend
+
+The wrapper automatically appends the `[1m]` suffix (1M-token context window) to the model ID where it is available. Which models get it depends on the active backend:
+
+| Backend | Sonnet | Opus | Fable |
+|---------|--------|------|-------|
+| **AWS Bedrock** | `[1m]` | `[1m]` | `[1m]` |
+| **Azure AI Foundry** (`--az` / `CLAUDE_CODE_USE_FOUNDRY=1`) | `[1m]` | `[1m]` | `[1m]` |
+| **Native claude.ai login** (`claude /login`) | — (not included in plan) | `[1m]` | `[1m]` |
+| **Local LLM / custom `ANTHROPIC_BASE_URL`** | — | — | — |
+
+Notes:
+
+- The suffix is baked into the exported `ANTHROPIC_DEFAULT_SONNET_MODEL`, `ANTHROPIC_DEFAULT_OPUS_MODEL`, and `ANTHROPIC_DEFAULT_FABLE_MODEL` variables, so models selected inside Claude Code (e.g. via `/model`) also resolve to the 1M variants.
+- If you export one of these variables yourself with a `[1m]` suffix already present, the wrapper will not add it twice.
+- Haiku never uses `[1m]`.
+- The legacy aliases `sonnet-1m` and `opus-1m` are still accepted and resolve to the same models as `sonnet` and `opus`.
+- Sonnet on a native claude.ai login stays on the standard 200k window because the 1M context is not included in claude.ai plans.
+
 ## Usage
 
 ### Default (Haiku - Fast)
@@ -418,12 +437,12 @@ Answering `y` launches Claude Code; anything else exits without running it. This
 ## Configuration Notes
 
 - **Inference Backend**: native claude.ai login (`claude /login`), AWS Bedrock, Azure AI Foundry (`CLAUDE_CODE_USE_FOUNDRY=1`), or local LLM (`--local`). Force a specific cloud backend per run with `--aws` (Bedrock) or `--az` (Foundry).
-- **Permissions**: By default the wrapper uses `--allowedTools` / `--disallowedTools` to allow a broad but safe set of commands. To grant full unrestricted permissions, create `~/.claude/yolo-mode`:
+- **Permissions**: By default the wrapper uses `--allowedTools` / `--disallowedTools` to allow a broad but safe set of commands. To grant full unrestricted permissions:
   ```bash
-  touch ~/.claude/yolo-mode   # enables --dangerously-skip-permissions
-  rm ~/.claude/yolo-mode      # reverts to allowedTools mode
+  claude default yolo     # enables --dangerously-skip-permissions
+  claude default noyolo   # reverts to allowedTools mode
   ```
-- **Model Selection**: Easy switching between Haiku (fast), Sonnet (balanced), and Opus (capable)
+- **Model Selection**: Easy switching between Haiku (fast), Sonnet (balanced), Opus (capable), and Fable (most capable); see the [1M context matrix](#1m-context-window-by-backend) for which variants each backend uses
 - **Debug Mode**: Use `--wdebug` to inspect environment variables and the final command before execution
 
 ## Secure Setup: Sandboxed Claude Code with Bubblewrap
