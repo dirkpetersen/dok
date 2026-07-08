@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.34"
+WRAPPER_VERSION="1.35"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -352,7 +352,7 @@ install_wrapper() {
   echo "  claude sonnet-1m      # Alias for sonnet"
   echo "  claude opus           # Launch with Opus (most capable, 1M context)"
   echo "  claude opus-1m        # Alias for opus"
-  echo "  claude fable          # Launch with Fable 5 (no 1M variant)"
+  echo "  claude fable          # Launch with Fable 5 (1M context)"
   echo "  claude -c opus        # Model name works anywhere in args"
   echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/fable/sonnet-1m/opus-1m)"
   echo "  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)"
@@ -471,7 +471,7 @@ if [[ "$1" == "--models" ]]; then
   echo "Effective model the wrapper launches (Bedrock/Foundry/native — [1m] added):"
   echo "  Sonnet: ${ANTHROPIC_DEFAULT_SONNET_MODEL:-global.anthropic.claude-sonnet-4-6}[1m]  (1M context)"
   echo "  Opus:   ${ANTHROPIC_DEFAULT_OPUS_MODEL:-global.anthropic.claude-opus-4-8}[1m]  (1M context)"
-  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-global.anthropic.claude-fable-5}  (no [1m] variant)"
+  echo "  Fable:  ${ANTHROPIC_DEFAULT_FABLE_MODEL:-global.anthropic.claude-fable-5}[1m]  (1M context)"
   echo ""
   echo "  (the legacy -1m aliases — sonnet-1m/opus-1m — resolve to the same models)"
   echo ""
@@ -829,22 +829,22 @@ else
 fi
 export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL}"
 
-# Sonnet and Opus always use the 1M-context [1m] variant on AWS Bedrock,
-# Azure Foundry and native claude.ai logins (Fable has no [1m] option).
-# Local LLMs (--local) and custom ANTHROPIC_BASE_URL endpoints get no suffix.
+# Sonnet, Opus and Fable always use the 1M-context [1m] variant on AWS
+# Bedrock, Azure Foundry and native claude.ai logins. Local LLMs (--local)
+# and custom ANTHROPIC_BASE_URL endpoints get no suffix.
 # The suffix is baked into the exported ANTHROPIC_DEFAULT_*_MODEL vars so
-# Claude Code's own sonnet/opus aliases resolve to the [1m] variants too
+# Claude Code's own model aliases resolve to the [1m] variants too
 # (guarded so an already-suffixed user override is not suffixed twice).
 if [[ "${USING_LOCAL:-0}" != "1" ]] && { [[ -z "$ANTHROPIC_BASE_URL" ]] || [[ "${USING_FOUNDRY:-0}" == "1" ]]; }; then
   [[ "$ANTHROPIC_DEFAULT_SONNET_MODEL" != *'[1m]' ]] && export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL}[1m]"
   [[ "$ANTHROPIC_DEFAULT_OPUS_MODEL"   != *'[1m]' ]] && export ANTHROPIC_DEFAULT_OPUS_MODEL="${ANTHROPIC_DEFAULT_OPUS_MODEL}[1m]"
+  [[ "$ANTHROPIC_DEFAULT_FABLE_MODEL"  != *'[1m]' ]] && export ANTHROPIC_DEFAULT_FABLE_MODEL="${ANTHROPIC_DEFAULT_FABLE_MODEL}[1m]"
 fi
 
 # Default model — haiku unless overridden by 'claude default <model>'
 model_name="${WRAPPER_DEFAULT_MODEL:-haiku}"
 case "$model_name" in
-  # The legacy -1m aliases resolve to the same models; Fable has no [1m]
-  # variant.
+  # The legacy -1m aliases resolve to the same models.
   fable)     mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}" ;;
   opus-1m)   mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}" ;;
   opus)      mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}" ;;
@@ -862,7 +862,6 @@ new_args=()
 for arg in "$@"; do
   case "$arg" in
     fable)
-      # Fable has no [1m] variant
       mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}"
       model_name="fable"
       ;;
