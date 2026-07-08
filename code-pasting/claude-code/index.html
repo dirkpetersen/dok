@@ -1035,6 +1035,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Model Comparison">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1m-context-window-by-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1M Context Window by Backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1965,6 +1982,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Model Comparison">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1m-context-window-by-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1M Context Window by Backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -4615,6 +4649,52 @@ git<span class="w"> </span>init
 </tr>
 </tbody>
 </table>
+<h3 id="1m-context-window-by-backend">1M Context Window by Backend<a class="headerlink" href="#1m-context-window-by-backend" title="Permanent link">&para;</a></h3>
+<p>The wrapper automatically appends the <code>[1m]</code> suffix (1M-token context window) to the model ID where it is available. Which models get it depends on the active backend:</p>
+<table>
+<thead>
+<tr>
+<th>Backend</th>
+<th>Sonnet</th>
+<th>Opus</th>
+<th>Fable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AWS Bedrock</strong></td>
+<td><code>[1m]</code></td>
+<td><code>[1m]</code></td>
+<td><code>[1m]</code></td>
+</tr>
+<tr>
+<td><strong>Azure AI Foundry</strong> (<code>--az</code> / <code>CLAUDE_CODE_USE_FOUNDRY=1</code>)</td>
+<td><code>[1m]</code></td>
+<td><code>[1m]</code></td>
+<td><code>[1m]</code></td>
+</tr>
+<tr>
+<td><strong>Native claude.ai login</strong> (<code>claude /login</code>)</td>
+<td>— (not included in plan)</td>
+<td><code>[1m]</code></td>
+<td><code>[1m]</code></td>
+</tr>
+<tr>
+<td><strong>Local LLM / custom <code>ANTHROPIC_BASE_URL</code></strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Notes:</p>
+<ul>
+<li>The suffix is baked into the exported <code>ANTHROPIC_DEFAULT_SONNET_MODEL</code>, <code>ANTHROPIC_DEFAULT_OPUS_MODEL</code>, and <code>ANTHROPIC_DEFAULT_FABLE_MODEL</code> variables, so models selected inside Claude Code (e.g. via <code>/model</code>) also resolve to the 1M variants.</li>
+<li>If you export one of these variables yourself with a <code>[1m]</code> suffix already present, the wrapper will not add it twice.</li>
+<li>Haiku never uses <code>[1m]</code>.</li>
+<li>The legacy aliases <code>sonnet-1m</code> and <code>opus-1m</code> are still accepted and resolve to the same models as <code>sonnet</code> and <code>opus</code>.</li>
+<li>Sonnet on a native claude.ai login stays on the standard 200k window because the 1M context is not included in claude.ai plans.</li>
+</ul>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <h3 id="default-haiku-fast">Default (Haiku - Fast)<a class="headerlink" href="#default-haiku-fast" title="Permanent link">&para;</a></h3>
 <p>Run Claude Code with the default fast Haiku model for quick fixes and simple tasks:</p>
@@ -4688,12 +4768,12 @@ Execute Claude Code now? (y/n):
 <h2 id="configuration-notes">Configuration Notes<a class="headerlink" href="#configuration-notes" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Inference Backend</strong>: native claude.ai login (<code>claude /login</code>), AWS Bedrock, Azure AI Foundry (<code>CLAUDE_CODE_USE_FOUNDRY=1</code>), or local LLM (<code>--local</code>). Force a specific cloud backend per run with <code>--aws</code> (Bedrock) or <code>--az</code> (Foundry).</li>
-<li><strong>Permissions</strong>: By default the wrapper uses <code>--allowedTools</code> / <code>--disallowedTools</code> to allow a broad but safe set of commands. To grant full unrestricted permissions, create <code>~/.claude/yolo-mode</code>:
+<li><strong>Permissions</strong>: By default the wrapper uses <code>--allowedTools</code> / <code>--disallowedTools</code> to allow a broad but safe set of commands. To grant full unrestricted permissions:
   <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>touch<span class="w"> </span>~/.claude/yolo-mode<span class="w">   </span><span class="c1"># enables --dangerously-skip-permissions</span>
-rm<span class="w"> </span>~/.claude/yolo-mode<span class="w">      </span><span class="c1"># reverts to allowedTools mode</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>claude<span class="w"> </span>default<span class="w"> </span>yolo<span class="w">     </span><span class="c1"># enables --dangerously-skip-permissions</span>
+claude<span class="w"> </span>default<span class="w"> </span>noyolo<span class="w">   </span><span class="c1"># reverts to allowedTools mode</span>
 </code></pre></div></td></tr></table></div></li>
-<li><strong>Model Selection</strong>: Easy switching between Haiku (fast), Sonnet (balanced), and Opus (capable)</li>
+<li><strong>Model Selection</strong>: Easy switching between Haiku (fast), Sonnet (balanced), Opus (capable), and Fable (most capable); see the <a href="#1m-context-window-by-backend">1M context matrix</a> for which variants each backend uses</li>
 <li><strong>Debug Mode</strong>: Use <code>--wdebug</code> to inspect environment variables and the final command before execution</li>
 </ul>
 <h2 id="secure-setup-sandboxed-claude-code-with-bubblewrap">Secure Setup: Sandboxed Claude Code with Bubblewrap<a class="headerlink" href="#secure-setup-sandboxed-claude-code-with-bubblewrap" title="Permanent link">&para;</a></h2>
