@@ -169,7 +169,7 @@ When `CLAUDE_CODE_USE_FOUNDRY=1` is active, model defaults switch to plain Anthr
 | Alias  | Default model       |
 |--------|---------------------|
 | haiku  | `claude-haiku-4-5`  |
-| sonnet | `claude-sonnet-4-6` |
+| sonnet | `claude-sonnet-5` |
 | opus   | `claude-opus-4-8`   |
 | fable  | `claude-fable-5`    |
 
@@ -178,7 +178,7 @@ You can override any of these by adding them to `~/.azure/clauderc`:
 ```bash
 export ANTHROPIC_DEFAULT_OPUS_MODEL="claude-opus-4-8"
 export ANTHROPIC_DEFAULT_FABLE_MODEL="claude-fable-5"
-export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-6"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-5"
 ```
 
 !!! warning "Both Foundry variables must be set"
@@ -239,7 +239,7 @@ The recommended approach is to keep both backend configurations in your profile 
 # $env:ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION = $env:AWS_REGION
 # $env:ANTHROPIC_DEFAULT_OPUS_MODEL          = "global.anthropic.claude-opus-4-8"
 # $env:ANTHROPIC_DEFAULT_FABLE_MODEL         = "global.anthropic.claude-fable-5"
-# $env:ANTHROPIC_DEFAULT_SONNET_MODEL        = "global.anthropic.claude-sonnet-4-6"
+# $env:ANTHROPIC_DEFAULT_SONNET_MODEL        = "global.anthropic.claude-sonnet-5"
 
 # ── Option B: Azure AI Foundry ────────────────────────────────
 $env:CLAUDE_CODE_USE_FOUNDRY        = 1
@@ -248,7 +248,7 @@ $env:ANTHROPIC_FOUNDRY_BASE_URL     = "https://xxxxxxxxxxxx.azure-api.net/anthro
 $env:ANTHROPIC_FOUNDRY_API_KEY      = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 $env:ANTHROPIC_DEFAULT_OPUS_MODEL   = "claude-opus-4-8"
 $env:ANTHROPIC_DEFAULT_FABLE_MODEL  = "claude-fable-5"
-$env:ANTHROPIC_DEFAULT_SONNET_MODEL = "claude-sonnet-4-6"
+$env:ANTHROPIC_DEFAULT_SONNET_MODEL = "claude-sonnet-5"
 ```
 
 **AWS Bedrock notes**: credentials must also be present in `~\.aws\credentials` under a `[bedrock]` profile (see step 1). The PowerShell variables handle region and model selection; the credentials file handles authentication.
@@ -417,9 +417,9 @@ The flag can appear anywhere in the argument list. It prints a summary to stderr
 === claude-wrapper debug ===
 
 Environment variables set by wrapper:
-  ANTHROPIC_MODEL=global.anthropic.claude-sonnet-4-6[1m]
+  ANTHROPIC_MODEL=global.anthropic.claude-sonnet-5[1m]
   ANTHROPIC_DEFAULT_HAIKU_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
-  ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-4-6[1m]
+  ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-5[1m]
   ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-4-8[1m]
   ANTHROPIC_DEFAULT_FABLE_MODEL=global.anthropic.claude-fable-5[1m]
   ANTHROPIC_SMALL_FAST_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
@@ -427,7 +427,7 @@ Environment variables set by wrapper:
   AWS_DEFAULT_REGION=us-west-2
   AWS_PROFILE=bedrock
 
-Command: /home/user/.local/bin/claude --model global.anthropic.claude-sonnet-4-6[1m] --allowedTools <list> --disallowedTools <list>
+Command: /home/user/.local/bin/claude --model global.anthropic.claude-sonnet-5[1m] --allowedTools <list> --disallowedTools <list>
 
 Execute Claude Code now? (y/n):
 ```
