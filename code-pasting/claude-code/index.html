@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -3302,7 +3302,54 @@
 <span class="normal">1035</span>
 <span class="normal">1036</span>
 <span class="normal">1037</span>
-<span class="normal">1038</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1038</span>
+<span class="normal">1039</span>
+<span class="normal">1040</span>
+<span class="normal">1041</span>
+<span class="normal">1042</span>
+<span class="normal">1043</span>
+<span class="normal">1044</span>
+<span class="normal">1045</span>
+<span class="normal">1046</span>
+<span class="normal">1047</span>
+<span class="normal">1048</span>
+<span class="normal">1049</span>
+<span class="normal">1050</span>
+<span class="normal">1051</span>
+<span class="normal">1052</span>
+<span class="normal">1053</span>
+<span class="normal">1054</span>
+<span class="normal">1055</span>
+<span class="normal">1056</span>
+<span class="normal">1057</span>
+<span class="normal">1058</span>
+<span class="normal">1059</span>
+<span class="normal">1060</span>
+<span class="normal">1061</span>
+<span class="normal">1062</span>
+<span class="normal">1063</span>
+<span class="normal">1064</span>
+<span class="normal">1065</span>
+<span class="normal">1066</span>
+<span class="normal">1067</span>
+<span class="normal">1068</span>
+<span class="normal">1069</span>
+<span class="normal">1070</span>
+<span class="normal">1071</span>
+<span class="normal">1072</span>
+<span class="normal">1073</span>
+<span class="normal">1074</span>
+<span class="normal">1075</span>
+<span class="normal">1076</span>
+<span class="normal">1077</span>
+<span class="normal">1078</span>
+<span class="normal">1079</span>
+<span class="normal">1080</span>
+<span class="normal">1081</span>
+<span class="normal">1082</span>
+<span class="normal">1083</span>
+<span class="normal">1084</span>
+<span class="normal">1085</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
@@ -4164,10 +4211,57 @@ _migrate_to_wrapper_env
 <span class="c1"># Trade-off: a bare arg equal to a model keyword (opus/sonnet/haiku/-1m) is</span>
 <span class="c1"># consumed as a model selector and not forwarded to Claude Code. This is</span>
 <span class="c1"># intentional so the keyword works anywhere in the arg list.</span>
+<span class="c1"># Flag-form &quot;--model &lt;value&gt;&quot; / &quot;--model=&lt;value&gt;&quot; (as passed by the Claude</span>
+<span class="c1"># Code SDK / kanna) is also recognized here: both the flag and its value are</span>
+<span class="c1"># consumed (never forwarded) since the wrapper injects its own single</span>
+<span class="c1"># &quot;--model $mymodel&quot; at exec time below. This avoids leaving a dangling</span>
+<span class="c1"># &quot;--model&quot; that would otherwise swallow the next unrelated argument.</span>
+<span class="c1">#</span>
+<span class="c1"># Resolve an explicit --model VALUE: map a known keyword to its full id, else</span>
+<span class="c1"># pass the value through as an explicit model id. Sets mymodel/model_name.</span>
+_apply_model_value<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span>fable<span class="o">)</span><span class="w">               </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w">  </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;fable&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">    </span>opus<span class="p">|</span>opus-1m<span class="o">)</span><span class="w">        </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w">   </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;opus&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">    </span>sonnet<span class="p">|</span>sonnet-1m<span class="o">)</span><span class="w">    </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;sonnet&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">    </span>haiku<span class="o">)</span><span class="w">               </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w">  </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;haiku&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">    </span><span class="s2">&quot;&quot;</span><span class="o">)</span><span class="w">                  </span>:<span class="w"> </span><span class="p">;;</span><span class="w">  </span><span class="c1"># empty value: leave defaults, don&#39;t blank the model</span>
+<span class="w">    </span>*<span class="o">)</span><span class="w">                   </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="p">;</span><span class="w">                                </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">  </span><span class="k">esac</span>
+<span class="o">}</span>
+
+<span class="c1"># In YOLO mode the exec below adds --dangerously-skip-permissions, which</span>
+<span class="c1"># supersedes any --permission-prompt-tool the SDK passed; drop that flag (and</span>
+<span class="c1"># its value) in that case to avoid a redundant/conflicting pair of options.</span>
+<span class="nv">_yolo</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">WRAPPER_YOLO</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">&quot;</span>
+
 <span class="nv">wdebug</span><span class="o">=</span><span class="m">0</span>
 <span class="nv">new_args</span><span class="o">=()</span>
+<span class="nv">_expect_model_value</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">_drop_next</span><span class="o">=</span><span class="m">0</span>
 <span class="k">for</span><span class="w"> </span>arg<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_expect_model_value</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">_expect_model_value</span><span class="o">=</span><span class="m">0</span>
+<span class="w">    </span>_apply_model_value<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$arg</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="k">continue</span>
+<span class="w">  </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_drop_next</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">_drop_next</span><span class="o">=</span><span class="m">0</span>
+<span class="w">    </span><span class="k">continue</span>
+<span class="w">  </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$arg</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span>--model<span class="o">)</span>
+<span class="w">      </span><span class="nv">_expect_model_value</span><span class="o">=</span><span class="m">1</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>--model<span class="o">=</span>*<span class="o">)</span>
+<span class="w">      </span>_apply_model_value<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">arg</span><span class="p">#--model=</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>--permission-prompt-tool<span class="o">)</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_yolo</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="nv">_drop_next</span><span class="o">=</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="nv">new_args</span><span class="o">+=(</span><span class="s2">&quot;</span><span class="nv">$arg</span><span class="s2">&quot;</span><span class="o">)</span><span class="p">;</span><span class="w"> </span><span class="k">fi</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>--permission-prompt-tool<span class="o">=</span>*<span class="o">)</span>
+<span class="w">      </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$_yolo</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nv">new_args</span><span class="o">+=(</span><span class="s2">&quot;</span><span class="nv">$arg</span><span class="s2">&quot;</span><span class="o">)</span>
+<span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>fable<span class="o">)</span>
 <span class="w">      </span><span class="nv">mymodel</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">      </span><span class="nv">model_name</span><span class="o">=</span><span class="s2">&quot;fable&quot;</span>
@@ -5343,7 +5437,7 @@ npm<span class="w"> </span>--version
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "toc.follow", "search.suggest", "search.highlight", "search.share", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
