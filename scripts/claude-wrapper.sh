@@ -860,10 +860,57 @@ esac
 # Trade-off: a bare arg equal to a model keyword (opus/sonnet/haiku/-1m) is
 # consumed as a model selector and not forwarded to Claude Code. This is
 # intentional so the keyword works anywhere in the arg list.
+# Flag-form "--model <value>" / "--model=<value>" (as passed by the Claude
+# Code SDK / kanna) is also recognized here: both the flag and its value are
+# consumed (never forwarded) since the wrapper injects its own single
+# "--model $mymodel" at exec time below. This avoids leaving a dangling
+# "--model" that would otherwise swallow the next unrelated argument.
+#
+# Resolve an explicit --model VALUE: map a known keyword to its full id, else
+# pass the value through as an explicit model id. Sets mymodel/model_name.
+_apply_model_value() {
+  case "$1" in
+    fable)               mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}";  model_name="fable" ;;
+    opus|opus-1m)        mymodel="${ANTHROPIC_DEFAULT_OPUS_MODEL}";   model_name="opus" ;;
+    sonnet|sonnet-1m)    mymodel="${ANTHROPIC_DEFAULT_SONNET_MODEL}"; model_name="sonnet" ;;
+    haiku)               mymodel="${ANTHROPIC_DEFAULT_HAIKU_MODEL}";  model_name="haiku" ;;
+    "")                  : ;;  # empty value: leave defaults, don't blank the model
+    *)                   mymodel="$1";                                model_name="$1" ;;
+  esac
+}
+
+# In YOLO mode the exec below adds --dangerously-skip-permissions, which
+# supersedes any --permission-prompt-tool the SDK passed; drop that flag (and
+# its value) in that case to avoid a redundant/conflicting pair of options.
+_yolo="${WRAPPER_YOLO:-0}"
+
 wdebug=0
 new_args=()
+_expect_model_value=0
+_drop_next=0
 for arg in "$@"; do
+  if [[ "$_expect_model_value" == "1" ]]; then
+    _expect_model_value=0
+    _apply_model_value "$arg"
+    continue
+  fi
+  if [[ "$_drop_next" == "1" ]]; then
+    _drop_next=0
+    continue
+  fi
   case "$arg" in
+    --model)
+      _expect_model_value=1
+      ;;
+    --model=*)
+      _apply_model_value "${arg#--model=}"
+      ;;
+    --permission-prompt-tool)
+      if [[ "$_yolo" == "1" ]]; then _drop_next=1; else new_args+=("$arg"); fi
+      ;;
+    --permission-prompt-tool=*)
+      [[ "$_yolo" == "1" ]] || new_args+=("$arg")
+      ;;
     fable)
       mymodel="${ANTHROPIC_DEFAULT_FABLE_MODEL}"
       model_name="fable"
