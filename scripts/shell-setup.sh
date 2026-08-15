@@ -1070,7 +1070,30 @@ install_keychain() {
 
   echo -e "${YELLOW}Installing keychain...${NC}"
   mkdir -p "$HOME/bin"
-  curl -fsSL https://raw.githubusercontent.com/danielrobbins/keychain/refs/heads/master/keychain.sh -o "$HOME/bin/keychain"
+
+  # Pinned classic single-file keychain (pure shell, no dependencies, directly
+  # executable). The upstream project was rewritten in Python and its master no
+  # longer ships keychain.sh, so we pin the last stand-alone shell release.
+  local keychain_url="https://raw.githubusercontent.com/funtoo/keychain/2.8.5/keychain"
+  local keychain_tmp
+  keychain_tmp="$(mktemp)"
+
+  if ! curl -fsSL "$keychain_url" -o "$keychain_tmp"; then
+    rm -f "$keychain_tmp"
+    echo -e "${RED}✗${NC} Failed to download keychain from $keychain_url" >&2
+    echo -e "${YELLOW}  Skipping keychain install. Install it via your package manager (e.g. 'apt install keychain') and re-run.${NC}" >&2
+    return 1
+  fi
+
+  # Guard against a 0-byte or error-page download slipping through.
+  if [[ ! -s "$keychain_tmp" ]] || ! head -1 "$keychain_tmp" | grep -q '^#!'; then
+    rm -f "$keychain_tmp"
+    echo -e "${RED}✗${NC} Downloaded keychain looks invalid (empty or not a script)" >&2
+    echo -e "${YELLOW}  Skipping keychain install. Install it via your package manager (e.g. 'apt install keychain') and re-run.${NC}" >&2
+    return 1
+  fi
+
+  mv "$keychain_tmp" "$HOME/bin/keychain"
   chmod +x "$HOME/bin/keychain"
   echo -e "${GREEN}✓${NC} Keychain installed to $HOME/bin/keychain"
 }
