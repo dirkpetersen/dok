@@ -3519,7 +3519,30 @@
 <span class="normal">1778</span>
 <span class="normal">1779</span>
 <span class="normal">1780</span>
-<span class="normal">1781</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1781</span>
+<span class="normal">1782</span>
+<span class="normal">1783</span>
+<span class="normal">1784</span>
+<span class="normal">1785</span>
+<span class="normal">1786</span>
+<span class="normal">1787</span>
+<span class="normal">1788</span>
+<span class="normal">1789</span>
+<span class="normal">1790</span>
+<span class="normal">1791</span>
+<span class="normal">1792</span>
+<span class="normal">1793</span>
+<span class="normal">1794</span>
+<span class="normal">1795</span>
+<span class="normal">1796</span>
+<span class="normal">1797</span>
+<span class="normal">1798</span>
+<span class="normal">1799</span>
+<span class="normal">1800</span>
+<span class="normal">1801</span>
+<span class="normal">1802</span>
+<span class="normal">1803</span>
+<span class="normal">1804</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -4591,7 +4614,30 @@ install_keychain<span class="o">()</span><span class="w"> </span><span class="o"
 
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Installing keychain...</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="w">  </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin&quot;</span>
-<span class="w">  </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/danielrobbins/keychain/refs/heads/master/keychain.sh<span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin/keychain&quot;</span>
+
+<span class="w">  </span><span class="c1"># Pinned classic single-file keychain (pure shell, no dependencies, directly</span>
+<span class="w">  </span><span class="c1"># executable). The upstream project was rewritten in Python and its master no</span>
+<span class="w">  </span><span class="c1"># longer ships keychain.sh, so we pin the last stand-alone shell release.</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">keychain_url</span><span class="o">=</span><span class="s2">&quot;https://raw.githubusercontent.com/funtoo/keychain/2.8.5/keychain&quot;</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span>keychain_tmp
+<span class="w">  </span><span class="nv">keychain_tmp</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>mktemp<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$keychain_url</span><span class="s2">&quot;</span><span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$keychain_tmp</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$keychain_tmp</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Failed to download keychain from </span><span class="nv">$keychain_url</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">  Skipping keychain install. Install it via your package manager (e.g. &#39;apt install keychain&#39;) and re-run.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span><span class="c1"># Guard against a 0-byte or error-page download slipping through.</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$keychain_tmp</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>!<span class="w"> </span>head<span class="w"> </span>-1<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$keychain_tmp</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;^#!&#39;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$keychain_tmp</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Downloaded keychain looks invalid (empty or not a script)&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">  Skipping keychain install. Install it via your package manager (e.g. &#39;apt install keychain&#39;) and re-run.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">  </span><span class="k">fi</span>
+
+<span class="w">  </span>mv<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$keychain_tmp</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin/keychain&quot;</span>
 <span class="w">  </span>chmod<span class="w"> </span>+x<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/bin/keychain&quot;</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Keychain installed to </span><span class="nv">$HOME</span><span class="s2">/bin/keychain&quot;</span>
 <span class="o">}</span>
