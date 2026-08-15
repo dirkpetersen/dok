@@ -21,8 +21,10 @@ The repository follows a standard MkDocs structure with organized topic sections
   - `tutorials/` - Step-by-step guides
 - `scripts/` - Utility scripts referenced in documentation
   - `dev-station-install.sh` - One-stop installer for development workstation (shell-setup, claude-wrapper, nodejs, AWS CLI)
-  - `claude-wrapper.sh` - AWS Bedrock wrapper for Claude Code with model switching
+  - `claude-wrapper.sh` - Multi-backend wrapper for Claude Code (Bedrock / Azure AI Foundry / native claude.ai / local) with model switching
   - `shell-setup.sh` - Comprehensive shell and SSH setup automation
+  - `aws-bedrock-user.sh` - Creates a least-privilege IAM user for Bedrock access; run in AWS CloudShell, outputs paste-ready credentials
+  - `setup-wsl-claude-kanna.ps1` - Windows PowerShell bootstrap: installs WSL2 + Ubuntu, runs dev-station-install.sh, installs Bun + kanna-code
   - `nodejs-install-check.sh` - Node.js installation verification
   - `python-build-standalone-install.sh` - Python Build Standalone installer
   - `vim-wrapper.sh` - Simple vim editor wrapper with easy-edit mode (double-escape to save/quit)
@@ -37,7 +39,7 @@ The scripts directory contains production-ready automation tools documented in t
 
 1. **dev-station-install.sh**: One-stop installer that sets up a complete development workstation. Installs shell-setup.sh (light mode by default), claude-wrapper.sh, Node.js, and AWS CLI. Detects OS/architecture (x86_64/aarch64) for AWS CLI installation. Uses Python's zipfile as fallback when unzip is unavailable (no root required). Supports `--full` flag for interactive shell-setup.
 
-2. **claude-wrapper.sh**: Wraps Claude Code CLI with AWS Bedrock integration, providing easy model switching (opus/sonnet/haiku) and permission management. Self-installs to `~/bin/claude`.
+2. **claude-wrapper.sh**: Wraps the Claude Code CLI across four backends and self-installs to `~/bin/claude`. Backend is auto-detected — native `claude /login` (claude.ai OAuth) if present, else a `[bedrock]` profile in `~/.aws/config`, else Foundry via `~/.azure/clauderc` — and can be forced per-run with `--aws` (Bedrock), `--az` (Azure AI Foundry), or `--local` (`LOCAL_ANTHROPIC_BASE_URL`). Model switching accepts `haiku`/`sonnet`/`opus`/`fable` (plus legacy `-1m` aliases) anywhere in the args; on cloud backends Sonnet/Opus/Fable resolve to the 1M-context `[1m]` variants (no `[1m]` on native claude.ai logins). Persistent settings via `claude default <model>` and `claude default yolo|noyolo`. Every commit touching this file must bump `WRAPPER_VERSION` (see below).
 
 3. **shell-setup.sh**: Idempotent setup script that configures a complete development environment including PATH, SSH keys with passphrases, GPG keys for Git signing, keychain for SSH key management, Vim configuration, and vim-wrapper installation. Supports `--light` mode for minimal automated setup (PATH, convenience settings, Vim with edr command, Git default branch only), `--force` mode with backups, and `--revert` to undo all changes.
 
