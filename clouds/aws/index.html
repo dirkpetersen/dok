@@ -2050,7 +2050,7 @@
 <li>Click the <strong>CloudShell</strong> icon in the top navigation bar (or search for "CloudShell")</li>
 <li>Paste and run this one-liner:</li>
 </ol>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/aws-bedrock-user.sh<span class="k">)</span><span class="s2">&quot;</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">"</span><span class="k">$(</span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/aws-bedrock-user.sh<span class="k">)</span><span class="s2">"</span>
 </code></pre></div></td></tr></table></div>
 <p>Or if you have cloned this repo, run it directly:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>bash<span class="w"> </span>scripts/aws-bedrock-user.sh
@@ -2090,7 +2090,7 @@
 <p>AWS CLI v2 is the recommended command-line interface for AWS services.</p>
 <h3 id="linuxwsl-installation">Linux/WSL Installation<a class="headerlink" href="#linuxwsl-installation" title="Permanent link">&para;</a></h3>
 <p>One-liner to download, extract (using Python's built-in <code>zipfile</code> — no <code>unzip</code> required), install to user directory, and verify:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-fsSL<span class="w"> </span><span class="s2">&quot;https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip&quot;</span><span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;awscliv2.zip&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import zipfile,sys; zipfile.ZipFile(sys.argv[1]).extractall()&quot;</span><span class="w"> </span>awscliv2.zip<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./aws/install<span class="w"> </span>-i<span class="w"> </span>~/.local/aws-cli<span class="w"> </span>-b<span class="w"> </span>~/.local/bin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>aws<span class="w"> </span>--version<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>aws<span class="w"> </span>awscliv2.zip
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-fsSL<span class="w"> </span><span class="s2">"https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"</span><span class="w"> </span>-o<span class="w"> </span><span class="s2">"awscliv2.zip"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import zipfile,sys; zipfile.ZipFile(sys.argv[1]).extractall()"</span><span class="w"> </span>awscliv2.zip<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./aws/install<span class="w"> </span>-i<span class="w"> </span>~/.local/aws-cli<span class="w"> </span>-b<span class="w"> </span>~/.local/bin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>aws<span class="w"> </span>--version<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>aws<span class="w"> </span>awscliv2.zip
 </code></pre></div></td></tr></table></div>
 <p>This installs AWS CLI to <code>~/.local/aws-cli</code> with the <code>aws</code> command in <code>~/.local/bin</code> (no sudo required, no <code>unzip</code> dependency).</p>
 <p><strong>Requirements:</strong>
@@ -2101,7 +2101,7 @@
 </code></pre></div></td></tr></table></div>
 <p><strong>Or manually (user directory installation):</strong></p>
 <p>One-liner to download, extract, install to user directory, and verify:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-fsSL<span class="w"> </span><span class="s2">&quot;https://awscli.amazonaws.com/awscli-exe-macos.zip&quot;</span><span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;awscliv2.zip&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>unzip<span class="w"> </span>awscliv2.zip<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./aws/install<span class="w"> </span>-i<span class="w"> </span>~/.local/aws-cli<span class="w"> </span>-b<span class="w"> </span>~/.local/bin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>aws<span class="w"> </span>--version<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>aws<span class="w"> </span>awscliv2.zip
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>curl<span class="w"> </span>-fsSL<span class="w"> </span><span class="s2">"https://awscli.amazonaws.com/awscli-exe-macos.zip"</span><span class="w"> </span>-o<span class="w"> </span><span class="s2">"awscliv2.zip"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>unzip<span class="w"> </span>awscliv2.zip<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./aws/install<span class="w"> </span>-i<span class="w"> </span>~/.local/aws-cli<span class="w"> </span>-b<span class="w"> </span>~/.local/bin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>aws<span class="w"> </span>--version<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>aws<span class="w"> </span>awscliv2.zip
 </code></pre></div></td></tr></table></div>
 <p>This installs AWS CLI to <code>~/.local/aws-cli</code> with the <code>aws</code> command in <code>~/.local/bin</code> (no sudo required).</p>
 <h2 id="aws-credential-setup">AWS Credential Setup<a class="headerlink" href="#aws-credential-setup" title="Permanent link">&para;</a></h2>
@@ -2204,15 +2204,15 @@
 <span class="normal">11</span>
 <span class="normal">12</span>
 <span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;Version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012-10-17&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;Statement&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;Effect&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Allow&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;Action&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="s2">&quot;bedrock:InvokeModel&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="s2">&quot;bedrock:InvokeModelWithResponseStream&quot;</span>
+<span class="w">      </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">"bedrock:InvokeModel"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"bedrock:InvokeModelWithResponseStream"</span>
 <span class="w">      </span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;Resource&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="w">      </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*"</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
@@ -2235,18 +2235,18 @@
 <span class="normal">15</span>
 <span class="normal">16</span>
 <span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;Version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012-10-17&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;Statement&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;Effect&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Allow&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;Action&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="s2">&quot;s3:GetObject&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="s2">&quot;s3:PutObject&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="s2">&quot;s3:ListBucket&quot;</span>
+<span class="w">      </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">"s3:GetObject"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"s3:PutObject"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"s3:ListBucket"</span>
 <span class="w">      </span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;Resource&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="s2">&quot;arn:aws:s3:::my-bucket&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="s2">&quot;arn:aws:s3:::my-bucket/*&quot;</span>
+<span class="w">      </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">"arn:aws:s3:::my-bucket"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"arn:aws:s3:::my-bucket/*"</span>
 <span class="w">      </span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">]</span>

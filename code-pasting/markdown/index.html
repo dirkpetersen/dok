@@ -2260,11 +2260,11 @@
 <span class="normal">7</span>
 <span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code>\`\`\`python
 def hello_world():
-    print(&quot;Hello, World!&quot;)
+    print("Hello, World!")
 \`\`\`
 
 \`\`\`javascript
-console.log(&quot;Hello, World!&quot;);
+console.log("Hello, World!");
 \`\`\`
 </code></pre></div></td></tr></table></div>
 <p><strong>Important</strong>: Always specify the language for syntax highlighting and AI understanding.</p>
@@ -2274,7 +2274,7 @@ console.log(&quot;Hello, World!&quot;);
 <span class="normal">3</span>
 <span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ge">*italic*</span> or <span class="ge">_italic_</span>
 <span class="gs">**bold**</span> or <span class="gs">__bold__</span>
-***bold italic***
+<span class="ges">***bold italic***</span>
 <span class="gd">~~strikethrough~~</span>
 </code></pre></div></td></tr></table></div>
 <h3 id="links-and-images">Links and Images<a class="headerlink" href="#links-and-images" title="Permanent link">&para;</a></h3>
@@ -2329,8 +2329,8 @@ Brief description of what the feature does.
 
 <span class="gu">## Example Usage</span>
 \`\`\`python
-user = register_user(&quot;email@example.com&quot;, &quot;password&quot;)
-assert user.email == &quot;email@example.com&quot;
+user = register_user("email@example.com", "password")
+assert user.email == "email@example.com"
 \`\`\`
 </code></pre></div></td></tr></table></div>
 <h3 id="specify-edge-cases">Specify Edge Cases<a class="headerlink" href="#specify-edge-cases" title="Permanent link">&para;</a></h3>
@@ -2373,13 +2373,13 @@ assert user.email == &quot;email@example.com&quot;
 
 <span class="gu">### Successful Registration</span>
 \`\`\`
-Input: {&quot;email&quot;: &quot;user@example.com&quot;, &quot;password&quot;: &quot;secure123&quot;}
-Output: {&quot;user_id&quot;: 123, &quot;created_at&quot;: &quot;2025-01-01&quot;}
+Input: {"email": "user@example.com", "password": "secure123"}
+Output: {"user_id": 123, "created_at": "2025-01-01"}
 \`\`\`
 
 <span class="gu">### Error Handling</span>
 \`\`\`
-Input: {&quot;email&quot;: &quot;invalid-email&quot;, &quot;password&quot;: &quot;123&quot;}
+Input: {"email": "invalid-email", "password": "123"}
 Output: Error with message explaining validation failure
 \`\`\`
 </code></pre></div></td></tr></table></div>
@@ -2417,18 +2417,18 @@ Create a new user.
 <span class="gu">### Request</span>
 \`\`\`json
 {
-  &quot;email&quot;: &quot;user@example.com&quot;,
-  &quot;password&quot;: &quot;secure_password&quot;,
-  &quot;name&quot;: &quot;User Name&quot;
+  "email": "user@example.com",
+  "password": "secure_password",
+  "name": "User Name"
 }
 \`\`\`
 
 <span class="gu">### Response</span>
 \`\`\`json
 {
-  &quot;id&quot;: &quot;user_123&quot;,
-  &quot;email&quot;: &quot;user@example.com&quot;,
-  &quot;created_at&quot;: &quot;2025-01-01T00:00:00Z&quot;
+  "id": "user_123",
+  "email": "user@example.com",
+  "created_at": "2025-01-01T00:00:00Z"
 }
 \`\`\`
 

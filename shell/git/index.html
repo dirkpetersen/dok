@@ -2042,8 +2042,8 @@
 <p>at the very least execute these commands initially  </p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
-<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="s2">&quot;Your Name&quot;</span>
-git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">&quot;your.email@example.com&quot;</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="s2">"Your Name"</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">"your.email@example.com"</span>
 git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>init.defaultBranch<span class="w"> </span>main
 </code></pre></div></td></tr></table></div>
 <p>everything below is optional </p>
@@ -2056,12 +2056,12 @@ git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"
 <span class="normal">5</span>
 <span class="normal">6</span>
 <span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Git</span>
-<span class="nb">alias</span><span class="w"> </span><span class="nv">g</span><span class="o">=</span><span class="s1">&#39;git&#39;</span>
-<span class="nb">alias</span><span class="w"> </span><span class="nv">gs</span><span class="o">=</span><span class="s1">&#39;git status&#39;</span>
-<span class="nb">alias</span><span class="w"> </span><span class="nv">ga</span><span class="o">=</span><span class="s1">&#39;git add&#39;</span>
-<span class="nb">alias</span><span class="w"> </span><span class="nv">gc</span><span class="o">=</span><span class="s1">&#39;git commit&#39;</span>
-<span class="nb">alias</span><span class="w"> </span><span class="nv">gp</span><span class="o">=</span><span class="s1">&#39;git push&#39;</span>
-<span class="nb">alias</span><span class="w"> </span><span class="nv">gl</span><span class="o">=</span><span class="s1">&#39;git log&#39;</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">g</span><span class="o">=</span><span class="s1">'git'</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">gs</span><span class="o">=</span><span class="s1">'git status'</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">ga</span><span class="o">=</span><span class="s1">'git add'</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">gc</span><span class="o">=</span><span class="s1">'git commit'</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">gp</span><span class="o">=</span><span class="s1">'git push'</span>
+<span class="nb">alias</span><span class="w"> </span><span class="nv">gl</span><span class="o">=</span><span class="s1">'git log'</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="global-git-configuration">Global Git Configuration<a class="headerlink" href="#global-git-configuration" title="Permanent link">&para;</a></h2>
 <p>Set up your global Git configuration with modern 2025 best practices:</p>
@@ -2099,8 +2099,8 @@ git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"
 <span class="normal">32</span>
 <span class="normal">33</span>
 <span class="normal">34</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># User identity (required)</span>
-git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="s2">&quot;Your Name&quot;</span>
-git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">&quot;your.email@example.com&quot;</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="s2">"Your Name"</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">"your.email@example.com"</span>
 
 <span class="c1"># Editor and diff</span>
 git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>core.editor<span class="w"> </span>vim
@@ -2342,7 +2342,7 @@ git<span class="w"> </span>add<span class="w"> </span>path/to/file
 git<span class="w"> </span>add<span class="w"> </span>.
 
 <span class="c1"># Commit with message</span>
-git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Describe your changes&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Describe your changes"</span>
 </code></pre></div></td></tr></table></div>
 <h3 id="push-to-remote">Push to Remote<a class="headerlink" href="#push-to-remote" title="Permanent link">&para;</a></h3>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
@@ -2387,7 +2387,7 @@ git<span class="w"> </span>log
 git<span class="w"> </span>log<span class="w"> </span>--oneline<span class="w"> </span>--graph<span class="w"> </span>--all
 
 <span class="c1"># View commits by author</span>
-git<span class="w"> </span>log<span class="w"> </span>--author<span class="o">=</span><span class="s2">&quot;Name&quot;</span>
+git<span class="w"> </span>log<span class="w"> </span>--author<span class="o">=</span><span class="s2">"Name"</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="git-best-practices">Git Best Practices<a class="headerlink" href="#git-best-practices" title="Permanent link">&para;</a></h2>
 <h3 id="commit-messages">Commit Messages<a class="headerlink" href="#commit-messages" title="Permanent link">&para;</a></h3>
@@ -2397,10 +2397,10 @@ git<span class="w"> </span>log<span class="w"> </span>--author<span class="o">=<
 <span class="normal">3</span>
 <span class="normal">4</span>
 <span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Good</span>
-git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Fix authentication bug in login flow&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Fix authentication bug in login flow"</span>
 
 <span class="c1"># Bad</span>
-git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Fix bug&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Fix bug"</span>
 </code></pre></div></td></tr></table></div>
 <p>Follow the format:
 - <strong>First line</strong>: Short summary (50 chars max)
@@ -2516,7 +2516,7 @@ git<span class="w"> </span>reset<span class="w"> </span>--hard<span class="w"> <
 git<span class="w"> </span>blame<span class="w"> </span>path/to/file
 
 <span class="c1"># Search commit history</span>
-git<span class="w"> </span>log<span class="w"> </span>-S<span class="w"> </span><span class="s2">&quot;search term&quot;</span>
+git<span class="w"> </span>log<span class="w"> </span>-S<span class="w"> </span><span class="s2">"search term"</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="ssh-integration-with-git">SSH Integration with Git<a class="headerlink" href="#ssh-integration-with-git" title="Permanent link">&para;</a></h2>
 <p>Ensure your SSH key is configured for Git authentication:</p>
@@ -2526,7 +2526,7 @@ git<span class="w"> </span>log<span class="w"> </span>-S<span class="w"> </span>
 <span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># Test SSH connection to GitHub</span>
 ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
 
-<span class="c1"># Should output: Hi USERNAME! You&#39;ve successfully authenticated...</span>
+<span class="c1"># Should output: Hi USERNAME! You've successfully authenticated...</span>
 </code></pre></div></td></tr></table></div>
 <p>Your SSH configuration from the <a href="../ssh/">SSH section</a> enables secure Git operations without storing credentials.</p>
 <h2 id="troubleshooting-ssh-agent-on-windows">Troubleshooting: SSH Agent on Windows<a class="headerlink" href="#troubleshooting-ssh-agent-on-windows" title="Permanent link">&para;</a></h2>
@@ -2540,7 +2540,7 @@ ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
 Identity added: C:\Users\peterdir\.ssh\id_ed25519 (dp@wsl)
 
 PS C:\Users\peterdir\gh\maude&gt; git pull
-Enter passphrase for key &#39;/c/Users/peterdir/.ssh/id_ed25519&#39;:
+Enter passphrase for key '/c/Users/peterdir/.ssh/id_ed25519':
 </code></pre></div></td></tr></table></div>
 <p><strong>Root cause</strong>: two different SSH agents are in play.</p>
 <ul>
@@ -2549,7 +2549,7 @@ Enter passphrase for key &#39;/c/Users/peterdir/.ssh/id_ed25519&#39;:
 </ul>
 <p>The two agents are separate processes and do not share keys.</p>
 <p><strong>Fix</strong>: point Git at the Windows OpenSSH binary so both operations use the same agent:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">git</span> <span class="n">config</span> <span class="p">-</span><span class="n">-global</span> <span class="n">core</span><span class="p">.</span><span class="n">sshCommand</span> <span class="s2">&quot;C:/Windows/System32/OpenSSH/ssh.exe&quot;</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">git</span> <span class="n">config</span> <span class="p">-</span><span class="n">-global</span> <span class="n">core</span><span class="p">.</span><span class="n">sshCommand</span> <span class="s2">"C:/Windows/System32/OpenSSH/ssh.exe"</span>
 </code></pre></div></td></tr></table></div>
 <p>Verify it was saved:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>

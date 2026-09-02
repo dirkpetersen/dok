@@ -2518,14 +2518,14 @@ ls<span class="w"> </span>/mnt/d/Projects
 <h3 id="configure-ssh">Configure SSH<a class="headerlink" href="#configure-ssh" title="Permanent link">&para;</a></h3>
 <p>WSL integrates with your host SSH setup. Your WSL SSH commands can use your Windows SSH keys or generate WSL-specific ones.</p>
 <p>Generate a new key in WSL:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ed25519<span class="w"> </span>-C<span class="w"> </span><span class="s2">&quot;your_email@example.com&quot;</span><span class="w"> </span>-f<span class="w"> </span>~/.ssh/id_ed25519
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ed25519<span class="w"> </span>-C<span class="w"> </span><span class="s2">"your_email@example.com"</span><span class="w"> </span>-f<span class="w"> </span>~/.ssh/id_ed25519
 </code></pre></div></td></tr></table></div>
 <h3 id="git-configuration">Git Configuration<a class="headerlink" href="#git-configuration" title="Permanent link">&para;</a></h3>
 <p>Set up Git in WSL (see <a href="../git/">Git</a> section for detailed setup):</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
-<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="s2">&quot;Your Name&quot;</span>
-git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">&quot;your.email@example.com&quot;</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="s2">"Your Name"</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">"your.email@example.com"</span>
 git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>core.editor<span class="w"> </span>vim
 </code></pre></div></td></tr></table></div>
 <h2 id="common-wsl-commands">Common WSL Commands<a class="headerlink" href="#common-wsl-commands" title="Permanent link">&para;</a></h2>
@@ -2656,7 +2656,7 @@ code<span class="w"> </span><span class="se">\\</span>wsl$<span class="se">\U</s
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">Set-ExecutionPolicy</span> <span class="n">Bypass</span> <span class="n">-Scope</span> <span class="k">Process</span> <span class="n">-Force</span>
-<span class="nb">Invoke-WebRequest</span> <span class="n">-Uri</span> <span class="s2">&quot;https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/setup-wsl-claude-kanna.ps1&quot;</span> <span class="n">-OutFile</span> <span class="n">setup-wsl-claude-kanna</span><span class="p">.</span><span class="n">ps1</span>
+<span class="nb">Invoke-WebRequest</span> <span class="n">-Uri</span> <span class="s2">"https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/setup-wsl-claude-kanna.ps1"</span> <span class="n">-OutFile</span> <span class="n">setup-wsl-claude-kanna</span><span class="p">.</span><span class="n">ps1</span>
 <span class="p">.\</span><span class="n">setup-wsl-claude-kanna</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div></td></tr></table></div>
 <p>Or, if you have already cloned this repo:</p>
