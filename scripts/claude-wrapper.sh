@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.40"
+WRAPPER_VERSION="1.41"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -1065,7 +1065,11 @@ DISALLOWED_TOOLS=(
   "Bash(rm -rf /*)"
   "Bash(mkfs *)"
   "Bash(dd *)"
-  "Bash(:(){ :|:& };:)"
+  # NOTE: the classic fork bomb ":(){ :|:& };:" cannot be expressed as a
+  # permission rule. Claude Code parses rules as Tool(pattern), and the
+  # nested parens in ":()" break that parse — the rule was silently split
+  # on whitespace into three bogus rules, each warning "matches no known
+  # tool" at every startup while denying nothing. Left out deliberately.
 )
 
 # Join each tool list into a single comma-separated argument. Passed as
