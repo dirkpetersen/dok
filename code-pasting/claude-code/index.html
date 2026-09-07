@@ -3349,13 +3349,17 @@
 <span class="normal">1082</span>
 <span class="normal">1083</span>
 <span class="normal">1084</span>
-<span class="normal">1085</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1085</span>
+<span class="normal">1086</span>
+<span class="normal">1087</span>
+<span class="normal">1088</span>
+<span class="normal">1089</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">"claude-wrapper.sh"</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.40"</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.41"</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/bin"</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">"</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude"</span>
@@ -4416,7 +4420,11 @@ _apply_model_value<span class="o">()</span><span class="w"> </span><span class="
 <span class="w">  </span><span class="s2">"Bash(rm -rf /*)"</span>
 <span class="w">  </span><span class="s2">"Bash(mkfs *)"</span>
 <span class="w">  </span><span class="s2">"Bash(dd *)"</span>
-<span class="w">  </span><span class="s2">"Bash(:(){ :|:&amp; };:)"</span>
+<span class="w">  </span><span class="c1"># NOTE: the classic fork bomb ":(){ :|:&amp; };:" cannot be expressed as a</span>
+<span class="w">  </span><span class="c1"># permission rule. Claude Code parses rules as Tool(pattern), and the</span>
+<span class="w">  </span><span class="c1"># nested parens in ":()" break that parse — the rule was silently split</span>
+<span class="w">  </span><span class="c1"># on whitespace into three bogus rules, each warning "matches no known</span>
+<span class="w">  </span><span class="c1"># tool" at every startup while denying nothing. Left out deliberately.</span>
 <span class="o">)</span>
 
 <span class="c1"># Join each tool list into a single comma-separated argument. Passed as</span>
