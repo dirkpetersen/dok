@@ -3477,7 +3477,7 @@
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">"claude-wrapper.sh"</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.43"</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.44"</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/bin"</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">"</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude"</span>
@@ -3999,12 +3999,12 @@ _migrate_to_wrapper_env
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Haiku:  </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="k">:-</span><span class="nv">us</span><span class="p">.anthropic.claude-haiku-4-5-20251001-v1:</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Sonnet: </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-sonnet-5</span><span class="si">}</span><span class="s2">"</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Opus:   </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-opus-5</span><span class="si">}</span><span class="s2">"</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Opus:   </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-opus-5-5</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Fable:  </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-fable-5-1</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Effective model the wrapper launches (Bedrock/Foundry/native — [1m] added):"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Sonnet: </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-sonnet-5</span><span class="si">}</span><span class="s2">[1m]  (1M context; no [1m] on claude.ai logins)"</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Opus:   </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-opus-5</span><span class="si">}</span><span class="s2">[1m]  (1M context)"</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Opus:   </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-opus-5-5</span><span class="si">}</span><span class="s2">[1m]  (1M context)"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Fable:  </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-fable-5-1</span><span class="si">}</span><span class="s2">[1m]  (1M context)"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  (the legacy -1m aliases — sonnet-1m/opus-1m — resolve to the same models)"</span>
@@ -4031,7 +4031,7 @@ _migrate_to_wrapper_env
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Base URL: </span><span class="nv">$ANTHROPIC_FOUNDRY_BASE_URL</span><span class="s2">"</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Haiku:    </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="k">:-</span><span class="nv">claude</span><span class="p">-haiku-4-5</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Sonnet:   </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="k">:-</span><span class="nv">claude</span><span class="p">-sonnet-5</span><span class="si">}</span><span class="s2">"</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Opus:     </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">claude</span><span class="p">-opus-5</span><span class="si">}</span><span class="s2">"</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Opus:     </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">claude</span><span class="p">-opus-5-5</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Fable:    </span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="k">:-</span><span class="nv">claude</span><span class="p">-fable-5-1</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span>
 <span class="w">  </span><span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -4410,12 +4410,12 @@ _migrate_to_wrapper_env
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">USING_FOUNDRY</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">USING_NATIVE</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="k">:-</span><span class="nv">claude</span><span class="p">-sonnet-5</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="k">:-</span><span class="nv">claude</span><span class="p">-haiku-4-5</span><span class="si">}</span><span class="s2">"</span>
-<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">claude</span><span class="p">-opus-5</span><span class="si">}</span><span class="s2">"</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">claude</span><span class="p">-opus-5-5</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="k">:-</span><span class="nv">claude</span><span class="p">-fable-5-1</span><span class="si">}</span><span class="s2">"</span>
 <span class="k">else</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="k">:-</span><span class="nv">us</span><span class="p">.anthropic.claude-haiku-4-5-20251001-v1:</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-sonnet-5</span><span class="si">}</span><span class="s2">"</span>
-<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-opus-5</span><span class="si">}</span><span class="s2">"</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-opus-5-5</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="k">:-</span><span class="nv">global</span><span class="p">.anthropic.claude-fable-5-1</span><span class="si">}</span><span class="s2">"</span>
 <span class="k">fi</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_SMALL_FAST_MODEL</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">ANTHROPIC_DEFAULT_HAIKU_MODEL</span><span class="si">}</span><span class="s2">"</span>
@@ -4789,7 +4789,7 @@ Save these settings to ~/.azure/clauderc for future sessions? (Y/n):
 </tr>
 <tr>
 <td>opus</td>
-<td><code>claude-opus-5</code></td>
+<td><code>claude-opus-5-5</code></td>
 </tr>
 <tr>
 <td>fable</td>
@@ -4800,7 +4800,7 @@ Save these settings to ~/.azure/clauderc for future sessions? (Y/n):
 <p>You can override any of these by adding them to <code>~/.azure/clauderc</code>:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
-<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="o">=</span><span class="s2">"claude-opus-5"</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_OPUS_MODEL</span><span class="o">=</span><span class="s2">"claude-opus-5-5"</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_FABLE_MODEL</span><span class="o">=</span><span class="s2">"claude-fable-5-1"</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_DEFAULT_SONNET_MODEL</span><span class="o">=</span><span class="s2">"claude-sonnet-5"</span>
 </code></pre></div></td></tr></table></div>
@@ -4883,7 +4883,7 @@ Log in to claude.ai again? (Y/n/never):
 <span class="c"># $env:AWS_REGION                            = "us-west-2"</span>
 <span class="c"># $env:AWS_PROFILE                           = "bedrock"</span>
 <span class="c"># $env:ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION = $env:AWS_REGION</span>
-<span class="c"># $env:ANTHROPIC_DEFAULT_OPUS_MODEL          = "global.anthropic.claude-opus-5"</span>
+<span class="c"># $env:ANTHROPIC_DEFAULT_OPUS_MODEL          = "global.anthropic.claude-opus-5-5"</span>
 <span class="c"># $env:ANTHROPIC_DEFAULT_FABLE_MODEL         = "global.anthropic.claude-fable-5-1"</span>
 <span class="c"># $env:ANTHROPIC_DEFAULT_SONNET_MODEL        = "global.anthropic.claude-sonnet-5"</span>
 
@@ -4892,7 +4892,7 @@ Log in to claude.ai again? (Y/n/never):
 <span class="nv">$env:CLAUDE_CODE_USE_BEDROCK</span>        <span class="p">=</span> <span class="n">0</span>
 <span class="nv">$env:ANTHROPIC_FOUNDRY_BASE_URL</span>     <span class="p">=</span> <span class="s2">"https://xxxxxxxxxxxx.azure-api.net/anthropic"</span>
 <span class="nv">$env:ANTHROPIC_FOUNDRY_API_KEY</span>      <span class="p">=</span> <span class="s2">"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</span>
-<span class="nv">$env:ANTHROPIC_DEFAULT_OPUS_MODEL</span>   <span class="p">=</span> <span class="s2">"claude-opus-5"</span>
+<span class="nv">$env:ANTHROPIC_DEFAULT_OPUS_MODEL</span>   <span class="p">=</span> <span class="s2">"claude-opus-5-5"</span>
 <span class="nv">$env:ANTHROPIC_DEFAULT_FABLE_MODEL</span>  <span class="p">=</span> <span class="s2">"claude-fable-5-1"</span>
 <span class="nv">$env:ANTHROPIC_DEFAULT_SONNET_MODEL</span> <span class="p">=</span> <span class="s2">"claude-sonnet-5"</span>
 </code></pre></div></td></tr></table></div>
@@ -5106,7 +5106,7 @@ Environment variables set by wrapper:
   ANTHROPIC_MODEL=global.anthropic.claude-sonnet-5[1m]
   ANTHROPIC_DEFAULT_HAIKU_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
   ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-5[1m]
-  ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-5[1m]
+  ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-5-5[1m]
   ANTHROPIC_DEFAULT_FABLE_MODEL=global.anthropic.claude-fable-5-1[1m]
   ANTHROPIC_SMALL_FAST_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
   CLAUDE_CODE_USE_BEDROCK=1
