@@ -189,15 +189,19 @@ export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-5"
 1. `--local` flag (always wins)
 2. `ANTHROPIC_BASE_URL` already set in environment
 3. Native claude.ai login (token in `~/.claude/.credentials.json` from `claude /login`)
-4. `CLAUDE_CODE_USE_FOUNDRY=1`
-5. AWS Bedrock profile in `~/.aws/config`
+4. Expired native login → interactive re-login prompt (see below)
+5. `CLAUDE_CODE_USE_FOUNDRY=1`
+6. AWS Bedrock profile in `~/.aws/config`
 
-The `--aws` and `--az` flags are *forcing overrides*: they take priority over native login (and each other is mutually exclusive). Use them to pick a specific backend per run — for example to switch between a personal claude.ai account and a work Azure/AWS account:
+The `--aws`, `--az`, and `--claudeai` flags are *forcing overrides*: they take priority over native login and over each other (only one may be used per run). Use them to pick a specific backend per run — for example to switch between a personal claude.ai account and a work Azure/AWS account:
 
 - `claude --aws` — force AWS Bedrock even when logged in or when Foundry is configured.
 - `claude --az` — force Azure AI Foundry even when logged in. Requires `ANTHROPIC_FOUNDRY_BASE_URL` and `ANTHROPIC_FOUNDRY_API_KEY` (normally loaded from `~/.azure/clauderc`).
+- `claude --claudeai` (alias `--native`) — force the claude.ai login even when Foundry or a Bedrock profile is configured. Errors out if no valid login is found.
 
-Neither flag can be combined with `--local`, and `--aws` and `--az` cannot be used together.
+None of these three flags can be combined with each other or with `--local`.
+
+**Expired login handling**: the claude.ai access token is short-lived and lapses several times a day — the wrapper treats that as still logged in and lets Claude Code silently refresh it behind the scenes, as long as the longer-lived refresh token is still valid. Only when the login is *fully* expired (refresh token also stale, or missing) does the wrapper step in: if a `~/.claude/.credentials.json` exists and the session is interactive, it asks `Your claude.ai login has expired. Log in to claude.ai again now? (Y/n)`. Answering yes runs `claude auth login`; answering no (or a non-interactive run, e.g. in CI) falls through to Foundry/Bedrock as before.
 
 ### 6. (Optional) Using Claude Code Natively on Windows via PowerShell
 

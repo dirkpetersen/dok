@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.41"
+WRAPPER_VERSION="1.42"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -68,13 +68,41 @@ _is_claude_logged_in() {
     # malformed value means "can't tell", not "expired".
     if [[ "$expires_ms" =~ ^[0-9]+$ ]] && [[ "$expires_ms" != "0" ]]; then
       local now_ms=$(( $(date +%s) * 1000 ))
-      (( expires_ms > now_ms )) || return 1
+      if (( expires_ms <= now_ms )); then
+        # The access token is short-lived and lapses several times a day; that
+        # does NOT mean the user is logged out. Claude Code silently refreshes
+        # it while the refresh token is valid, so treat the login as live when
+        # a refresh token is present and has not itself expired. Without this
+        # the wrapper silently fell through to Bedrock/Foundry every time the
+        # access token aged out.
+        local refresh refresh_exp_ms
+        refresh=$(jq -r '.claudeAiOauth.refreshToken // empty' "$creds" 2>/dev/null)
+        refresh_exp_ms=$(jq -r '.claudeAiOauth.refreshTokenExpiresAt // 0' "$creds" 2>/dev/null)
+        [[ -n "$refresh" ]] || return 1
+        if [[ "$refresh_exp_ms" =~ ^[0-9]+$ ]] && [[ "$refresh_exp_ms" != "0" ]]; then
+          (( refresh_exp_ms > now_ms )) || return 1
+        fi
+      fi
     fi
   else
     # Fallback: grep for a non-empty accessToken value
     grep -q '"accessToken"[[:space:]]*:[[:space:]]*"[^"]' "$creds" 2>/dev/null || return 1
   fi
   return 0
+}
+
+# Interactively offer to re-authenticate a fully expired claude.ai login (both
+# the access token and its refresh token are stale, or the token is otherwise
+# invalid). Returns 0 if the user logs back in successfully, 1 if they decline
+# or the login attempt fails — callers fall back to Bedrock/Foundry on 1.
+_prompt_relogin() {
+  echo -e "${YELLOW}Your claude.ai login has expired.${NC}" >&2
+  read -rp "Log in to claude.ai again now? (Y/n): " _relogin_confirm
+  if [[ -z "$_relogin_confirm" || "$_relogin_confirm" == "y" || "$_relogin_confirm" == "Y" ]]; then
+    "$REAL_CLAUDE" auth login
+    _is_claude_logged_in && return 0
+  fi
+  return 1
 }
 
 # Write or update a single KEY="value" line in claude-wrapper.env.
@@ -362,6 +390,7 @@ install_wrapper() {
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
   echo "  claude --aws          # Force AWS Bedrock (overrides Foundry and native login)"
   echo "  claude --az           # Force Azure AI Foundry (overrides native login)"
+  echo "  claude --claudeai     # Force claude.ai login (overrides Bedrock/Foundry)"
   echo ""
 
   exit 0
@@ -484,6 +513,10 @@ if [[ "$1" == "--models" ]]; then
     echo "Native Login (claude /login): active — Bedrock/Foundry vars will be unset"
     echo "  Override per-run with: claude --aws (Bedrock) or claude --az (Foundry)"
     echo ""
+  else
+    echo "Native Login (claude /login): not active (no valid claude.ai token)"
+    echo "  Run 'claude /login', then use 'claude --claudeai' to force it."
+    echo ""
   fi
 
   # Show Foundry configuration section
@@ -600,14 +633,18 @@ fi
 # --local presence is tracked too so conflicting combinations can be rejected.
 # --aws forces AWS Bedrock, --az forces Azure AI Foundry — each overrides native
 # claude.ai login (useful for switching between a personal and a work account).
+# --claudeai (alias --native) forces the claude.ai login, overriding a Foundry
+# or Bedrock configuration that would otherwise win.
 FORCE_AWS=0
 FORCE_AZ=0
+FORCE_NATIVE=0
 _has_local=0
 _prescan_args=()
 for _parg in "$@"; do
   case "$_parg" in
     --aws) FORCE_AWS=1 ;;
     --az)  FORCE_AZ=1 ;;
+    --claudeai|--native) FORCE_NATIVE=1 ;;
     --local) _has_local=1; _prescan_args+=("$_parg") ;;
     *) _prescan_args+=("$_parg") ;;
   esac
@@ -620,6 +657,19 @@ if [[ "$FORCE_AWS" == "1" && "$FORCE_AZ" == "1" ]]; then
   echo "" >&2
   echo "  --aws  forces AWS Bedrock" >&2
   echo "  --az   forces Azure AI Foundry" >&2
+  echo "" >&2
+  exit 1
+fi
+
+# Conflict: --claudeai cannot be combined with any backend-forcing flag
+if [[ "$FORCE_NATIVE" == "1" ]] && [[ "$FORCE_AWS" == "1" || "$FORCE_AZ" == "1" || "$_has_local" == "1" ]]; then
+  _other="--aws"
+  [[ "$FORCE_AZ" == "1" ]] && _other="--az"
+  [[ "$_has_local" == "1" ]] && _other="--local"
+  echo -e "${RED}✗ Error: --claudeai and $_other cannot be used together${NC}" >&2
+  echo "" >&2
+  echo "  --claudeai  forces the claude.ai login" >&2
+  echo "  $_other     forces another backend" >&2
   echo "" >&2
   exit 1
 fi
@@ -690,7 +740,7 @@ if [[ "$1" == "--local" ]]; then
   fi
 
 # Check if ANTHROPIC_BASE_URL is already set (for local LLM usage without --local flag)
-elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
+elif [[ "${FORCE_NATIVE:-0}" != "1" ]] && [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   # Custom endpoint — neither cloud backend should be active.
   export CLAUDE_CODE_USE_BEDROCK=0
   export CLAUDE_CODE_USE_FOUNDRY=0
@@ -700,8 +750,16 @@ elif [[ -n "$ANTHROPIC_BASE_URL" ]]; then
   fi
 
 # Native claude.ai login — oauth token found in ~/.claude/.credentials.json
-# (skipped when --aws or --az forces a specific cloud backend)
-elif [[ "${FORCE_AWS:-0}" != "1" && "${FORCE_AZ:-0}" != "1" ]] && _is_claude_logged_in; then
+# (skipped when --aws or --az forces a cloud backend; forced by --claudeai)
+elif [[ "${FORCE_NATIVE:-0}" == "1" ]] || { [[ "${FORCE_AWS:-0}" != "1" && "${FORCE_AZ:-0}" != "1" ]] && _is_claude_logged_in; }; then
+  if [[ "${FORCE_NATIVE:-0}" == "1" ]] && ! _is_claude_logged_in; then
+    echo -e "${RED}✗ Error: --claudeai used but no valid claude.ai login was found${NC}" >&2
+    echo "" >&2
+    echo "Log in first:" >&2
+    echo "  claude /login" >&2
+    echo "" >&2
+    exit 1
+  fi
   # Clear all cloud-backend vars so Claude Code uses its own oauth token
   unset ANTHROPIC_API_KEY
   unset ANTHROPIC_BASE_URL
@@ -715,6 +773,19 @@ elif [[ "${FORCE_AWS:-0}" != "1" && "${FORCE_AZ:-0}" != "1" ]] && _is_claude_log
     echo -e "${YELLOW}⚠ ~/.claude/settings.json sets ANTHROPIC_API_KEY (or apiKeyHelper).${NC}" >&2
     echo -e "${YELLOW}  Remove it from that file to stop the 'Both claude.ai and ANTHROPIC_API_KEY set' warning.${NC}" >&2
   fi
+
+# A claude.ai login was set up before (a credentials file exists) but is now
+# fully expired — offer to log back in interactively rather than silently
+# falling back to Bedrock/Foundry. Skipped when a backend is forced, or
+# non-interactively (no tty), or when claude.ai was never logged into here.
+elif [[ "${FORCE_AWS:-0}" != "1" && "${FORCE_AZ:-0}" != "1" ]] \
+     && [[ -f "$HOME/.claude/.credentials.json" ]] && [[ -t 0 ]] \
+     && _prompt_relogin; then
+  unset ANTHROPIC_API_KEY
+  unset ANTHROPIC_BASE_URL
+  export CLAUDE_CODE_USE_BEDROCK=0
+  export CLAUDE_CODE_USE_FOUNDRY=0
+  USING_NATIVE=1
 
 # Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1 or --az
 # forces it (skipped when --aws). --az overrides native claude.ai login.
