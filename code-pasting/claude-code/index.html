@@ -3353,13 +3353,84 @@
 <span class="normal">1086</span>
 <span class="normal">1087</span>
 <span class="normal">1088</span>
-<span class="normal">1089</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1089</span>
+<span class="normal">1090</span>
+<span class="normal">1091</span>
+<span class="normal">1092</span>
+<span class="normal">1093</span>
+<span class="normal">1094</span>
+<span class="normal">1095</span>
+<span class="normal">1096</span>
+<span class="normal">1097</span>
+<span class="normal">1098</span>
+<span class="normal">1099</span>
+<span class="normal">1100</span>
+<span class="normal">1101</span>
+<span class="normal">1102</span>
+<span class="normal">1103</span>
+<span class="normal">1104</span>
+<span class="normal">1105</span>
+<span class="normal">1106</span>
+<span class="normal">1107</span>
+<span class="normal">1108</span>
+<span class="normal">1109</span>
+<span class="normal">1110</span>
+<span class="normal">1111</span>
+<span class="normal">1112</span>
+<span class="normal">1113</span>
+<span class="normal">1114</span>
+<span class="normal">1115</span>
+<span class="normal">1116</span>
+<span class="normal">1117</span>
+<span class="normal">1118</span>
+<span class="normal">1119</span>
+<span class="normal">1120</span>
+<span class="normal">1121</span>
+<span class="normal">1122</span>
+<span class="normal">1123</span>
+<span class="normal">1124</span>
+<span class="normal">1125</span>
+<span class="normal">1126</span>
+<span class="normal">1127</span>
+<span class="normal">1128</span>
+<span class="normal">1129</span>
+<span class="normal">1130</span>
+<span class="normal">1131</span>
+<span class="normal">1132</span>
+<span class="normal">1133</span>
+<span class="normal">1134</span>
+<span class="normal">1135</span>
+<span class="normal">1136</span>
+<span class="normal">1137</span>
+<span class="normal">1138</span>
+<span class="normal">1139</span>
+<span class="normal">1140</span>
+<span class="normal">1141</span>
+<span class="normal">1142</span>
+<span class="normal">1143</span>
+<span class="normal">1144</span>
+<span class="normal">1145</span>
+<span class="normal">1146</span>
+<span class="normal">1147</span>
+<span class="normal">1148</span>
+<span class="normal">1149</span>
+<span class="normal">1150</span>
+<span class="normal">1151</span>
+<span class="normal">1152</span>
+<span class="normal">1153</span>
+<span class="normal">1154</span>
+<span class="normal">1155</span>
+<span class="normal">1156</span>
+<span class="normal">1157</span>
+<span class="normal">1158</span>
+<span class="normal">1159</span>
+<span class="normal">1160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">"claude-wrapper.sh"</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.41"</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.42"</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/bin"</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">"</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude"</span>
@@ -3423,13 +3494,41 @@ _is_claude_logged_in<span class="o">()</span><span class="w"> </span><span class
 <span class="w">    </span><span class="c1"># malformed value means "can't tell", not "expired".</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$expires_ms</span><span class="s2">"</span><span class="w"> </span><span class="o">=</span>~<span class="w"> </span>^<span class="o">[</span><span class="m">0</span>-9<span class="o">]</span>+$<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$expires_ms</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"0"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">      </span><span class="nb">local</span><span class="w"> </span><span class="nv">now_ms</span><span class="o">=</span><span class="k">$((</span><span class="w"> </span><span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1000</span><span class="w"> </span><span class="k">))</span>
-<span class="w">      </span><span class="o">((</span><span class="w"> </span>expires_ms<span class="w"> </span>&gt;<span class="w"> </span>now_ms<span class="w"> </span><span class="o">))</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>expires_ms<span class="w"> </span>&lt;<span class="o">=</span><span class="w"> </span>now_ms<span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="c1"># The access token is short-lived and lapses several times a day; that</span>
+<span class="w">        </span><span class="c1"># does NOT mean the user is logged out. Claude Code silently refreshes</span>
+<span class="w">        </span><span class="c1"># it while the refresh token is valid, so treat the login as live when</span>
+<span class="w">        </span><span class="c1"># a refresh token is present and has not itself expired. Without this</span>
+<span class="w">        </span><span class="c1"># the wrapper silently fell through to Bedrock/Foundry every time the</span>
+<span class="w">        </span><span class="c1"># access token aged out.</span>
+<span class="w">        </span><span class="nb">local</span><span class="w"> </span>refresh<span class="w"> </span>refresh_exp_ms
+<span class="w">        </span><span class="nv">refresh</span><span class="o">=</span><span class="k">$(</span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">'.claudeAiOauth.refreshToken // empty'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$creds</span><span class="s2">"</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="k">)</span>
+<span class="w">        </span><span class="nv">refresh_exp_ms</span><span class="o">=</span><span class="k">$(</span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">'.claudeAiOauth.refreshTokenExpiresAt // 0'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$creds</span><span class="s2">"</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="k">)</span>
+<span class="w">        </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">"</span><span class="nv">$refresh</span><span class="s2">"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$refresh_exp_ms</span><span class="s2">"</span><span class="w"> </span><span class="o">=</span>~<span class="w"> </span>^<span class="o">[</span><span class="m">0</span>-9<span class="o">]</span>+$<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$refresh_exp_ms</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"0"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">          </span><span class="o">((</span><span class="w"> </span>refresh_exp_ms<span class="w"> </span>&gt;<span class="w"> </span>now_ms<span class="w"> </span><span class="o">))</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">        </span><span class="k">fi</span>
+<span class="w">      </span><span class="k">fi</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="c1"># Fallback: grep for a non-empty accessToken value</span>
 <span class="w">    </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">'"accessToken"[[:space:]]*:[[:space:]]*"[^"]'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$creds</span><span class="s2">"</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="w">  </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="o">}</span>
+
+<span class="c1"># Interactively offer to re-authenticate a fully expired claude.ai login (both</span>
+<span class="c1"># the access token and its refresh token are stale, or the token is otherwise</span>
+<span class="c1"># invalid). Returns 0 if the user logs back in successfully, 1 if they decline</span>
+<span class="c1"># or the login attempt fails — callers fall back to Bedrock/Foundry on 1.</span>
+_prompt_relogin<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Your claude.ai login has expired.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">read</span><span class="w"> </span>-rp<span class="w"> </span><span class="s2">"Log in to claude.ai again now? (Y/n): "</span><span class="w"> </span>_relogin_confirm
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">"</span><span class="nv">$_relogin_confirm</span><span class="s2">"</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"</span><span class="nv">$_relogin_confirm</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"y"</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"</span><span class="nv">$_relogin_confirm</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"Y"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="s2">"</span><span class="nv">$REAL_CLAUDE</span><span class="s2">"</span><span class="w"> </span>auth<span class="w"> </span>login
+<span class="w">    </span>_is_claude_logged_in<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="o">}</span>
 
 <span class="c1"># Write or update a single KEY="value" line in claude-wrapper.env.</span>
@@ -3717,6 +3816,7 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude --aws          # Force AWS Bedrock (overrides Foundry and native login)"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude --az           # Force Azure AI Foundry (overrides native login)"</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude --claudeai     # Force claude.ai login (overrides Bedrock/Foundry)"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span>
 
 <span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
@@ -3839,6 +3939,10 @@ _migrate_to_wrapper_env
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Native Login (claude /login): active — Bedrock/Foundry vars will be unset"</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Override per-run with: claude --aws (Bedrock) or claude --az (Foundry)"</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Native Login (claude /login): not active (no valid claude.ai token)"</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  Run 'claude /login', then use 'claude --claudeai' to force it."</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span>
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="c1"># Show Foundry configuration section</span>
@@ -3955,14 +4059,18 @@ _migrate_to_wrapper_env
 <span class="c1"># --local presence is tracked too so conflicting combinations can be rejected.</span>
 <span class="c1"># --aws forces AWS Bedrock, --az forces Azure AI Foundry — each overrides native</span>
 <span class="c1"># claude.ai login (useful for switching between a personal and a work account).</span>
+<span class="c1"># --claudeai (alias --native) forces the claude.ai login, overriding a Foundry</span>
+<span class="c1"># or Bedrock configuration that would otherwise win.</span>
 <span class="nv">FORCE_AWS</span><span class="o">=</span><span class="m">0</span>
 <span class="nv">FORCE_AZ</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">FORCE_NATIVE</span><span class="o">=</span><span class="m">0</span>
 <span class="nv">_has_local</span><span class="o">=</span><span class="m">0</span>
 <span class="nv">_prescan_args</span><span class="o">=()</span>
 <span class="k">for</span><span class="w"> </span>_parg<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">"</span><span class="nv">$_parg</span><span class="s2">"</span><span class="w"> </span><span class="k">in</span>
 <span class="w">    </span>--aws<span class="o">)</span><span class="w"> </span><span class="nv">FORCE_AWS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="p">;;</span>
 <span class="w">    </span>--az<span class="o">)</span><span class="w">  </span><span class="nv">FORCE_AZ</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">    </span>--claudeai<span class="p">|</span>--native<span class="o">)</span><span class="w"> </span><span class="nv">FORCE_NATIVE</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="p">;;</span>
 <span class="w">    </span>--local<span class="o">)</span><span class="w"> </span><span class="nv">_has_local</span><span class="o">=</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="nv">_prescan_args</span><span class="o">+=(</span><span class="s2">"</span><span class="nv">$_parg</span><span class="s2">"</span><span class="o">)</span><span class="w"> </span><span class="p">;;</span>
 <span class="w">    </span>*<span class="o">)</span><span class="w"> </span><span class="nv">_prescan_args</span><span class="o">+=(</span><span class="s2">"</span><span class="nv">$_parg</span><span class="s2">"</span><span class="o">)</span><span class="w"> </span><span class="p">;;</span>
 <span class="w">  </span><span class="k">esac</span>
@@ -3975,6 +4083,19 @@ _migrate_to_wrapper_env
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  --aws  forces AWS Bedrock"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  --az   forces Azure AI Foundry"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="c1"># Conflict: --claudeai cannot be combined with any backend-forcing flag</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$FORCE_NATIVE</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$FORCE_AWS</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"</span><span class="nv">$FORCE_AZ</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"</span><span class="nv">$_has_local</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nv">_other</span><span class="o">=</span><span class="s2">"--aws"</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$FORCE_AZ</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">_other</span><span class="o">=</span><span class="s2">"--az"</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$_has_local</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">_other</span><span class="o">=</span><span class="s2">"--local"</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: --claudeai and </span><span class="nv">$_other</span><span class="s2"> cannot be used together</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  --claudeai  forces the claude.ai login"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  </span><span class="nv">$_other</span><span class="s2">     forces another backend"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="k">fi</span>
@@ -4045,7 +4166,7 @@ _migrate_to_wrapper_env
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="c1"># Check if ANTHROPIC_BASE_URL is already set (for local LLM usage without --local flag)</span>
-<span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">"</span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="s2">"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_NATIVE</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">"</span><span class="nv">$ANTHROPIC_BASE_URL</span><span class="s2">"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="c1"># Custom endpoint — neither cloud backend should be active.</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="o">=</span><span class="m">0</span>
@@ -4055,8 +4176,16 @@ _migrate_to_wrapper_env
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="c1"># Native claude.ai login — oauth token found in ~/.claude/.credentials.json</span>
-<span class="c1"># (skipped when --aws or --az forces a specific cloud backend)</span>
-<span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_AWS</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_AZ</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>_is_claude_logged_in<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="c1"># (skipped when --aws or --az forces a cloud backend; forced by --claudeai)</span>
+<span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_NATIVE</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_AWS</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_AZ</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>_is_claude_logged_in<span class="p">;</span><span class="w"> </span><span class="o">}</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_NATIVE</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>!<span class="w"> </span>_is_claude_logged_in<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Error: --claudeai used but no valid claude.ai login was found</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Log in first:"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude /login"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="w">  </span><span class="k">fi</span>
 <span class="w">  </span><span class="c1"># Clear all cloud-backend vars so Claude Code uses its own oauth token</span>
 <span class="w">  </span><span class="nb">unset</span><span class="w"> </span>ANTHROPIC_API_KEY
 <span class="w">  </span><span class="nb">unset</span><span class="w"> </span>ANTHROPIC_BASE_URL
@@ -4070,6 +4199,19 @@ _migrate_to_wrapper_env
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠ ~/.claude/settings.json sets ANTHROPIC_API_KEY (or apiKeyHelper).</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">  Remove it from that file to stop the 'Both claude.ai and ANTHROPIC_API_KEY set' warning.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="k">fi</span>
+
+<span class="c1"># A claude.ai login was set up before (a credentials file exists) but is now</span>
+<span class="c1"># fully expired — offer to log back in interactively rather than silently</span>
+<span class="c1"># falling back to Bedrock/Foundry. Skipped when a backend is forced, or</span>
+<span class="c1"># non-interactively (no tty), or when claude.ai was never logged into here.</span>
+<span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_AWS</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_AZ</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.claude/.credentials.json"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-t<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span>_prompt_relogin<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">unset</span><span class="w"> </span>ANTHROPIC_API_KEY
+<span class="w">  </span><span class="nb">unset</span><span class="w"> </span>ANTHROPIC_BASE_URL
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">0</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="o">=</span><span class="m">0</span>
+<span class="w">  </span><span class="nv">USING_NATIVE</span><span class="o">=</span><span class="m">1</span>
 
 <span class="c1"># Foundry Configuration - use Azure AI Foundry if CLAUDE_CODE_USE_FOUNDRY=1 or --az</span>
 <span class="c1"># forces it (skipped when --aws). --az overrides native claude.ai login.</span>
@@ -4577,15 +4719,18 @@ Save these settings to ~/.azure/clauderc for future sessions? (Y/n):
 <li><code>--local</code> flag (always wins)</li>
 <li><code>ANTHROPIC_BASE_URL</code> already set in environment</li>
 <li>Native claude.ai login (token in <code>~/.claude/.credentials.json</code> from <code>claude /login</code>)</li>
+<li>Expired native login → interactive re-login prompt (see below)</li>
 <li><code>CLAUDE_CODE_USE_FOUNDRY=1</code></li>
 <li>AWS Bedrock profile in <code>~/.aws/config</code></li>
 </ol>
-<p>The <code>--aws</code> and <code>--az</code> flags are <em>forcing overrides</em>: they take priority over native login (and each other is mutually exclusive). Use them to pick a specific backend per run — for example to switch between a personal claude.ai account and a work Azure/AWS account:</p>
+<p>The <code>--aws</code>, <code>--az</code>, and <code>--claudeai</code> flags are <em>forcing overrides</em>: they take priority over native login and over each other (only one may be used per run). Use them to pick a specific backend per run — for example to switch between a personal claude.ai account and a work Azure/AWS account:</p>
 <ul>
 <li><code>claude --aws</code> — force AWS Bedrock even when logged in or when Foundry is configured.</li>
 <li><code>claude --az</code> — force Azure AI Foundry even when logged in. Requires <code>ANTHROPIC_FOUNDRY_BASE_URL</code> and <code>ANTHROPIC_FOUNDRY_API_KEY</code> (normally loaded from <code>~/.azure/clauderc</code>).</li>
+<li><code>claude --claudeai</code> (alias <code>--native</code>) — force the claude.ai login even when Foundry or a Bedrock profile is configured. Errors out if no valid login is found.</li>
 </ul>
-<p>Neither flag can be combined with <code>--local</code>, and <code>--aws</code> and <code>--az</code> cannot be used together.</p>
+<p>None of these three flags can be combined with each other or with <code>--local</code>.</p>
+<p><strong>Expired login handling</strong>: the claude.ai access token is short-lived and lapses several times a day — the wrapper treats that as still logged in and lets Claude Code silently refresh it behind the scenes, as long as the longer-lived refresh token is still valid. Only when the login is <em>fully</em> expired (refresh token also stale, or missing) does the wrapper step in: if a <code>~/.claude/.credentials.json</code> exists and the session is interactive, it asks <code>Your claude.ai login has expired. Log in to claude.ai again now? (Y/n)</code>. Answering yes runs <code>claude auth login</code>; answering no (or a non-interactive run, e.g. in CI) falls through to Foundry/Bedrock as before.</p>
 <h3 id="6-optional-using-claude-code-natively-on-windows-via-powershell">6. (Optional) Using Claude Code Natively on Windows via PowerShell<a class="headerlink" href="#6-optional-using-claude-code-natively-on-windows-via-powershell" title="Permanent link">&para;</a></h3>
 <p>If you are running Claude Code directly on Windows (not inside WSL), configure the required environment variables in your PowerShell profile so they are set automatically in every session.</p>
 <p>First, check whether the profile file exists — on a fresh Windows install it often does not:</p>
