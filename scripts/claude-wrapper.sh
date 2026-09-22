@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.42"
+WRAPPER_VERSION="1.43"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -91,17 +91,48 @@ _is_claude_logged_in() {
   return 0
 }
 
-# Interactively offer to re-authenticate a fully expired claude.ai login (both
-# the access token and its refresh token are stale, or the token is otherwise
-# invalid). Returns 0 if the user logs back in successfully, 1 if they decline
-# or the login attempt fails — callers fall back to Bedrock/Foundry on 1.
+# True when this user has ever signed in to claude.ai on this machine.
+# `claude auth logout` deletes ~/.claude/.credentials.json and also clears
+# Claude Code's own account residue in ~/.claude.json, so a logged-out user
+# leaves no trace to key off. The wrapper therefore records its own sticky
+# marker (WRAPPER_CLAUDEAI_SEEN) the first time it sees a native login, and
+# that marker — not the presence of a credentials file — is what makes the
+# re-login prompt keep appearing after a logout.
+_has_used_claudeai_login() {
+  [[ -f "$HOME/.claude/.credentials.json" ]] && return 0
+  [[ "${WRAPPER_CLAUDEAI_SEEN:-0}" == "1" ]] && return 0
+  return 1
+}
+
+# Remember that a claude.ai login was used here (written once, then left alone).
+_record_claudeai_login() {
+  [[ "${WRAPPER_CLAUDEAI_SEEN:-0}" == "1" ]] && return 0
+  _set_wrapper_env WRAPPER_CLAUDEAI_SEEN "1"
+  WRAPPER_CLAUDEAI_SEEN=1
+}
+
+# Interactively offer to re-authenticate when the claude.ai login is gone —
+# either fully expired (access token and refresh token both stale) or logged
+# out. Returns 0 if the user logs back in successfully, 1 if they decline or
+# the login fails — callers fall back to Bedrock/Foundry on 1. Answering
+# "never" records WRAPPER_CLAUDEAI_PROMPT=0 so the prompt stops for good.
 _prompt_relogin() {
-  echo -e "${YELLOW}Your claude.ai login has expired.${NC}" >&2
-  read -rp "Log in to claude.ai again now? (Y/n): " _relogin_confirm
-  if [[ -z "$_relogin_confirm" || "$_relogin_confirm" == "y" || "$_relogin_confirm" == "Y" ]]; then
-    "$REAL_CLAUDE" auth login
-    _is_claude_logged_in && return 0
-  fi
+  echo -e "${YELLOW}You have signed in to claude.ai on this machine before, but there is no valid login now.${NC}" >&2
+  read -rp "Log in to claude.ai again? (Y/n/never): " _relogin_confirm
+  case "$_relogin_confirm" in
+    ""|y|Y|yes|YES)
+      "$REAL_CLAUDE" auth login
+      if _is_claude_logged_in; then
+        _record_claudeai_login
+        return 0
+      fi
+      echo -e "${YELLOW}⚠ Still not logged in — continuing with the configured cloud backend.${NC}" >&2
+      ;;
+    never|NEVER|Never)
+      _set_wrapper_env WRAPPER_CLAUDEAI_PROMPT "0"
+      echo -e "${GREEN}✓${NC} Will not ask again. Re-enable with: claude default claudeai" >&2
+      ;;
+  esac
   return 1
 }
 
@@ -385,6 +416,7 @@ install_wrapper() {
   echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/fable/sonnet-1m/opus-1m)"
   echo "  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)"
   echo "  claude default noyolo # Re-enable permission prompts (sets WRAPPER_YOLO=0)"
+  echo "  claude default noclaudeai # Stop asking to re-login to claude.ai"
   echo "  claude --models       # Show default Anthropic models"
   echo "  claude update         # Update wrapper and Claude Code"
   echo "  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"
@@ -571,8 +603,9 @@ if [[ "$1" == "default" ]]; then
   if [[ -z "$_chosen" ]]; then
     echo -e "${YELLOW}Current default model: ${WRAPPER_DEFAULT_MODEL:-haiku}${NC}" >&2
     echo -e "${YELLOW}Yolo mode (skip permissions): ${WRAPPER_YOLO:-0}${NC}" >&2
+    echo -e "${YELLOW}claude.ai re-login prompt: ${WRAPPER_CLAUDEAI_PROMPT:-1}${NC}" >&2
     echo "" >&2
-    echo "Usage: claude default <model|yolo|noyolo>" >&2
+    echo "Usage: claude default <model|yolo|noyolo|claudeai|noclaudeai>" >&2
     echo "Valid models: $_valid_models" >&2
     exit 0
   fi
@@ -592,10 +625,20 @@ if [[ "$1" == "default" ]]; then
       echo -e "${GREEN}✓${NC} Yolo mode disabled (WRAPPER_YOLO=0) in ~/.claude/claude-wrapper.env" >&2
       exit 0
       ;;
+    claudeai)
+      _set_wrapper_env WRAPPER_CLAUDEAI_PROMPT "1"
+      echo -e "${GREEN}✓${NC} claude.ai re-login prompt enabled (WRAPPER_CLAUDEAI_PROMPT=1)" >&2
+      exit 0
+      ;;
+    noclaudeai)
+      _set_wrapper_env WRAPPER_CLAUDEAI_PROMPT "0"
+      echo -e "${GREEN}✓${NC} claude.ai re-login prompt disabled (WRAPPER_CLAUDEAI_PROMPT=0)" >&2
+      exit 0
+      ;;
     *)
       echo -e "${RED}✗ Unknown option '$_chosen'${NC}" >&2
       echo "Valid models: $_valid_models" >&2
-      echo "Other options: yolo, noyolo" >&2
+      echo "Other options: yolo, noyolo, claudeai, noclaudeai" >&2
       exit 1
       ;;
   esac
@@ -766,6 +809,9 @@ elif [[ "${FORCE_NATIVE:-0}" == "1" ]] || { [[ "${FORCE_AWS:-0}" != "1" && "${FO
   export CLAUDE_CODE_USE_BEDROCK=0
   export CLAUDE_CODE_USE_FOUNDRY=0
   USING_NATIVE=1
+  # Remember this so the re-login prompt still fires after `claude auth logout`
+  # wipes the credentials file.
+  _record_claudeai_login
   # The wrapper can only clear environment variables — if ANTHROPIC_API_KEY is
   # baked into ~/.claude/settings.json (env block or apiKeyHelper), Claude Code
   # re-adds it itself and warns about mixed auth. Point the user at the file.
@@ -774,12 +820,13 @@ elif [[ "${FORCE_NATIVE:-0}" == "1" ]] || { [[ "${FORCE_AWS:-0}" != "1" && "${FO
     echo -e "${YELLOW}  Remove it from that file to stop the 'Both claude.ai and ANTHROPIC_API_KEY set' warning.${NC}" >&2
   fi
 
-# A claude.ai login was set up before (a credentials file exists) but is now
-# fully expired — offer to log back in interactively rather than silently
-# falling back to Bedrock/Foundry. Skipped when a backend is forced, or
-# non-interactively (no tty), or when claude.ai was never logged into here.
+# This user has signed in to claude.ai here before but has no valid login now
+# (expired, or logged out) — offer to log back in rather than silently falling
+# back to Bedrock/Foundry. Skipped when a backend is forced, non-interactively
+# (no tty), when claude.ai was never used here, or after answering "never".
 elif [[ "${FORCE_AWS:-0}" != "1" && "${FORCE_AZ:-0}" != "1" ]] \
-     && [[ -f "$HOME/.claude/.credentials.json" ]] && [[ -t 0 ]] \
+     && [[ "${WRAPPER_CLAUDEAI_PROMPT:-1}" != "0" ]] \
+     && _has_used_claudeai_login && [[ -t 0 ]] \
      && _prompt_relogin; then
   unset ANTHROPIC_API_KEY
   unset ANTHROPIC_BASE_URL

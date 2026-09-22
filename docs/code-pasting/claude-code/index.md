@@ -189,7 +189,7 @@ export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-5"
 1. `--local` flag (always wins)
 2. `ANTHROPIC_BASE_URL` already set in environment
 3. Native claude.ai login (token in `~/.claude/.credentials.json` from `claude /login`)
-4. Expired native login → interactive re-login prompt (see below)
+4. Expired or logged-out native login → interactive re-login prompt (see below)
 5. `CLAUDE_CODE_USE_FOUNDRY=1`
 6. AWS Bedrock profile in `~/.aws/config`
 
@@ -201,7 +201,22 @@ The `--aws`, `--az`, and `--claudeai` flags are *forcing overrides*: they take p
 
 None of these three flags can be combined with each other or with `--local`.
 
-**Expired login handling**: the claude.ai access token is short-lived and lapses several times a day — the wrapper treats that as still logged in and lets Claude Code silently refresh it behind the scenes, as long as the longer-lived refresh token is still valid. Only when the login is *fully* expired (refresh token also stale, or missing) does the wrapper step in: if a `~/.claude/.credentials.json` exists and the session is interactive, it asks `Your claude.ai login has expired. Log in to claude.ai again now? (Y/n)`. Answering yes runs `claude auth login`; answering no (or a non-interactive run, e.g. in CI) falls through to Foundry/Bedrock as before.
+**Expired or logged-out claude.ai login**: the claude.ai access token is short-lived and lapses several times a day — the wrapper treats that as still logged in and lets Claude Code silently refresh it behind the scenes, as long as the longer-lived refresh token is still valid.
+
+The wrapper only steps in when there is no usable login at all — the refresh token is stale too, or you ran `claude auth logout`. If you have signed in to claude.ai on this machine before and the session is interactive, it asks:
+
+```
+You have signed in to claude.ai on this machine before, but there is no valid login now.
+Log in to claude.ai again? (Y/n/never):
+```
+
+- **Y** (or Enter) runs `claude auth login` and uses the claude.ai login if it succeeds.
+- **n** skips just this run; you are asked again next time.
+- **never** records `WRAPPER_CLAUDEAI_PROMPT=0` and stops asking for good. Re-enable with `claude default claudeai` (or disable later with `claude default noclaudeai`).
+
+Non-interactive runs (CI, pipes — no tty) never prompt and fall through to Foundry/Bedrock silently.
+
+Because `claude auth logout` deletes `~/.claude/.credentials.json` *and* clears Claude Code's own account residue, a logged-out user leaves nothing on disk to key off. The wrapper therefore writes its own sticky marker `WRAPPER_CLAUDEAI_SEEN=1` to `~/.claude/claude-wrapper.env` the first time it sees a native login — that marker is what keeps the prompt appearing after a logout, so you are never silently switched to a work Foundry/Bedrock account. Users who have never used claude.ai here are never prompted.
 
 ### 6. (Optional) Using Claude Code Natively on Windows via PowerShell
 
