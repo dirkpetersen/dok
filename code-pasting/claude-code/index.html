@@ -3424,13 +3424,60 @@
 <span class="normal">1157</span>
 <span class="normal">1158</span>
 <span class="normal">1159</span>
-<span class="normal">1160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1160</span>
+<span class="normal">1161</span>
+<span class="normal">1162</span>
+<span class="normal">1163</span>
+<span class="normal">1164</span>
+<span class="normal">1165</span>
+<span class="normal">1166</span>
+<span class="normal">1167</span>
+<span class="normal">1168</span>
+<span class="normal">1169</span>
+<span class="normal">1170</span>
+<span class="normal">1171</span>
+<span class="normal">1172</span>
+<span class="normal">1173</span>
+<span class="normal">1174</span>
+<span class="normal">1175</span>
+<span class="normal">1176</span>
+<span class="normal">1177</span>
+<span class="normal">1178</span>
+<span class="normal">1179</span>
+<span class="normal">1180</span>
+<span class="normal">1181</span>
+<span class="normal">1182</span>
+<span class="normal">1183</span>
+<span class="normal">1184</span>
+<span class="normal">1185</span>
+<span class="normal">1186</span>
+<span class="normal">1187</span>
+<span class="normal">1188</span>
+<span class="normal">1189</span>
+<span class="normal">1190</span>
+<span class="normal">1191</span>
+<span class="normal">1192</span>
+<span class="normal">1193</span>
+<span class="normal">1194</span>
+<span class="normal">1195</span>
+<span class="normal">1196</span>
+<span class="normal">1197</span>
+<span class="normal">1198</span>
+<span class="normal">1199</span>
+<span class="normal">1200</span>
+<span class="normal">1201</span>
+<span class="normal">1202</span>
+<span class="normal">1203</span>
+<span class="normal">1204</span>
+<span class="normal">1205</span>
+<span class="normal">1206</span>
+<span class="normal">1207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">"claude-wrapper.sh"</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.42"</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.43"</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/bin"</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">"</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude"</span>
@@ -3517,17 +3564,48 @@ _is_claude_logged_in<span class="o">()</span><span class="w"> </span><span class
 <span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="o">}</span>
 
-<span class="c1"># Interactively offer to re-authenticate a fully expired claude.ai login (both</span>
-<span class="c1"># the access token and its refresh token are stale, or the token is otherwise</span>
-<span class="c1"># invalid). Returns 0 if the user logs back in successfully, 1 if they decline</span>
-<span class="c1"># or the login attempt fails — callers fall back to Bedrock/Foundry on 1.</span>
+<span class="c1"># True when this user has ever signed in to claude.ai on this machine.</span>
+<span class="c1"># `claude auth logout` deletes ~/.claude/.credentials.json and also clears</span>
+<span class="c1"># Claude Code's own account residue in ~/.claude.json, so a logged-out user</span>
+<span class="c1"># leaves no trace to key off. The wrapper therefore records its own sticky</span>
+<span class="c1"># marker (WRAPPER_CLAUDEAI_SEEN) the first time it sees a native login, and</span>
+<span class="c1"># that marker — not the presence of a credentials file — is what makes the</span>
+<span class="c1"># re-login prompt keep appearing after a logout.</span>
+_has_used_claudeai_login<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.claude/.credentials.json"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">WRAPPER_CLAUDEAI_SEEN</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="o">}</span>
+
+<span class="c1"># Remember that a claude.ai login was used here (written once, then left alone).</span>
+_record_claudeai_login<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">WRAPPER_CLAUDEAI_SEEN</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span>_set_wrapper_env<span class="w"> </span>WRAPPER_CLAUDEAI_SEEN<span class="w"> </span><span class="s2">"1"</span>
+<span class="w">  </span><span class="nv">WRAPPER_CLAUDEAI_SEEN</span><span class="o">=</span><span class="m">1</span>
+<span class="o">}</span>
+
+<span class="c1"># Interactively offer to re-authenticate when the claude.ai login is gone —</span>
+<span class="c1"># either fully expired (access token and refresh token both stale) or logged</span>
+<span class="c1"># out. Returns 0 if the user logs back in successfully, 1 if they decline or</span>
+<span class="c1"># the login fails — callers fall back to Bedrock/Foundry on 1. Answering</span>
+<span class="c1"># "never" records WRAPPER_CLAUDEAI_PROMPT=0 so the prompt stops for good.</span>
 _prompt_relogin<span class="o">()</span><span class="w"> </span><span class="o">{</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Your claude.ai login has expired.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">  </span><span class="nb">read</span><span class="w"> </span>-rp<span class="w"> </span><span class="s2">"Log in to claude.ai again now? (Y/n): "</span><span class="w"> </span>_relogin_confirm
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">"</span><span class="nv">$_relogin_confirm</span><span class="s2">"</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"</span><span class="nv">$_relogin_confirm</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"y"</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">"</span><span class="nv">$_relogin_confirm</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"Y"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="s2">"</span><span class="nv">$REAL_CLAUDE</span><span class="s2">"</span><span class="w"> </span>auth<span class="w"> </span>login
-<span class="w">    </span>_is_claude_logged_in<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
-<span class="w">  </span><span class="k">fi</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">You have signed in to claude.ai on this machine before, but there is no valid login now.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">  </span><span class="nb">read</span><span class="w"> </span>-rp<span class="w"> </span><span class="s2">"Log in to claude.ai again? (Y/n/never): "</span><span class="w"> </span>_relogin_confirm
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">"</span><span class="nv">$_relogin_confirm</span><span class="s2">"</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span><span class="s2">""</span><span class="p">|</span>y<span class="p">|</span>Y<span class="p">|</span>yes<span class="p">|</span>YES<span class="o">)</span>
+<span class="w">      </span><span class="s2">"</span><span class="nv">$REAL_CLAUDE</span><span class="s2">"</span><span class="w"> </span>auth<span class="w"> </span>login
+<span class="w">      </span><span class="k">if</span><span class="w"> </span>_is_claude_logged_in<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span>_record_claudeai_login
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="w">      </span><span class="k">fi</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠ Still not logged in — continuing with the configured cloud backend.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>never<span class="p">|</span>NEVER<span class="p">|</span>Never<span class="o">)</span>
+<span class="w">      </span>_set_wrapper_env<span class="w"> </span>WRAPPER_CLAUDEAI_PROMPT<span class="w"> </span><span class="s2">"0"</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Will not ask again. Re-enable with: claude default claudeai"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">  </span><span class="k">esac</span>
 <span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="o">}</span>
 
@@ -3811,6 +3889,7 @@ install_wrapper<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude default opus   # Set persistent default model (haiku/sonnet/opus/fable/sonnet-1m/opus-1m)"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude default noyolo # Re-enable permission prompts (sets WRAPPER_YOLO=0)"</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude default noclaudeai # Stop asking to re-login to claude.ai"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude --models       # Show default Anthropic models"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude update         # Update wrapper and Claude Code"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  claude --local        # Use local LLM (requires LOCAL_ANTHROPIC_BASE_URL)"</span>
@@ -3997,8 +4076,9 @@ _migrate_to_wrapper_env
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">"</span><span class="nv">$_chosen</span><span class="s2">"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Current default model: </span><span class="si">${</span><span class="nv">WRAPPER_DEFAULT_MODEL</span><span class="k">:-</span><span class="nv">haiku</span><span class="si">}${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Yolo mode (skip permissions): </span><span class="si">${</span><span class="nv">WRAPPER_YOLO</span><span class="k">:-</span><span class="nv">0</span><span class="si">}${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">claude.ai re-login prompt: </span><span class="si">${</span><span class="nv">WRAPPER_CLAUDEAI_PROMPT</span><span class="k">:-</span><span class="nv">1</span><span class="si">}${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Usage: claude default &lt;model|yolo|noyolo&gt;"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Usage: claude default &lt;model|yolo|noyolo|claudeai|noclaudeai&gt;"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Valid models: </span><span class="nv">$_valid_models</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
 <span class="w">  </span><span class="k">fi</span>
@@ -4018,10 +4098,20 @@ _migrate_to_wrapper_env
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Yolo mode disabled (WRAPPER_YOLO=0) in ~/.claude/claude-wrapper.env"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
 <span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>claudeai<span class="o">)</span>
+<span class="w">      </span>_set_wrapper_env<span class="w"> </span>WRAPPER_CLAUDEAI_PROMPT<span class="w"> </span><span class="s2">"1"</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> claude.ai re-login prompt enabled (WRAPPER_CLAUDEAI_PROMPT=1)"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>noclaudeai<span class="o">)</span>
+<span class="w">      </span>_set_wrapper_env<span class="w"> </span>WRAPPER_CLAUDEAI_PROMPT<span class="w"> </span><span class="s2">"0"</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> claude.ai re-login prompt disabled (WRAPPER_CLAUDEAI_PROMPT=0)"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w">      </span><span class="p">;;</span>
 <span class="w">    </span>*<span class="o">)</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ Unknown option '</span><span class="nv">$_chosen</span><span class="s2">'</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Valid models: </span><span class="nv">$_valid_models</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Other options: yolo, noyolo"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Other options: yolo, noyolo, claudeai, noclaudeai"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="w">      </span><span class="p">;;</span>
 <span class="w">  </span><span class="k">esac</span>
@@ -4192,6 +4282,9 @@ _migrate_to_wrapper_env
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_BEDROCK</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_USE_FOUNDRY</span><span class="o">=</span><span class="m">0</span>
 <span class="w">  </span><span class="nv">USING_NATIVE</span><span class="o">=</span><span class="m">1</span>
+<span class="w">  </span><span class="c1"># Remember this so the re-login prompt still fires after `claude auth logout`</span>
+<span class="w">  </span><span class="c1"># wipes the credentials file.</span>
+<span class="w">  </span>_record_claudeai_login
 <span class="w">  </span><span class="c1"># The wrapper can only clear environment variables — if ANTHROPIC_API_KEY is</span>
 <span class="w">  </span><span class="c1"># baked into ~/.claude/settings.json (env block or apiKeyHelper), Claude Code</span>
 <span class="w">  </span><span class="c1"># re-adds it itself and warns about mixed auth. Point the user at the file.</span>
@@ -4200,12 +4293,13 @@ _migrate_to_wrapper_env
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">  Remove it from that file to stop the 'Both claude.ai and ANTHROPIC_API_KEY set' warning.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="k">fi</span>
 
-<span class="c1"># A claude.ai login was set up before (a credentials file exists) but is now</span>
-<span class="c1"># fully expired — offer to log back in interactively rather than silently</span>
-<span class="c1"># falling back to Bedrock/Foundry. Skipped when a backend is forced, or</span>
-<span class="c1"># non-interactively (no tty), or when claude.ai was never logged into here.</span>
+<span class="c1"># This user has signed in to claude.ai here before but has no valid login now</span>
+<span class="c1"># (expired, or logged out) — offer to log back in rather than silently falling</span>
+<span class="c1"># back to Bedrock/Foundry. Skipped when a backend is forced, non-interactively</span>
+<span class="c1"># (no tty), when claude.ai was never used here, or after answering "never".</span>
 <span class="k">elif</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_AWS</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">FORCE_AZ</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.claude/.credentials.json"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-t<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">WRAPPER_CLAUDEAI_PROMPT</span><span class="k">:-</span><span class="nv">1</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"0"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span>_has_used_claudeai_login<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-t<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="se">\</span>
 <span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span>_prompt_relogin<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nb">unset</span><span class="w"> </span>ANTHROPIC_API_KEY
 <span class="w">  </span><span class="nb">unset</span><span class="w"> </span>ANTHROPIC_BASE_URL
@@ -4719,7 +4813,7 @@ Save these settings to ~/.azure/clauderc for future sessions? (Y/n):
 <li><code>--local</code> flag (always wins)</li>
 <li><code>ANTHROPIC_BASE_URL</code> already set in environment</li>
 <li>Native claude.ai login (token in <code>~/.claude/.credentials.json</code> from <code>claude /login</code>)</li>
-<li>Expired native login → interactive re-login prompt (see below)</li>
+<li>Expired or logged-out native login → interactive re-login prompt (see below)</li>
 <li><code>CLAUDE_CODE_USE_FOUNDRY=1</code></li>
 <li>AWS Bedrock profile in <code>~/.aws/config</code></li>
 </ol>
@@ -4730,7 +4824,19 @@ Save these settings to ~/.azure/clauderc for future sessions? (Y/n):
 <li><code>claude --claudeai</code> (alias <code>--native</code>) — force the claude.ai login even when Foundry or a Bedrock profile is configured. Errors out if no valid login is found.</li>
 </ul>
 <p>None of these three flags can be combined with each other or with <code>--local</code>.</p>
-<p><strong>Expired login handling</strong>: the claude.ai access token is short-lived and lapses several times a day — the wrapper treats that as still logged in and lets Claude Code silently refresh it behind the scenes, as long as the longer-lived refresh token is still valid. Only when the login is <em>fully</em> expired (refresh token also stale, or missing) does the wrapper step in: if a <code>~/.claude/.credentials.json</code> exists and the session is interactive, it asks <code>Your claude.ai login has expired. Log in to claude.ai again now? (Y/n)</code>. Answering yes runs <code>claude auth login</code>; answering no (or a non-interactive run, e.g. in CI) falls through to Foundry/Bedrock as before.</p>
+<p><strong>Expired or logged-out claude.ai login</strong>: the claude.ai access token is short-lived and lapses several times a day — the wrapper treats that as still logged in and lets Claude Code silently refresh it behind the scenes, as long as the longer-lived refresh token is still valid.</p>
+<p>The wrapper only steps in when there is no usable login at all — the refresh token is stale too, or you ran <code>claude auth logout</code>. If you have signed in to claude.ai on this machine before and the session is interactive, it asks:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>You have signed in to claude.ai on this machine before, but there is no valid login now.
+Log in to claude.ai again? (Y/n/never):
+</code></pre></div></td></tr></table></div>
+<ul>
+<li><strong>Y</strong> (or Enter) runs <code>claude auth login</code> and uses the claude.ai login if it succeeds.</li>
+<li><strong>n</strong> skips just this run; you are asked again next time.</li>
+<li><strong>never</strong> records <code>WRAPPER_CLAUDEAI_PROMPT=0</code> and stops asking for good. Re-enable with <code>claude default claudeai</code> (or disable later with <code>claude default noclaudeai</code>).</li>
+</ul>
+<p>Non-interactive runs (CI, pipes — no tty) never prompt and fall through to Foundry/Bedrock silently.</p>
+<p>Because <code>claude auth logout</code> deletes <code>~/.claude/.credentials.json</code> <em>and</em> clears Claude Code's own account residue, a logged-out user leaves nothing on disk to key off. The wrapper therefore writes its own sticky marker <code>WRAPPER_CLAUDEAI_SEEN=1</code> to <code>~/.claude/claude-wrapper.env</code> the first time it sees a native login — that marker is what keeps the prompt appearing after a logout, so you are never silently switched to a work Foundry/Bedrock account. Users who have never used claude.ai here are never prompted.</p>
 <h3 id="6-optional-using-claude-code-natively-on-windows-via-powershell">6. (Optional) Using Claude Code Natively on Windows via PowerShell<a class="headerlink" href="#6-optional-using-claude-code-natively-on-windows-via-powershell" title="Permanent link">&para;</a></h3>
 <p>If you are running Claude Code directly on Windows (not inside WSL), configure the required environment variables in your PowerShell profile so they are set automatically in every session.</p>
 <p>First, check whether the profile file exists — on a fresh Windows install it often does not:</p>
