@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.46"
+WRAPPER_VERSION="1.47"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -414,7 +414,7 @@ install_wrapper() {
   echo "  claude fable          # Launch with Fable 5.1 (1M context)"
   echo "  claude -c opus        # Model name works anywhere in args"
   echo "  claude default opus   # Set persistent default model (haiku/sonnet/opus/fable/sonnet-1m/opus-1m)"
-  echo "  claude default yolo   # Skip all permission prompts (sets WRAPPER_YOLO=1)"
+  echo "  claude default yolo   # Skip all permission prompts (WRAPPER_YOLO=1; runs with IS_SANDBOX=1)"
   echo "  claude default noyolo # Re-enable permission prompts (sets WRAPPER_YOLO=0)"
   echo "  claude default noclaudeai # Stop asking to re-login to claude.ai"
   echo "  claude --models       # Show default Anthropic models"
@@ -1101,7 +1101,7 @@ if [[ "$wdebug" -eq 1 ]]; then
   done
   echo "" >&2
   if [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
-    echo "Command: $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
+    echo "Command: IS_SANDBOX=${IS_SANDBOX:-1} $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
   else
     echo "Command: $REAL_CLAUDE --model $mymodel --allowedTools <list> --disallowedTools <list> $*" >&2
   fi
@@ -1198,6 +1198,12 @@ _disallowed_csv=$(IFS=,; printf '%s' "${DISALLOWED_TOOLS[*]}")
 
 # Execute Claude Code (skip permissions if WRAPPER_YOLO=1)
 if [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
+  # IS_SANDBOX=1 tells Claude Code it is running in a sandbox, so a permission
+  # bypass really bypasses: without it, some commands (e.g. a `sh -c` script
+  # that runs rm, including ones issued by subagents) still stop for a
+  # "could not be checked — Do you want to proceed?" prompt. It only declares
+  # a sandbox, it does not create one. A value already set by the user wins.
+  export IS_SANDBOX="${IS_SANDBOX:-1}"
   exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
 else
   exec "$REAL_CLAUDE" --model "$mymodel" \
