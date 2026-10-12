@@ -3477,13 +3477,17 @@
 <span class="normal">1210</span>
 <span class="normal">1211</span>
 <span class="normal">1212</span>
-<span class="normal">1213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1213</span>
+<span class="normal">1214</span>
+<span class="normal">1215</span>
+<span class="normal">1216</span>
+<span class="normal">1217</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">"claude-wrapper.sh"</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.47"</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.48"</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/bin"</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">"</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude"</span>
@@ -4580,7 +4584,7 @@ _apply_model_value<span class="o">()</span><span class="w"> </span><span class="
 <span class="w">  </span><span class="k">done</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">WRAPPER_YOLO</span><span class="k">:-</span><span class="nv">0</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Command: IS_SANDBOX=</span><span class="si">${</span><span class="nv">IS_SANDBOX</span><span class="k">:-</span><span class="nv">1</span><span class="si">}</span><span class="s2"> </span><span class="nv">$REAL_CLAUDE</span><span class="s2"> --model </span><span class="nv">$mymodel</span><span class="s2"> --dangerously-skip-permissions </span><span class="nv">$*</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Command: IS_SANDBOX=</span><span class="si">${</span><span class="nv">IS_SANDBOX</span><span class="k">:-</span><span class="nv">1</span><span class="si">}</span><span class="s2"> CLAUDE_CODE_DISABLE_INLINE_SHELL_RM_PROMPT=</span><span class="si">${</span><span class="nv">CLAUDE_CODE_DISABLE_INLINE_SHELL_RM_PROMPT</span><span class="k">:-</span><span class="nv">1</span><span class="si">}</span><span class="s2"> CLAUDE_CODE_DISABLE_SUBSTITUTION_RM_PROMPT=</span><span class="si">${</span><span class="nv">CLAUDE_CODE_DISABLE_SUBSTITUTION_RM_PROMPT</span><span class="k">:-</span><span class="nv">1</span><span class="si">}</span><span class="s2"> </span><span class="nv">$REAL_CLAUDE</span><span class="s2"> --model </span><span class="nv">$mymodel</span><span class="s2"> --dangerously-skip-permissions </span><span class="nv">$*</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Command: </span><span class="nv">$REAL_CLAUDE</span><span class="s2"> --model </span><span class="nv">$mymodel</span><span class="s2"> --allowedTools &lt;list&gt; --disallowedTools &lt;list&gt; </span><span class="nv">$*</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">  </span><span class="k">fi</span>
@@ -4683,6 +4687,10 @@ _apply_model_value<span class="o">()</span><span class="w"> </span><span class="
 <span class="w">  </span><span class="c1"># "could not be checked — Do you want to proceed?" prompt. It only declares</span>
 <span class="w">  </span><span class="c1"># a sandbox, it does not create one. A value already set by the user wins.</span>
 <span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">IS_SANDBOX</span><span class="k">:-</span><span class="nv">1</span><span class="si">}</span><span class="s2">"</span>
+<span class="w">  </span><span class="c1"># Also silence the dedicated rm prompts for `sh -c '... rm ...'` scripts and</span>
+<span class="w">  </span><span class="c1"># for rm inside $(...) / `...` substitutions, which fire even under a bypass.</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_DISABLE_INLINE_SHELL_RM_PROMPT</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">CLAUDE_CODE_DISABLE_INLINE_SHELL_RM_PROMPT</span><span class="k">:-</span><span class="nv">1</span><span class="si">}</span><span class="s2">"</span>
+<span class="w">  </span><span class="nb">export</span><span class="w"> </span><span class="nv">CLAUDE_CODE_DISABLE_SUBSTITUTION_RM_PROMPT</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">CLAUDE_CODE_DISABLE_SUBSTITUTION_RM_PROMPT</span><span class="k">:-</span><span class="nv">1</span><span class="si">}</span><span class="s2">"</span>
 <span class="w">  </span><span class="nb">exec</span><span class="w"> </span><span class="s2">"</span><span class="nv">$REAL_CLAUDE</span><span class="s2">"</span><span class="w"> </span>--model<span class="w"> </span><span class="s2">"</span><span class="nv">$mymodel</span><span class="s2">"</span><span class="w"> </span>--dangerously-skip-permissions<span class="w"> </span><span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span>
 <span class="k">else</span>
 <span class="w">  </span><span class="nb">exec</span><span class="w"> </span><span class="s2">"</span><span class="nv">$REAL_CLAUDE</span><span class="s2">"</span><span class="w"> </span>--model<span class="w"> </span><span class="s2">"</span><span class="nv">$mymodel</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
@@ -5135,7 +5143,7 @@ Execute Claude Code now? (y/n):
 <li><strong>Inference Backend</strong>: native claude.ai login (<code>claude /login</code>), AWS Bedrock, Azure AI Foundry (<code>CLAUDE_CODE_USE_FOUNDRY=1</code>), or local LLM (<code>--local</code>). Force a specific cloud backend per run with <code>--aws</code> (Bedrock) or <code>--az</code> (Foundry).</li>
 <li><strong>Permissions</strong>: By default the wrapper uses <code>--allowedTools</code> / <code>--disallowedTools</code> to allow a broad but safe set of commands. To grant full unrestricted permissions:
   <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>claude<span class="w"> </span>default<span class="w"> </span>yolo<span class="w">     </span><span class="c1"># enables --dangerously-skip-permissions (with IS_SANDBOX=1)</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>claude<span class="w"> </span>default<span class="w"> </span>yolo<span class="w">     </span><span class="c1"># enables --dangerously-skip-permissions (with IS_SANDBOX=1 and the rm-prompt opt-outs)</span>
 claude<span class="w"> </span>default<span class="w"> </span>noyolo<span class="w">   </span><span class="c1"># reverts to allowedTools mode</span>
 </code></pre></div></td></tr></table></div></li>
 <li><strong>Model Selection</strong>: Easy switching between Haiku (fast), Sonnet (balanced), Opus (capable), and Fable (most capable); see the <a href="#1m-context-window-by-backend">1M context matrix</a> for which variants each backend uses</li>
