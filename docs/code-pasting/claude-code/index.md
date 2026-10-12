@@ -161,14 +161,14 @@ Save these settings to ~/.azure/clauderc for future sessions? (Y/n):
 After saving, every subsequent launch sources `~/.azure/clauderc` automatically and shows:
 
 ```
-Reading ~/.azure/clauderc, Foundry Model: claude-haiku-4-5, URL: https://<your-endpoint>.services.ai.azure.com/...
+Reading ~/.azure/clauderc, Foundry Model: claude-haiku-5-5, URL: https://<your-endpoint>.services.ai.azure.com/...
 ```
 
 When `CLAUDE_CODE_USE_FOUNDRY=1` is active, model defaults switch to plain Anthropic model names (no Bedrock prefixes):
 
 | Alias  | Default model       |
 |--------|---------------------|
-| haiku  | `claude-haiku-4-5`  |
+| haiku  | `claude-haiku-5-5`  |
 | sonnet | `claude-sonnet-5-5` |
 | opus   | `claude-opus-5-5`   |
 | fable  | `claude-fable-5-1`    |
@@ -437,11 +437,11 @@ The flag can appear anywhere in the argument list. It prints a summary to stderr
 
 Environment variables set by wrapper:
   ANTHROPIC_MODEL=global.anthropic.claude-sonnet-5-5[1m]
-  ANTHROPIC_DEFAULT_HAIKU_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
+  ANTHROPIC_DEFAULT_HAIKU_MODEL=global.anthropic.claude-haiku-5-5
   ANTHROPIC_DEFAULT_SONNET_MODEL=global.anthropic.claude-sonnet-5-5[1m]
   ANTHROPIC_DEFAULT_OPUS_MODEL=global.anthropic.claude-opus-5-5[1m]
   ANTHROPIC_DEFAULT_FABLE_MODEL=global.anthropic.claude-fable-5-1[1m]
-  ANTHROPIC_SMALL_FAST_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
+  ANTHROPIC_SMALL_FAST_MODEL=global.anthropic.claude-haiku-5-5
   CLAUDE_CODE_USE_BEDROCK=1
   AWS_DEFAULT_REGION=us-west-2
   AWS_PROFILE=bedrock
