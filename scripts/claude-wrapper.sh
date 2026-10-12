@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.47"
+WRAPPER_VERSION="1.48"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -1101,7 +1101,7 @@ if [[ "$wdebug" -eq 1 ]]; then
   done
   echo "" >&2
   if [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
-    echo "Command: IS_SANDBOX=${IS_SANDBOX:-1} $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
+    echo "Command: IS_SANDBOX=${IS_SANDBOX:-1} CLAUDE_CODE_DISABLE_INLINE_SHELL_RM_PROMPT=${CLAUDE_CODE_DISABLE_INLINE_SHELL_RM_PROMPT:-1} CLAUDE_CODE_DISABLE_SUBSTITUTION_RM_PROMPT=${CLAUDE_CODE_DISABLE_SUBSTITUTION_RM_PROMPT:-1} $REAL_CLAUDE --model $mymodel --dangerously-skip-permissions $*" >&2
   else
     echo "Command: $REAL_CLAUDE --model $mymodel --allowedTools <list> --disallowedTools <list> $*" >&2
   fi
@@ -1204,6 +1204,10 @@ if [[ "${WRAPPER_YOLO:-0}" == "1" ]]; then
   # "could not be checked — Do you want to proceed?" prompt. It only declares
   # a sandbox, it does not create one. A value already set by the user wins.
   export IS_SANDBOX="${IS_SANDBOX:-1}"
+  # Also silence the dedicated rm prompts for `sh -c '... rm ...'` scripts and
+  # for rm inside $(...) / `...` substitutions, which fire even under a bypass.
+  export CLAUDE_CODE_DISABLE_INLINE_SHELL_RM_PROMPT="${CLAUDE_CODE_DISABLE_INLINE_SHELL_RM_PROMPT:-1}"
+  export CLAUDE_CODE_DISABLE_SUBSTITUTION_RM_PROMPT="${CLAUDE_CODE_DISABLE_SUBSTITUTION_RM_PROMPT:-1}"
   exec "$REAL_CLAUDE" --model "$mymodel" --dangerously-skip-permissions "$@"
 else
   exec "$REAL_CLAUDE" --model "$mymodel" \

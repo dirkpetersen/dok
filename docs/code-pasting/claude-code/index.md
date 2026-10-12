@@ -458,7 +458,7 @@ Answering `y` launches Claude Code; anything else exits without running it. This
 - **Inference Backend**: native claude.ai login (`claude /login`), AWS Bedrock, Azure AI Foundry (`CLAUDE_CODE_USE_FOUNDRY=1`), or local LLM (`--local`). Force a specific cloud backend per run with `--aws` (Bedrock) or `--az` (Foundry).
 - **Permissions**: By default the wrapper uses `--allowedTools` / `--disallowedTools` to allow a broad but safe set of commands. To grant full unrestricted permissions:
   ```bash
-  claude default yolo     # enables --dangerously-skip-permissions (with IS_SANDBOX=1)
+  claude default yolo     # enables --dangerously-skip-permissions (with IS_SANDBOX=1 and the rm-prompt opt-outs)
   claude default noyolo   # reverts to allowedTools mode
   ```
 - **Model Selection**: Easy switching between Haiku (fast), Sonnet (balanced), Opus (capable), and Fable (most capable); see the [1M context matrix](#1m-context-window-by-backend) for which variants each backend uses
