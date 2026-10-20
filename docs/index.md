@@ -28,7 +28,7 @@ New to this setup? Start here:
 - **[Claude Code](code-pasting/claude-code/index.md)** - AI-assisted development setup
     - [Main Setup](code-pasting/claude-code/index.md) - Bedrock integration and model selection
     - [Tutorial](code-pasting/claude-code/tutorial.md) - Complete project workflow (Haiku → Sonnet → Opus)
-- **[Tips for Claude Code](code-pasting/tips/index.md)** - Technical English (ASD-STE100), sliders, diagrams, web pages and explainer videos
+- **[Tips for Claude Code](code-pasting/tips/index.md)** - Ponytail, Anthropic skills, technical English (ASD-STE100), sliders, diagrams, web pages and explainer videos
 - **[Python](code-pasting/python/index.md)** (optional) - Indigo distribution, UV, Pixi package managers
 
 ### Cloud Platforms

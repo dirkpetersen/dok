@@ -84,6 +84,8 @@ Claude Code works in your Git repository. It reads your requirements, writes and
 
 The agent can write more code than you can read. These tips make its output easier to understand and check:
 
+- **Must have:** install [Ponytail](https://github.com/dietrichgebert/ponytail), so that the agent writes only the code that the task needs.
+- **Must have:** install the [Anthropic skills](https://github.com/anthropics/skills) for Word, Excel, PowerPoint and PDF files, and the skill creator to make your own skills.
 - Ask for **technical English** (ASD-STE100) to get short, clear text.
 - Use **sliders**, for example "80% of the way to ASD-STE100", to set how strict the style is.
 - Put your style rules in **CLAUDE.md** so that they apply to each session.
