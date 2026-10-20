@@ -855,6 +855,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#must-have-ponytail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Must have: Ponytail
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#must-have-anthropic-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Must have: Anthropic skills
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#1-ask-for-technical-english-asd-ste100" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1469,6 +1491,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#must-have-ponytail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Must have: Ponytail
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#must-have-anthropic-skills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Must have: Anthropic skills
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#1-ask-for-technical-english-asd-ste100" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1579,6 +1623,81 @@
 <h1 id="tips-for-claude-code">Tips for Claude Code<a class="headerlink" href="#tips-for-claude-code" title="Permanent link">&para;</a></h1>
 <p>The agent now does most of the typing. It writes the code and it selects the language. Your work moves up to a higher level: you tell the agent what you need, and you make sure that you understand what it did.</p>
 <p>This page gives tips that make the output of the agent easier to read, check and understand. Many of them come from a <a href="https://x.com/karpathy">post by Andrej Karpathy</a> about how to understand the outputs of language models.</p>
+<h2 id="must-have-ponytail">Must have: Ponytail<a class="headerlink" href="#must-have-ponytail" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/dietrichgebert/ponytail">Ponytail</a> is a skill that makes the agent work like a lazy senior developer: it writes only the code that the task needs. Install it before you do anything else.</p>
+<p>Before the agent writes new code, Ponytail makes it stop at the first step that solves the problem:</p>
+<ol>
+<li>Is this code necessary?</li>
+<li>Is it already in this codebase?</li>
+<li>Does the standard library do it?</li>
+<li>Is it a native feature of the platform?</li>
+<li>Does an installed dependency do it?</li>
+<li>Can it be one line?</li>
+<li>Only then: write the minimum code that works, plus one small test if the code has logic.</li>
+</ol>
+<p>It is lazy about the solution, not about the work. It reads the code that the change touches before it selects a step, and it never removes validation, error handling, security or accessibility. Each reply ends with what it did not do or did not check.</p>
+<p>Less code means less code for you to read and understand. This is the same goal as the other tips on this page. The author's benchmark in Claude Code shows approximately half the code, less time and less cost, with more tests for risky logic. See the <a href="https://github.com/dietrichgebert/ponytail#numbers">numbers</a>.</p>
+<p><strong>Install in Claude Code</strong> (two separate prompts):</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>/plugin marketplace add DietrichGebert/ponytail
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>/plugin install ponytail@ponytail
+</code></pre></div></td></tr></table></div>
+<p>After the install, Ponytail is active in each session. Useful commands:</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/ponytail lite</code>, <code>full</code>, <code>ultra</code> or <code>off</code></td>
+<td>Set the intensity, or turn it off.</td>
+</tr>
+<tr>
+<td><code>/ponytail-review</code></td>
+<td>Review the current change: bugs, security, load, missing tests, slow code and code to remove.</td>
+</tr>
+<tr>
+<td><code>/ponytail-audit</code></td>
+<td>The same review for the full repository, most important problem first.</td>
+</tr>
+<tr>
+<td><code>/ponytail-debt</code></td>
+<td>Collect the <code>shortcut:</code> comments into a list, so that "later" does not become "never".</td>
+</tr>
+<tr>
+<td><code>/ponytail band</code></td>
+<td>Show or hide the band above the prompt with cost, tokens, agent time and test results.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Install only from the original source</p>
+<p>Install Ponytail only from <code>DietrichGebert/ponytail</code> on GitHub or <code>@dietrichgebert/ponytail</code> on npm. The author says that it never contains <code>.exe</code> or <code>.dll</code> files. A copy that does is not genuine.</p>
+</div>
+<h2 id="must-have-anthropic-skills">Must have: Anthropic skills<a class="headerlink" href="#must-have-anthropic-skills" title="Permanent link">&para;</a></h2>
+<p>A skill is a folder with a <code>SKILL.md</code> file. It contains instructions, scripts and resources that teach the agent one task. Claude Code loads a skill only when the task needs it. Anthropic publishes its own skills in <a href="https://github.com/anthropics/skills">anthropics/skills</a>. Two plugins from this repository are must haves.</p>
+<p><strong>Office documents</strong> (<code>document-skills</code>): Word (<code>docx</code>), Excel (<code>xlsx</code>), PowerPoint (<code>pptx</code>) and PDF (<code>pdf</code>). These are the same skills that create and edit files in claude.ai. With them, the agent can read, create and change real Office files, for example a report with a table of contents, a spreadsheet with working formulas or a slide deck from a template. It can also fill PDF forms, merge PDFs and extract text and tables.</p>
+<p><strong>Skill creator</strong> (<code>skill-creator</code>, in <code>example-skills</code>): it helps you make your own skills. When you do the same task again and again, ask the agent to make a skill for it. The skill creator writes the <code>SKILL.md</code>, tests the skill and improves its description so that Claude Code uses it at the correct time.</p>
+<p><strong>Install in Claude Code:</strong></p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>/plugin marketplace add anthropics/skills
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>/plugin install document-skills@anthropic-agent-skills
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>/plugin install example-skills@anthropic-agent-skills
+</code></pre></div></td></tr></table></div>
+<p>The <code>example-skills</code> plugin also contains other useful skills, for example <code>frontend-design</code> for better web pages (see <a href="#5-ask-for-a-web-page">tip 5</a>) and <code>webapp-testing</code>.</p>
+<p>After the install, you do not need a special command. Tell the agent what you need, and it uses the skill:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>Make a Word report from results.csv with a summary table and a chart.
+</code></pre></div></td></tr></table></div>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>Make a skill that converts our lab notebook exports to the format of our LIMS.
+</code></pre></div></td></tr></table></div>
+<div class="admonition note">
+<p class="admonition-title">License</p>
+<p>The Office document skills are source-available, not open source. Most of the other skills in the repository use the Apache 2.0 license.</p>
+</div>
 <h2 id="1-ask-for-technical-english-asd-ste100">1. Ask for technical English (ASD-STE100)<a class="headerlink" href="#1-ask-for-technical-english-asd-ste100" title="Permanent link">&para;</a></h2>
 <p>ASD-STE100 is a controlled language. It is also known as Simplified Technical English (STE). The aerospace industry made it for aircraft maintenance documentation, where a misunderstood sentence can cause an accident.</p>
 <p>The rules are strict, for example:</p>
@@ -1701,6 +1820,8 @@ Use Manim. Add narration with my ElevenLabs API key.
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <ul>
 <li>The agent does more of the work. Your work moves to <strong>oversight and understanding</strong>.</li>
+<li>Install <strong>Ponytail</strong> so that the agent writes only the code that the task needs.</li>
+<li>Install the <strong>Anthropic skills</strong> for Office documents, and use the <strong>skill creator</strong> to make your own skills.</li>
 <li>Ask for <strong>ASD-STE100</strong> to get clear text, and use <strong>sliders</strong> to set how strict it is.</li>
 <li>Put your preferred style in <strong>CLAUDE.md</strong> so that it applies to each session.</li>
 <li>Ask for <strong>diagrams</strong>, <strong>web pages</strong> and <strong>videos</strong> when text is not the best format.</li>
