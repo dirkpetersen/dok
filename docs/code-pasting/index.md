@@ -1,6 +1,6 @@
 # Code Pasting
 
-Modern software development through articulate requirements and AI-assisted tooling.
+Modern software development with clear requirements and an AI agent that writes the code.
 
 ## Quick Start
 
@@ -10,111 +10,89 @@ Set up a complete development workstation with one command:
 curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/dev-station-install.sh" | bash
 ```
 
-This installs shell configuration, AWS CLI, Node.js, and the Claude Code wrapper - everything needed to start AI-assisted development. No sudo required.
+This installs the shell configuration, the AWS CLI, Node.js and the Claude Code wrapper. You do not need sudo.
 
 !!! tip "Full interactive setup"
-    For complete setup with SSH keys, GPG signing, and Git configuration:
+    For a complete setup with SSH keys, GPG signing and Git configuration:
     ```bash
     curl -fsSL "https://raw.githubusercontent.com/dirkpetersen/dok/main/scripts/dev-station-install.sh" | bash -s -- --full
     ```
 
 ## Philosophy
 
-In 2025, effective software development is fundamentally about **clear communication of requirements**. The traditional approach of typing code directly is being augmented (and often replaced) by a more refined process:
+The agent now writes most of the code, and it also selects the programming language. Your work is different:
 
-1. **Articulate Requirements** - Express what you need clearly
-2. **Document in Markdown** - Use plain text that AI can understand perfectly
-3. **Version Control with GitHub** - Maintain organized, collaborative workflows
-4. **AI-Assisted Development** - Leverage modern tools like Claude Code
-5. **Manage Dependencies** - Handle the complexities of your tech stack
+1. **Tell the agent what you need.** Write clear requirements in Markdown.
+2. **Keep everything in Git.** Requirements, code and history go to GitHub.
+3. **Let the agent do the work.** Claude Code reads the requirements and writes the code.
+4. **Understand and check the result.** Ask for output that is easy to read: technical English, diagrams and web pages.
 
-This approach is more effective than "vibe coding" because it enforces clarity, maintainability, and reproducibility.
+Step 4 becomes more important each year. When the agent does more of the work, your main job is oversight and understanding.
+
+This method is better than "vibe coding" because it is clear, it is easy to maintain and you can repeat it.
 
 ## Why "Code Pasting"?
 
-The term captures the modern workflow:
+The name describes the workflow:
 
-- You **articulate** your requirements in markdown
-- You **paste** them into an AI tool
-- The AI **understands** your needs from clear documentation
-- You **paste** the generated code into version control
-- You **iterate** with feedback and refinement
+- You **write** your requirements in Markdown.
+- You **paste** them into the agent.
+- The agent **writes** the code from the requirements.
+- You **check** the result and **commit** it to version control.
+- You **repeat** with feedback until the result is correct.
 
-It's not about haphazard copying—it's about purposeful, documented development.
+It is not careless copying. It is development with a clear specification.
 
 ## The Four Pillars
 
 ### 1. [Markdown](markdown/index.md)
 
-**The Foundation of Communication**
+**The language of requirements**
 
-Markdown is the universal language for documentation and requirement specification. When your requirements are in well-structured markdown, AI tools can:
-- Parse structure effortlessly
-- Understand context precisely
-- Generate code that matches your intent
-- Help you iterate on specifications
+Markdown is plain text with a simple structure. Humans can read it easily and agents can parse it reliably. Good requirements in Markdown give you code that matches what you need.
 
-Topics:
-- Markdown syntax and best practices
+- Markdown syntax and good practices
 - Documentation patterns
-- Requirement specification formats
-- Creating effective prompts for AI
+- Requirement formats
+- Effective prompts for an agent
 
 ### 2. [GitHub](github/index.md)
 
-**Version Control and Collaboration**
+**Version control and collaboration**
 
-GitHub is the backbone of modern development:
-- Track requirements and changes
-- Collaborate with teams
-- Integrate with AI tools
-- Maintain history and accountability
-- Publish your work
+GitHub keeps the history of your requirements and your code. It lets you work with a team and with agents.
 
-Topics:
 - SSH authentication and setup
-- GitHub CLI for productivity
-- Git workflows and best practices
+- GitHub CLI
+- Git workflows
 - Collaboration patterns
 
 ### 3. [Claude Code](claude-code/index.md)
 
-**AI-Assisted Development**
+**The agent that does the work**
 
-Claude Code represents the next generation of development tools:
-- Understands complex requirements
-- Generates production-ready code
-- Operates within git repositories
-- Supports multiple AI models (Haiku, Sonnet, Opus)
-- Integrates with your AWS infrastructure
+Claude Code works in your Git repository. It reads your requirements, writes and changes code, runs commands and tests, and commits the result.
 
-Topics:
-- Setup with AWS Bedrock
-- Model selection and usage
-- Integration with git workflows
-- Best practices for AI-assisted coding
+- Setup with a claude.ai login, AWS Bedrock, Azure AI Foundry or a local LLM
+- Model selection (Haiku, Sonnet, Opus, Fable)
+- The `claude` wrapper and its permission modes
+- A complete [tutorial](claude-code/tutorial.md)
 
-### 4. [Python](python/index.md)
+### 4. [Tips for Claude Code](tips/index.md)
 
-**The Ecosystem of Science and AI**
+**Understand what the agent did**
 
-Python is the primary ecosystem for AI and scientific computing. While language choice varies by use case, Python's ecosystem deserves special attention:
-- ML/AI frameworks (PyTorch, TensorFlow, transformers)
-- Scientific computing (NumPy, SciPy, Pandas)
-- Data visualization and analysis
-- Quirks and best practices unique to Python
+The agent can write more code than you can read. These tips make its output easier to understand and check:
 
-Topics:
-- Modern Python tooling (UV, Pixi)
-- Virtual environments and dependency management
-- Common gotchas and solutions
-- Integration with AI workflows
+- Ask for **technical English** (ASD-STE100) to get short, clear text.
+- Use **sliders**, for example "80% of the way to ASD-STE100", to set how strict the style is.
+- Put your style rules in **CLAUDE.md** so that they apply to each session.
+- Ask for **diagrams**, **web pages** and **explainer videos** when text is not the best format.
+- Make **discardable software** that helps you understand one problem.
 
 ## The Workflow
 
-### Step 1: Define Requirements (Markdown)
-
-Write clear, structured requirements in markdown:
+### Step 1: Write the requirements (Markdown)
 
 ```markdown
 # Feature: User Authentication
@@ -131,12 +109,10 @@ Write clear, structured requirements in markdown:
 
 ## Success Criteria
 - All tests pass
-- Performance <100ms for login
+- Login takes less than 100 ms
 ```
 
-### Step 2: Version Control (GitHub)
-
-Commit your requirements to your repository:
+### Step 2: Commit them (GitHub)
 
 ```bash
 git add requirements.md
@@ -144,70 +120,57 @@ git commit -m "Add user authentication requirements"
 git push origin main
 ```
 
-### Step 3: Generate Code (Claude Code)
+### Step 3: Let the agent do the work (Claude Code)
 
-Paste requirements into Claude Code:
+Start Claude Code in the project directory and give it the requirements:
 
 ```bash
-claude /path/to/project
+cd ~/my-project
+claude
 ```
 
-Provide the requirements document to Claude—the tool understands markdown perfectly and can generate code that matches your specification.
+```text
+Implement the feature in requirements.md. Select a suitable language and framework.
+```
 
-### Step 4: Iterate and Refine
+### Step 4: Understand and check the result
 
-- Review generated code
-- Commit to GitHub
-- Update requirements based on learnings
-- Re-run Claude Code with updated specs
-- Merge and deploy
+Do not accept the result without understanding it. Ask the agent to explain it in a format that is easy to check:
 
-## Why This Works
+```text
+Explain what you changed. Use 80% ASD-STE100 and add a Mermaid diagram of the new flow.
+```
 
-### For AI Tools
-- Markdown is unambiguous
-- AI can parse structure reliably
-- Plain text avoids parsing errors
-- Requirements are self-documenting
+Then:
 
-### For Developers
-- Clear specification prevents miscommunication
-- Requirements become documentation
-- Easy to iterate with AI
-- Entire workflow is versionable
+- Review the changes and the tests.
+- Commit to GitHub.
+- Update the requirements with what you learned.
+- Repeat.
 
-### For Teams
-- Markdown enables collaboration
-- GitHub provides visibility
-- AI tools democratize capabilities
-- Python ecosystem is well-established
+## Good Practices
 
-## Best Practices
+**Do:**
 
-- ✅ **Document first** - Start with markdown requirements
-- ✅ **Be specific** - AI works best with clear specs
-- ✅ **Use examples** - Show what success looks like
-- ✅ **Version everything** - Git all requirements and code
-- ✅ **Iterate together** - Refine with AI feedback
-- ❌ **Don't assume** - Always specify constraints
-- ❌ **Skip documentation** - Markdown IS the foundation
-- ❌ **Ignore edge cases** - Specify them in requirements
+- Write the requirements first.
+- Be specific. Give constraints and success criteria.
+- Give examples of a correct result.
+- Keep requirements and code in Git.
+- Ask the agent to explain its work in clear technical English.
+
+**Do not:**
+
+- Assume that the agent knows constraints that you did not write down.
+- Forget edge cases. Put them in the requirements.
+- Accept code that you do not understand.
 
 ## Getting Started
 
-1. Start with [Markdown](markdown/index.md) to understand documentation best practices
-2. Set up [GitHub](github/index.md) for version control
-3. Configure [Claude Code](claude-code/index.md) for AI-assisted development
-4. Explore [Python](python/index.md) if building AI/ML projects
+1. Learn [Markdown](markdown/index.md) to write good requirements.
+2. Set up [GitHub](github/index.md) for version control.
+3. Configure [Claude Code](claude-code/index.md) and do the [tutorial](claude-code/tutorial.md).
+4. Read the [Tips for Claude Code](tips/index.md) to understand what the agent makes.
 
-## The Future of Development
+## Language Toolchains (Optional)
 
-This approach represents how software development is evolving in 2025:
-
-- **Less typing** - AI handles code generation
-- **More thinking** - Clear specification is paramount
-- **Better collaboration** - Documentation enables team understanding
-- **Faster iteration** - AI suggests, you refine
-- **Reproducible workflows** - Everything is documented and versioned
-
-By mastering these four pillars, you're not just keeping up with development trends—you're leading the way.
+The agent selects the programming language for each task, so you do not need to learn a language before you start. But some ecosystems have their own tools and problems. If you work with AI, machine learning or scientific computing, see the [Python](python/index.md) page for package managers (UV, Pixi) and environment setup.

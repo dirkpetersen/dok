@@ -48,7 +48,8 @@ nav:
       - Markdown: code-pasting/markdown/index.md
       - GitHub: code-pasting/github/index.md
       - Claude Code: code-pasting/claude-code/index.md
-      - Python: code-pasting/python/index.md
+      - Tips for Claude Code: code-pasting/tips/index.md
+      - Python (optional): code-pasting/python/index.md
   - Nvidia: nvidia/index.md
   - Clouds:
       - '': clouds/index.md
@@ -67,7 +68,11 @@ markdown_extensions:
   - admonition
   - attr_list
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tasklist
   - pymdownx.highlight:
       linenums: true
