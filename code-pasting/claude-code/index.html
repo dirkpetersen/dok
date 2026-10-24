@@ -3493,13 +3493,17 @@
 <span class="normal">1198</span>
 <span class="normal">1199</span>
 <span class="normal">1200</span>
-<span class="normal">1201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1201</span>
+<span class="normal">1202</span>
+<span class="normal">1203</span>
+<span class="normal">1204</span>
+<span class="normal">1205</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># claude-wrapper.sh</span>
 <span class="c1"># Wrapper script for Claude Code with AWS Bedrock integration</span>
 <span class="c1"># Provides easy model switching and proper permission handling</span>
 
 <span class="nv">SCRIPT_NAME</span><span class="o">=</span><span class="s2">"claude-wrapper.sh"</span>
-<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.50"</span>
+<span class="nv">WRAPPER_VERSION</span><span class="o">=</span><span class="s2">"1.51"</span>
 <span class="nv">INSTALL_DIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/bin"</span>
 <span class="nv">WRAPPER_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/</span><span class="nv">$SCRIPT_NAME</span><span class="s2">"</span>
 <span class="nv">SYMLINK_PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$INSTALL_DIR</span><span class="s2">/claude"</span>
@@ -3616,6 +3620,7 @@ _prompt_relogin<span class="o">()</span><span class="w"> </span><span class="o">
 <span class="w">  </span><span class="nb">read</span><span class="w"> </span>-rp<span class="w"> </span><span class="s2">"Log in to claude.ai again? (Y/n/never): "</span><span class="w"> </span>_relogin_confirm
 <span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">"</span><span class="nv">$_relogin_confirm</span><span class="s2">"</span><span class="w"> </span><span class="k">in</span>
 <span class="w">    </span><span class="s2">""</span><span class="p">|</span>y<span class="p">|</span>Y<span class="p">|</span>yes<span class="p">|</span>YES<span class="o">)</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Paste the code from the browser and press Enter. The code stays hidden while you paste it.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <span class="w">      </span><span class="s2">"</span><span class="nv">$REAL_CLAUDE</span><span class="s2">"</span><span class="w"> </span>auth<span class="w"> </span>login
 <span class="w">      </span><span class="k">if</span><span class="w"> </span>_is_claude_logged_in<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">        </span>_record_claudeai_login
@@ -3989,7 +3994,10 @@ _migrate_to_wrapper_env
 <span class="w">  </span>/login<span class="p">|</span>login<span class="p">|</span>/logout<span class="p">|</span>logout<span class="p">|</span>auth<span class="p">|</span>setup-token<span class="o">)</span>
 <span class="w">    </span><span class="nv">_auth_args</span><span class="o">=(</span><span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span><span class="o">)</span>
 <span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s2">"</span><span class="nv">$1</span><span class="s2">"</span><span class="w"> </span><span class="k">in</span>
-<span class="w">      </span>/login<span class="p">|</span>login<span class="o">)</span><span class="w">   </span><span class="nv">_auth_args</span><span class="o">=(</span>auth<span class="w"> </span>login<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="p">@:</span><span class="nv">2</span><span class="si">}</span><span class="s2">"</span><span class="o">)</span><span class="w"> </span><span class="p">;;</span>
+<span class="w">      </span><span class="c1"># The full interface shows the pasted code masked ("*****ODE123");</span>
+<span class="w">      </span><span class="c1"># `claude auth login` shows nothing while you paste, so use it only</span>
+<span class="w">      </span><span class="c1"># when options such as --email or --sso are given (only it takes them).</span>
+<span class="w">      </span>/login<span class="p">|</span>login<span class="o">)</span><span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span><span class="nv">$#</span><span class="w"> </span>&gt;<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="nv">_auth_args</span><span class="o">=(</span>auth<span class="w"> </span>login<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="p">@:</span><span class="nv">2</span><span class="si">}</span><span class="s2">"</span><span class="o">)</span><span class="p">;</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="nv">_auth_args</span><span class="o">=(</span>/login<span class="o">)</span><span class="p">;</span><span class="w"> </span><span class="k">fi</span><span class="w"> </span><span class="p">;;</span>
 <span class="w">      </span>/logout<span class="p">|</span><span class="nb">logout</span><span class="o">)</span><span class="w"> </span><span class="nv">_auth_args</span><span class="o">=(</span>auth<span class="w"> </span><span class="nb">logout</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="p">@:</span><span class="nv">2</span><span class="si">}</span><span class="s2">"</span><span class="o">)</span><span class="w"> </span><span class="p">;;</span>
 <span class="w">    </span><span class="k">esac</span>
 <span class="w">    </span><span class="nb">exec</span><span class="w"> </span>env<span class="w"> </span>-u<span class="w"> </span>ANTHROPIC_API_KEY<span class="w"> </span>-u<span class="w"> </span>ANTHROPIC_BASE_URL<span class="w"> </span><span class="se">\</span>
