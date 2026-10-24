@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.50"
+WRAPPER_VERSION="1.51"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -121,6 +121,7 @@ _prompt_relogin() {
   read -rp "Log in to claude.ai again? (Y/n/never): " _relogin_confirm
   case "$_relogin_confirm" in
     ""|y|Y|yes|YES)
+      echo -e "${YELLOW}Paste the code from the browser and press Enter. The code stays hidden while you paste it.${NC}" >&2
       "$REAL_CLAUDE" auth login
       if _is_claude_logged_in; then
         _record_claudeai_login
@@ -494,7 +495,10 @@ case "$1" in
   /login|login|/logout|logout|auth|setup-token)
     _auth_args=("$@")
     case "$1" in
-      /login|login)   _auth_args=(auth login "${@:2}") ;;
+      # The full interface shows the pasted code masked ("*****ODE123");
+      # `claude auth login` shows nothing while you paste, so use it only
+      # when options such as --email or --sso are given (only it takes them).
+      /login|login)   if (( $# > 1 )); then _auth_args=(auth login "${@:2}"); else _auth_args=(/login); fi ;;
       /logout|logout) _auth_args=(auth logout "${@:2}") ;;
     esac
     exec env -u ANTHROPIC_API_KEY -u ANTHROPIC_BASE_URL \
