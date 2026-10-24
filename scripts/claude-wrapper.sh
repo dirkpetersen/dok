@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.49"
+WRAPPER_VERSION="1.50"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -205,60 +205,29 @@ verify_path_configuration() {
     source_cmd=". $rc_file"
   fi
 
-  # Check if ~/bin is in PATH
-  if [[ ":$PATH:" != *":$home_bin:"* ]]; then
-    echo -e "${RED}✗ Error: $home_bin is not in PATH${NC}" >&2
-    echo "" >&2
-    echo "To fix this, add the following to $rc_file:" >&2
-    echo "" >&2
-    echo "  $path_cmd" >&2
-    echo "" >&2
-    echo "Then reload your shell:" >&2
-    echo "  $source_cmd" >&2
-    echo "" >&2
-    return 1
-  fi
-
-  # Check if ~/.local/bin is in PATH
-  if [[ ":$PATH:" != *":$home_local_bin:"* ]]; then
-    echo -e "${RED}✗ Error: $home_local_bin is not in PATH${NC}" >&2
-    echo "" >&2
-    echo "To fix this, add the following to $rc_file:" >&2
-    echo "" >&2
-    echo "  $path_cmd" >&2
-    echo "" >&2
-    echo "Then reload your shell:" >&2
-    echo "  $source_cmd" >&2
-    echo "" >&2
-    return 1
-  fi
-
-  # Check if ~/bin comes before ~/.local/bin
-  # Add colons to beginning and end for easier matching
+  # ~/bin must be in PATH and come before ~/.local/bin, so `claude` finds this
+  # wrapper before the real binary.
   local normalized_path=":$PATH:"
-
-  # Find the position of first occurrence of each directory
   local bin_pos="${normalized_path%%:$home_bin:*}"
   local local_bin_pos="${normalized_path%%:$home_local_bin:*}"
-
-  # If local_bin appears before bin, the prefix will be shorter
-  if [[ ${#local_bin_pos} -lt ${#bin_pos} ]]; then
-    echo -e "${RED}✗ Error: $home_bin must come before $home_local_bin in PATH${NC}" >&2
-    echo "" >&2
-    echo "Current PATH order:" >&2
-    echo "  $home_local_bin comes first" >&2
-    echo "  $home_bin comes second" >&2
-    echo "" >&2
-    echo "To fix this, ensure $rc_file has:" >&2
-    echo "" >&2
-    echo "  $path_cmd" >&2
-    echo "" >&2
-    echo "Then reload your shell:" >&2
-    echo "  $source_cmd" >&2
-    echo "" >&2
-    return 1
+  if [[ "$normalized_path" == *":$home_bin:"* && "$normalized_path" == *":$home_local_bin:"* ]] \
+     && (( ${#bin_pos} < ${#local_bin_pos} )); then
+    return 0
   fi
 
+  # Not set up: fix it instead of asking the user to paste the same line.
+  local rc_path="${rc_file/#\~/$HOME}"
+  if ! grep -qF "$path_cmd" "$rc_path" 2>/dev/null; then
+    if ! printf '\n%s\n' "$path_cmd" >> "$rc_path"; then
+      echo -e "${RED}✗ Error: $home_bin is not in PATH and $rc_file is not writable${NC}" >&2
+      echo "Add this line to $rc_file, then run: $source_cmd" >&2
+      echo "  $path_cmd" >&2
+      return 1
+    fi
+    echo -e "${GREEN}✓${NC} Added $home_bin and $home_local_bin to PATH in $rc_file" >&2
+  fi
+  export PATH="$home_bin:$home_local_bin:$PATH"
+  echo -e "${YELLOW}  Open a new terminal or run '$source_cmd' to use it in this shell.${NC}" >&2
   return 0
 }
 
