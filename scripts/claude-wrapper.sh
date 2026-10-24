@@ -4,7 +4,7 @@
 # Provides easy model switching and proper permission handling
 
 SCRIPT_NAME="claude-wrapper.sh"
-WRAPPER_VERSION="1.48"
+WRAPPER_VERSION="1.49"
 INSTALL_DIR="$HOME/bin"
 WRAPPER_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 SYMLINK_PATH="$INSTALL_DIR/claude"
@@ -518,6 +518,21 @@ REAL_CLAUDE=$(find_claude_binary)
 if [[ $? -ne 0 ]]; then
   exit 1
 fi
+
+# Login commands go straight to Claude Code: they must work before any backend
+# is configured, and they must sign in to claude.ai, not to Foundry or Bedrock.
+case "$1" in
+  /login|login|/logout|logout|auth|setup-token)
+    _auth_args=("$@")
+    case "$1" in
+      /login|login)   _auth_args=(auth login "${@:2}") ;;
+      /logout|logout) _auth_args=(auth logout "${@:2}") ;;
+    esac
+    exec env -u ANTHROPIC_API_KEY -u ANTHROPIC_BASE_URL \
+      CLAUDE_CODE_USE_FOUNDRY=0 CLAUDE_CODE_USE_BEDROCK=0 \
+      "$REAL_CLAUDE" "${_auth_args[@]}"
+    ;;
+esac
 
 # Check if --models flag is used
 if [[ "$1" == "--models" ]]; then
