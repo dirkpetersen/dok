@@ -3541,48 +3541,7 @@
 <span class="normal">1772</span>
 <span class="normal">1773</span>
 <span class="normal">1774</span>
-<span class="normal">1775</span>
-<span class="normal">1776</span>
-<span class="normal">1777</span>
-<span class="normal">1778</span>
-<span class="normal">1779</span>
-<span class="normal">1780</span>
-<span class="normal">1781</span>
-<span class="normal">1782</span>
-<span class="normal">1783</span>
-<span class="normal">1784</span>
-<span class="normal">1785</span>
-<span class="normal">1786</span>
-<span class="normal">1787</span>
-<span class="normal">1788</span>
-<span class="normal">1789</span>
-<span class="normal">1790</span>
-<span class="normal">1791</span>
-<span class="normal">1792</span>
-<span class="normal">1793</span>
-<span class="normal">1794</span>
-<span class="normal">1795</span>
-<span class="normal">1796</span>
-<span class="normal">1797</span>
-<span class="normal">1798</span>
-<span class="normal">1799</span>
-<span class="normal">1800</span>
-<span class="normal">1801</span>
-<span class="normal">1802</span>
-<span class="normal">1803</span>
-<span class="normal">1804</span>
-<span class="normal">1805</span>
-<span class="normal">1806</span>
-<span class="normal">1807</span>
-<span class="normal">1808</span>
-<span class="normal">1809</span>
-<span class="normal">1810</span>
-<span class="normal">1811</span>
-<span class="normal">1812</span>
-<span class="normal">1813</span>
-<span class="normal">1814</span>
-<span class="normal">1815</span>
-<span class="normal">1816</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1775</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -4532,30 +4491,6 @@ setup_convenience_settings<span class="o">()</span><span class="w"> </span><span
 <span class="w">  </span><span class="o">[[</span><span class="w"> </span><span class="nv">$old_opts</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>*e*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-e
 <span class="o">}</span>
 
-<span class="c1"># Function to check if SSH key has a password</span>
-ssh_key_has_password<span class="o">()</span><span class="w"> </span><span class="o">{</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">key_file</span><span class="o">=</span><span class="s2">"</span><span class="nv">$1</span><span class="s2">"</span>
-<span class="w">  </span><span class="c1"># Check for encryption markers in OpenSSH format keys</span>
-<span class="w">  </span><span class="c1"># Encrypted keys contain "aes" or "ENCRYPTED" markers</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-f<span class="w"> </span><span class="s2">"</span><span class="nv">$key_file</span><span class="s2">"</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">1</span><span class="w">  </span><span class="c1"># File doesn't exist</span>
-<span class="w">  </span><span class="k">fi</span>
-
-<span class="w">  </span><span class="c1"># Check in the base64-decoded content (OpenSSH format stores cipher info base64-encoded)</span>
-<span class="w">  </span><span class="c1"># Extract the second line (first base64 line) and decode it</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">key_header</span><span class="o">=</span><span class="k">$(</span>head<span class="w"> </span>-2<span class="w"> </span><span class="s2">"</span><span class="nv">$key_file</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-1<span class="k">)</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"</span><span class="nv">$key_header</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">"aes"</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span><span class="w">  </span><span class="c1"># Has password (encrypted)</span>
-<span class="w">  </span><span class="k">fi</span>
-
-<span class="w">  </span><span class="c1"># Also check for legacy PEM format with ENCRYPTED marker</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">"ENCRYPTED"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$key_file</span><span class="s2">"</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span><span class="w">  </span><span class="c1"># Has password (encrypted)</span>
-<span class="w">  </span><span class="k">fi</span>
-
-<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">1</span><span class="w">  </span><span class="c1"># No password</span>
-<span class="o">}</span>
-
 <span class="c1"># Use an existing key if there is one, so we never make a second key next to it.</span>
 <span class="c1"># Force mode keeps the old behavior: back up and replace id_ed25519.</span>
 <span class="nv">SSH_KEY_FILE</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.ssh/id_ed25519"</span>
@@ -4587,17 +4522,8 @@ setup_ssh_key<span class="o">()</span><span class="w"> </span><span class="o">{<
 <span class="w">      </span><span class="c1"># Remove existing keys so ssh-keygen doesn't prompt</span>
 <span class="w">      </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">"</span><span class="nv">$key_file</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">key_file</span><span class="si">}</span><span class="s2">.pub"</span>
 <span class="w">      </span><span class="c1"># Continue to generate new key</span>
-<span class="w">    </span><span class="k">elif</span><span class="w"> </span>ssh_key_has_password<span class="w"> </span><span class="s2">"</span><span class="nv">$key_file</span><span class="s2">"</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> SSH key has a password (encrypted)"</span>
-<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">else</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠ SSH key </span><span class="nv">$key_file</span><span class="s2"> has NO passphrase.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span>
-<span class="w">      </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">"Add a passphrase to this key now? The key itself does not change. (Y/n): "</span><span class="w"> </span>add_pass
-<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$add_pass</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"n"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">"</span><span class="nv">$add_pass</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"N"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>ssh-keygen<span class="w"> </span>-p<span class="w"> </span>-f<span class="w"> </span><span class="s2">"</span><span class="nv">$key_file</span><span class="s2">"</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">        </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Passphrase added to </span><span class="nv">$key_file</span><span class="s2">"</span>
-<span class="w">      </span><span class="k">else</span>
-<span class="w">        </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠ Using the key without a passphrase. Add one later: ssh-keygen -p -f </span><span class="nv">$key_file</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span>
-<span class="w">      </span><span class="k">fi</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Using existing SSH key </span><span class="nv">$key_file</span><span class="s2"> (keychain will load it)"</span>
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">fi</span>
@@ -4643,16 +4569,8 @@ setup_ssh_key<span class="o">()</span><span class="w"> </span><span class="o">{<
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
 <span class="w">    </span><span class="k">fi</span>
 
-<span class="w">    </span><span class="c1"># Verify key was created with password</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span>ssh_key_has_password<span class="w"> </span><span class="s2">"</span><span class="nv">$key_file</span><span class="s2">"</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> SSH key generated successfully with passphrase"</span>
-<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
-<span class="w">    </span><span class="k">else</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ SSH key was generated without a passphrase!</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Removing insecure key. Please run this script again and set a passphrase.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span>
-<span class="w">      </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">"</span><span class="nv">$key_file</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">key_file</span><span class="si">}</span><span class="s2">.pub"</span>
-<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
-<span class="w">    </span><span class="k">fi</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> SSH key generated successfully with passphrase"</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">  </span><span class="k">fi</span>
 <span class="o">}</span>
 
