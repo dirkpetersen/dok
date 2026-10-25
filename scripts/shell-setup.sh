@@ -972,11 +972,20 @@ ssh_key_has_password() {
   return 1  # No password
 }
 
+# Use an existing key if there is one, so we never make a second key next to it.
+# Force mode keeps the old behavior: back up and replace id_ed25519.
+SSH_KEY_FILE="$HOME/.ssh/id_ed25519"
+if [[ "$FORCE_MODE" != true ]]; then
+  for _k in id_ed25519 id_ecdsa id_rsa; do
+    [[ -f "$HOME/.ssh/$_k" ]] && { SSH_KEY_FILE="$HOME/.ssh/$_k"; break; }
+  done
+fi
+
 # Function to setup SSH key
 setup_ssh_key() {
   local email="$1"
   local ssh_dir="$HOME/.ssh"
-  local key_file="$ssh_dir/id_ed25519"
+  local key_file="$SSH_KEY_FILE"
 
   mkdir -p "$ssh_dir"
   chmod 700 "$ssh_dir"
@@ -998,12 +1007,14 @@ setup_ssh_key() {
       echo -e "${GREEN}✓${NC} SSH key has a password (encrypted)"
       return 0
     else
-      echo -e "${RED}✗ SSH key exists but has NO password!${NC}"
-      echo -e "${YELLOW}Please:${NC}"
-      echo "  1. Backup existing key: mv $key_file ${key_file}.bak"
-      echo "  2. Add a password to your existing key: ssh-keygen -p -f $key_file"
-      echo "  3. Run this script again, or use --force to backup and replace"
-      return 1
+      echo -e "${YELLOW}⚠ SSH key $key_file has NO passphrase.${NC}"
+      read -p "Add a passphrase to this key now? The key itself does not change. (Y/n): " add_pass
+      if [[ "$add_pass" != "n" && "$add_pass" != "N" ]] && ssh-keygen -p -f "$key_file"; then
+        echo -e "${GREEN}✓${NC} Passphrase added to $key_file"
+      else
+        echo -e "${YELLOW}⚠ Using the key without a passphrase. Add one later: ssh-keygen -p -f $key_file${NC}"
+      fi
+      return 0
     fi
   fi
 
@@ -1172,20 +1183,21 @@ EOF
 # Function to setup keychain in login profile
 setup_keychain_profile() {
   local profile=$(get_login_profile)
+  local key_name="${SSH_KEY_FILE##*/}"
 
   # Build keychain command for SSH key management
   # Use --nogui to avoid pinentry requirement (uses console prompts instead)
   local keychain_line
   if is_tcsh_shell; then
     # tcsh syntax: use backticks for command substitution and different test syntax
-    keychain_line='if ( ! $?SLURM_PTY_PORT ) eval `keychain --nogui --quiet --eval ~/.ssh/id_ed25519`'
+    keychain_line='if ( ! $?SLURM_PTY_PORT ) eval `keychain --nogui --quiet --eval ~/.ssh/'"$key_name"'`'
   else
-    keychain_line='[ -z $SLURM_PTY_PORT ] && eval $(keychain --nogui --quiet --eval ~/.ssh/id_ed25519)'
+    keychain_line='[ -z $SLURM_PTY_PORT ] && eval $(keychain --nogui --quiet --eval ~/.ssh/'"$key_name"')'
   fi
 
   if grep -q "keychain" "$profile" 2>/dev/null; then
     # Check if the desired SSH configuration already exists
-    if grep -q "keychain.*--nogui.*--quiet.*--eval.*id_ed25519" "$profile" 2>/dev/null; then
+    if grep -q "keychain.*--nogui.*--quiet.*--eval.*$key_name" "$profile" 2>/dev/null; then
       echo -e "${GREEN}✓${NC} Keychain already configured in $profile"
       return 0
     fi
@@ -1260,7 +1272,7 @@ setup_ssh_config() {
   mkdir -p "$HOME/.ssh/controlmasters"
   chmod 700 "$HOME/.ssh"
 
-  cat > "$ssh_config" << 'EOF'
+  cat > "$ssh_config" << EOF
 # SSH Connection Multiplexing and Global Defaults
 Host *
     ControlPath ~/.ssh/controlmasters/%r@%h:%p
@@ -1273,7 +1285,7 @@ Host *
 Host github.com
     HostName github.com
     User git
-    IdentityFile ~/.ssh/id_ed25519
+    IdentityFile ~/.ssh/${SSH_KEY_FILE##*/}
     AddKeysToAgent yes
 EOF
 
@@ -1748,7 +1760,7 @@ else
   echo ""
 
   echo "2. Add your SSH public key to GitHub:"
-  echo "   cat ~/.ssh/id_ed25519.pub"
+  echo "   cat $SSH_KEY_FILE.pub"
   echo "   Visit: https://github.com/settings/ssh/new"
   echo ""
 
