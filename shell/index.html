@@ -3570,7 +3570,19 @@
 <span class="normal">1801</span>
 <span class="normal">1802</span>
 <span class="normal">1803</span>
-<span class="normal">1804</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="normal">1804</span>
+<span class="normal">1805</span>
+<span class="normal">1806</span>
+<span class="normal">1807</span>
+<span class="normal">1808</span>
+<span class="normal">1809</span>
+<span class="normal">1810</span>
+<span class="normal">1811</span>
+<span class="normal">1812</span>
+<span class="normal">1813</span>
+<span class="normal">1814</span>
+<span class="normal">1815</span>
+<span class="normal">1816</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># shell-setup.sh</span>
 <span class="c1"># Comprehensive shell and SSH setup script for development environments</span>
 <span class="c1"># Works on both Linux and macOS</span>
@@ -4544,11 +4556,20 @@ ssh_key_has_password<span class="o">()</span><span class="w"> </span><span class
 <span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="m">1</span><span class="w">  </span><span class="c1"># No password</span>
 <span class="o">}</span>
 
+<span class="c1"># Use an existing key if there is one, so we never make a second key next to it.</span>
+<span class="c1"># Force mode keeps the old behavior: back up and replace id_ed25519.</span>
+<span class="nv">SSH_KEY_FILE</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.ssh/id_ed25519"</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$FORCE_MODE</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span>_k<span class="w"> </span><span class="k">in</span><span class="w"> </span>id_ed25519<span class="w"> </span>id_ecdsa<span class="w"> </span>id_rsa<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.ssh/</span><span class="nv">$_k</span><span class="s2">"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nv">SSH_KEY_FILE</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.ssh/</span><span class="nv">$_k</span><span class="s2">"</span><span class="p">;</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w"> </span><span class="o">}</span>
+<span class="w">  </span><span class="k">done</span>
+<span class="k">fi</span>
+
 <span class="c1"># Function to setup SSH key</span>
 setup_ssh_key<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">email</span><span class="o">=</span><span class="s2">"</span><span class="nv">$1</span><span class="s2">"</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ssh_dir</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.ssh"</span>
-<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">key_file</span><span class="o">=</span><span class="s2">"</span><span class="nv">$ssh_dir</span><span class="s2">/id_ed25519"</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">key_file</span><span class="o">=</span><span class="s2">"</span><span class="nv">$SSH_KEY_FILE</span><span class="s2">"</span>
 
 <span class="w">  </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">"</span><span class="nv">$ssh_dir</span><span class="s2">"</span>
 <span class="w">  </span>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span><span class="s2">"</span><span class="nv">$ssh_dir</span><span class="s2">"</span>
@@ -4570,12 +4591,14 @@ setup_ssh_key<span class="o">()</span><span class="w"> </span><span class="o">{<
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> SSH key has a password (encrypted)"</span>
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">else</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">RED</span><span class="si">}</span><span class="s2">✗ SSH key exists but has NO password!</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">Please:</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  1. Backup existing key: mv </span><span class="nv">$key_file</span><span class="s2"> </span><span class="si">${</span><span class="nv">key_file</span><span class="si">}</span><span class="s2">.bak"</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  2. Add a password to your existing key: ssh-keygen -p -f </span><span class="nv">$key_file</span><span class="s2">"</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"  3. Run this script again, or use --force to backup and replace"</span>
-<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠ SSH key </span><span class="nv">$key_file</span><span class="s2"> has NO passphrase.</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span>
+<span class="w">      </span><span class="nb">read</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">"Add a passphrase to this key now? The key itself does not change. (Y/n): "</span><span class="w"> </span>add_pass
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$add_pass</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"n"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">"</span><span class="nv">$add_pass</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"N"</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>ssh-keygen<span class="w"> </span>-p<span class="w"> </span>-f<span class="w"> </span><span class="s2">"</span><span class="nv">$key_file</span><span class="s2">"</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Passphrase added to </span><span class="nv">$key_file</span><span class="s2">"</span>
+<span class="w">      </span><span class="k">else</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">YELLOW</span><span class="si">}</span><span class="s2">⚠ Using the key without a passphrase. Add one later: ssh-keygen -p -f </span><span class="nv">$key_file</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2">"</span>
+<span class="w">      </span><span class="k">fi</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">fi</span>
 
@@ -4744,20 +4767,21 @@ setup_gpg_key<span class="o">()</span><span class="w"> </span><span class="o">{<
 <span class="c1"># Function to setup keychain in login profile</span>
 setup_keychain_profile<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">profile</span><span class="o">=</span><span class="k">$(</span>get_login_profile<span class="k">)</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">key_name</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">SSH_KEY_FILE</span><span class="p">##*/</span><span class="si">}</span><span class="s2">"</span>
 
 <span class="w">  </span><span class="c1"># Build keychain command for SSH key management</span>
 <span class="w">  </span><span class="c1"># Use --nogui to avoid pinentry requirement (uses console prompts instead)</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span>keychain_line
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>is_tcsh_shell<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="c1"># tcsh syntax: use backticks for command substitution and different test syntax</span>
-<span class="w">    </span><span class="nv">keychain_line</span><span class="o">=</span><span class="s1">'if ( ! $?SLURM_PTY_PORT ) eval `keychain --nogui --quiet --eval ~/.ssh/id_ed25519`'</span>
+<span class="w">    </span><span class="nv">keychain_line</span><span class="o">=</span><span class="s1">'if ( ! $?SLURM_PTY_PORT ) eval `keychain --nogui --quiet --eval ~/.ssh/'</span><span class="s2">"</span><span class="nv">$key_name</span><span class="s2">"</span><span class="s1">'`'</span>
 <span class="w">  </span><span class="k">else</span>
-<span class="w">    </span><span class="nv">keychain_line</span><span class="o">=</span><span class="s1">'[ -z $SLURM_PTY_PORT ] &amp;&amp; eval $(keychain --nogui --quiet --eval ~/.ssh/id_ed25519)'</span>
+<span class="w">    </span><span class="nv">keychain_line</span><span class="o">=</span><span class="s1">'[ -z $SLURM_PTY_PORT ] &amp;&amp; eval $(keychain --nogui --quiet --eval ~/.ssh/'</span><span class="s2">"</span><span class="nv">$key_name</span><span class="s2">"</span><span class="s1">')'</span>
 <span class="w">  </span><span class="k">fi</span>
 
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">"keychain"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$profile</span><span class="s2">"</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="c1"># Check if the desired SSH configuration already exists</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">"keychain.*--nogui.*--quiet.*--eval.*id_ed25519"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$profile</span><span class="s2">"</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">"keychain.*--nogui.*--quiet.*--eval.*</span><span class="nv">$key_name</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$profile</span><span class="s2">"</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">      </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">${</span><span class="nv">NC</span><span class="si">}</span><span class="s2"> Keychain already configured in </span><span class="nv">$profile</span><span class="s2">"</span>
 <span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
 <span class="w">    </span><span class="k">fi</span>
@@ -4832,7 +4856,7 @@ setup_ssh_config<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="w">  </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.ssh/controlmasters"</span>
 <span class="w">  </span>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.ssh"</span>
 
-<span class="w">  </span>cat<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$ssh_config</span><span class="s2">"</span><span class="w"> </span><span class="s">&lt;&lt; 'EOF'</span>
+<span class="w">  </span>cat<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$ssh_config</span><span class="s2">"</span><span class="w"> </span><span class="s">&lt;&lt; EOF</span>
 <span class="s"># SSH Connection Multiplexing and Global Defaults</span>
 <span class="s">Host *</span>
 <span class="s">    ControlPath ~/.ssh/controlmasters/%r@%h:%p</span>
@@ -4845,7 +4869,7 @@ setup_ssh_config<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="s">Host github.com</span>
 <span class="s">    HostName github.com</span>
 <span class="s">    User git</span>
-<span class="s">    IdentityFile ~/.ssh/id_ed25519</span>
+<span class="s">    IdentityFile ~/.ssh/${SSH_KEY_FILE##*/}</span>
 <span class="s">    AddKeysToAgent yes</span>
 <span class="s">EOF</span>
 
@@ -5320,7 +5344,7 @@ setup_convenience_settings
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span>
 
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"2. Add your SSH public key to GitHub:"</span>
-<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"   cat ~/.ssh/id_ed25519.pub"</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"   cat </span><span class="nv">$SSH_KEY_FILE</span><span class="s2">.pub"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"   Visit: https://github.com/settings/ssh/new"</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span>
 
