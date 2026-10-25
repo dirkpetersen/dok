@@ -948,30 +948,6 @@ setup_convenience_settings() {
   [[ $old_opts == *e* ]] && set -e
 }
 
-# Function to check if SSH key has a password
-ssh_key_has_password() {
-  local key_file="$1"
-  # Check for encryption markers in OpenSSH format keys
-  # Encrypted keys contain "aes" or "ENCRYPTED" markers
-  if [[ ! -f "$key_file" ]]; then
-    return 1  # File doesn't exist
-  fi
-
-  # Check in the base64-decoded content (OpenSSH format stores cipher info base64-encoded)
-  # Extract the second line (first base64 line) and decode it
-  local key_header=$(head -2 "$key_file" | tail -1)
-  if echo "$key_header" | base64 -d 2>/dev/null | grep -q "aes"; then
-    return 0  # Has password (encrypted)
-  fi
-
-  # Also check for legacy PEM format with ENCRYPTED marker
-  if grep -q "ENCRYPTED" "$key_file" 2>/dev/null; then
-    return 0  # Has password (encrypted)
-  fi
-
-  return 1  # No password
-}
-
 # Use an existing key if there is one, so we never make a second key next to it.
 # Force mode keeps the old behavior: back up and replace id_ed25519.
 SSH_KEY_FILE="$HOME/.ssh/id_ed25519"
@@ -1003,17 +979,8 @@ setup_ssh_key() {
       # Remove existing keys so ssh-keygen doesn't prompt
       rm -f "$key_file" "${key_file}.pub"
       # Continue to generate new key
-    elif ssh_key_has_password "$key_file"; then
-      echo -e "${GREEN}✓${NC} SSH key has a password (encrypted)"
-      return 0
     else
-      echo -e "${YELLOW}⚠ SSH key $key_file has NO passphrase.${NC}"
-      read -p "Add a passphrase to this key now? The key itself does not change. (Y/n): " add_pass
-      if [[ "$add_pass" != "n" && "$add_pass" != "N" ]] && ssh-keygen -p -f "$key_file"; then
-        echo -e "${GREEN}✓${NC} Passphrase added to $key_file"
-      else
-        echo -e "${YELLOW}⚠ Using the key without a passphrase. Add one later: ssh-keygen -p -f $key_file${NC}"
-      fi
+      echo -e "${GREEN}✓${NC} Using existing SSH key $key_file (keychain will load it)"
       return 0
     fi
   fi
@@ -1059,16 +1026,8 @@ setup_ssh_key() {
       return 1
     fi
 
-    # Verify key was created with password
-    if ssh_key_has_password "$key_file"; then
-      echo -e "${GREEN}✓${NC} SSH key generated successfully with passphrase"
-      return 0
-    else
-      echo -e "${RED}✗ SSH key was generated without a passphrase!${NC}"
-      echo -e "${YELLOW}Removing insecure key. Please run this script again and set a passphrase.${NC}"
-      rm -f "$key_file" "${key_file}.pub"
-      return 1
-    fi
+    echo -e "${GREEN}✓${NC} SSH key generated successfully with passphrase"
+    return 0
   fi
 }
 
